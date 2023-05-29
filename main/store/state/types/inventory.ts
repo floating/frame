@@ -4,7 +4,19 @@ const InventoryAssetSchema = z.object({
   name: z.string(),
   tokenId: z.string(),
   contract: z.string(),
-  img: z.string(),
+  image: z.object({
+    source: z.string(),
+    cdn: z.object({
+      original: z.object({
+        main: z.string().optional(),
+        thumb: z.string().optional()
+      }),
+      frozen: z.object({
+        main: z.string().optional(),
+        thumb: z.string().optional()
+      })
+    })
+  }),
   externalLink: z.string().optional()
 })
 

@@ -118,23 +118,20 @@ export function openBlockExplorer(openExplorer: OpenExplorer) {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
 
+  let explorerUrl = explorer
+
   if (explorer) {
     if (type === 'tx' && hash) {
-      const hashPath = `/tx/${hash}`
-      shell.openExternal(`${explorer}${hashPath}`)
+      explorerUrl = `/tx/${hash}`
     } else if (type === 'token' && address) {
       if (tokenId) {
-        const nftPath = `/nft/${address}/${tokenId}`
-        shell.openExternal(`${explorer}${nftPath}`)
+        explorerUrl = `/nft/${address}/${tokenId}`
       } else {
-        const tokenPath = `/token/${address}`
-        shell.openExternal(`${explorer}${tokenPath}`)
+        explorerUrl = `/token/${address}`
       }
     } else if (type === 'address' && address) {
-      const addressPath = `/address/${address}`
-      shell.openExternal(`${explorer}${addressPath}`)
-    } else {
-      shell.openExternal(`${explorer}`)
+      explorerUrl = `/address/${address}`
     }
+    shell.openExternal(explorerUrl)
   }
 }
