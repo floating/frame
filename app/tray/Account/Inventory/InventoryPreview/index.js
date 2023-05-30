@@ -3,9 +3,44 @@ import Restore from 'react-restore'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import { matchFilter } from '../../../../../resources/utils'
+import styled, { keyframes } from 'styled-components'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
+import CollectionList from '../CollectionList'
+
+const LoadingWave = keyframes`
+  0% {
+    transform: translateX(0);
+  }
+  100%{
+    transform: translateX(74px);
+  }
+`
+const BalanceLoading = styled.div`
+  position: relative;
+  height: 24px;
+  width: 90px;
+  display: flex;
+  overflow: hidden;
+  opacity: 1;
+  padding: 1px 0px;
+  border-radius: 12px;
+  background: var(--ghostZ);
+  border: 6px solid var(--ghostZ);
+  color: var(--mint);
+  box-sizing: border-box;
+  margin: 0px 0px 6px 0px;
+
+  svg {
+    width: 300%;
+    position: relative;
+    left: -100%;
+    stroke-width: 20px;
+    animation: ${LoadingWave} 3.4s linear infinite;
+    will-change: transform;
+  }
+`
 class Inventory extends React.Component {
   constructor(...args) {
     super(...args)
@@ -42,52 +77,25 @@ class Inventory extends React.Component {
 
   displayCollections() {
     const inventory = this.store('main.inventory', this.props.account)
+    const hiddenCollections = this.store('main.hiddenCollections')
     const collections = Object.keys(inventory || {})
     return collections
+      .filter((k) => {
+        const c = inventory[k]
+        if (!c || !c.meta) return false
+        const collectionId = `${c.meta.chainId}:${k}`
+        const isHidden = hiddenCollections.includes(collectionId)
+        return !isHidden
+      })
       .sort((a, b) => {
-        const assetsLengthA = inventory[a].meta.itemCount
-        const assetsLengthB = inventory[b].meta.itemCount
+        const assetsLengthA = inventory[a].meta.tokens.length
+        const assetsLengthB = inventory[b].meta.tokens.length
         if (assetsLengthA > assetsLengthB) return -1
         if (assetsLengthA < assetsLengthB) return 1
         return 0
       })
       .filter((c) => this.isFilterMatch(c))
-      .slice(0, 6)
-  }
-
-  renderInventoryList() {
-    const inventory = this.store('main.inventory', this.props.account)
-    const displayCollections = this.displayCollections()
-    return displayCollections.map((k) => {
-      const {
-        meta: { name, itemCount }
-      } = inventory[k]
-      return (
-        <ClusterRow key={k}>
-          <ClusterValue
-            onClick={() => {
-              const crumb = {
-                view: 'expandedModule',
-                data: {
-                  id: this.props.moduleId,
-                  account: this.props.account,
-                  currentCollection: k
-                }
-              }
-              link.send('nav:forward', 'panel', crumb)
-            }}
-          >
-            <div key={k} className='inventoryCollection'>
-              <div className='inventoryCollectionTop'>
-                <div className='inventoryCollectionName'>{name}</div>
-                <div className='inventoryCollectionCount'>{itemCount}</div>
-                <div className='inventoryCollectionLine' />
-              </div>
-            </div>
-          </ClusterValue>
-        </ClusterRow>
-      )
-    })
+      .slice(0, 5)
   }
 
   render() {
@@ -103,7 +111,7 @@ class Inventory extends React.Component {
         </div>
         <Cluster>
           {collections.length ? (
-            this.renderInventoryList()
+            <CollectionList {...this.props} collections={this.displayCollections()} />
           ) : inventory ? (
             <ClusterRow>
               <ClusterValue>
@@ -113,7 +121,10 @@ class Inventory extends React.Component {
           ) : (
             <ClusterRow>
               <ClusterValue>
-                <div className='inventoryNotFound'>Loading Items..</div>
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+                  <BalanceLoading>{svg.sine()}</BalanceLoading>
+                  <div className='inventoryNotFound'>Loading Items</div>
+                </div>
               </ClusterValue>
             </ClusterRow>
           )}

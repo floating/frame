@@ -6,6 +6,17 @@ import store from '../store'
 
 import type { ChainId } from '../store/state'
 
+type OpenExplorer = {
+  chain: {
+    id: number
+    type: string
+  }
+  type: 'tx' | 'address' | 'token'
+  hash?: string
+  address?: string
+  tokenId?: string
+}
+
 export function createWindow(
   name: string,
   opts?: BrowserWindowConstructorOptions,
@@ -101,19 +112,26 @@ export function openExternal(url = '') {
   }
 }
 
-export function openBlockExplorer({ id, type }: ChainId, hash?: string, account?: string) {
+export function openBlockExplorer(openExplorer: OpenExplorer) {
+  const { chain, type, hash, address, tokenId } = openExplorer
+
   // remove trailing slashes from the base url
-  const explorer = (store('main.networks', type, id, 'explorer') || '').replace(/\/+$/, '')
+  const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
+
+  let explorerUrl = explorer
 
   if (explorer) {
-    if (hash) {
-      const hashPath = hash && `/tx/${hash}`
-      shell.openExternal(`${explorer}${hashPath}`)
-    } else if (account) {
-      const accountPath = account && `/address/${account}`
-      shell.openExternal(`${explorer}${accountPath}`)
-    } else {
-      shell.openExternal(`${explorer}`)
+    if (type === 'tx' && hash) {
+      explorerUrl = `${explorer}/tx/${hash}`
+    } else if (type === 'token' && address) {
+      if (tokenId) {
+        explorerUrl = `${explorer}/nft/${address}/${tokenId}`
+      } else {
+        explorerUrl = `${explorer}/token/${address}`
+      }
+    } else if (type === 'address' && address) {
+      explorerUrl = `${explorer}/address/${address}`
     }
+    shell.openExternal(explorerUrl)
   }
 }

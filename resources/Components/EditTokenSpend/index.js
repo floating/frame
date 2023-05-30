@@ -26,7 +26,7 @@ const Details = ({ address, name }) => {
   return (
     <ClusterRow>
       <ClusterValue
-        pointerEvents={'auto'}
+        allowPointer={true}
         onClick={() => {
           copyAddress()
         }}
@@ -162,7 +162,7 @@ const EditTokenSpend = ({
             </ClusterValue>
           </ClusterRow>
           <ClusterRow>
-            <ClusterValue transparent={true} pointerEvents={'auto'}>
+            <ClusterValue transparent={true} allowPointer={true}>
               <div className='approveTokenSpendAmount'>
                 {isCustom && amount !== fromDecimal(custom) ? (
                   <div
@@ -228,27 +228,20 @@ const EditTokenSpend = ({
             </ClusterValue>
           </ClusterRow>
           <ClusterRow>
-            <ClusterValue onClick={() => resetToRequestAmount()}>
-              <div
-                className='clusterTag'
-                style={mode === 'requested' ? { color: 'var(--good)' } : {}}
-                role='button'
-              >
+            <ClusterValue role='button' onClick={() => resetToRequestAmount()}>
+              <div className='clusterTag' style={mode === 'requested' ? { color: 'var(--good)' } : {}}>
                 {'Requested'}
               </div>
             </ClusterValue>
           </ClusterRow>
           <ClusterRow>
             <ClusterValue
+              role='button'
               onClick={() => {
                 setToMax()
               }}
             >
-              <div
-                className='clusterTag'
-                style={mode === 'unlimited' ? { color: 'var(--good)' } : {}}
-                role='button'
-              >
+              <div className='clusterTag' style={mode === 'unlimited' ? { color: 'var(--good)' } : {}}>
                 {'Unlimited'}
               </div>
             </ClusterValue>
@@ -256,12 +249,13 @@ const EditTokenSpend = ({
           {!inputLock && (
             <ClusterRow>
               <ClusterValue
+                role='button'
                 onClick={() => {
                   setMode('custom')
                   setCustom('')
                 }}
               >
-                <div className={'clusterTag'} style={isCustom ? { color: 'var(--good)' } : {}} role='button'>
+                <div className={'clusterTag'} style={isCustom ? { color: 'var(--good)' } : {}}>
                   Custom
                 </div>
               </ClusterValue>

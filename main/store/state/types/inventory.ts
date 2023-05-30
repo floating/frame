@@ -3,8 +3,20 @@ import { z } from 'zod'
 const InventoryAssetSchema = z.object({
   name: z.string(),
   tokenId: z.string(),
-  img: z.string(),
   contract: z.string(),
+  image: z.object({
+    source: z.string(),
+    cdn: z.object({
+      original: z.object({
+        main: z.string().optional(),
+        thumb: z.string().optional()
+      }),
+      frozen: z.object({
+        main: z.string().optional(),
+        thumb: z.string().optional()
+      })
+    })
+  }),
   externalLink: z.string().optional()
 })
 
@@ -12,12 +24,24 @@ const InventoryCollectionSchema = z.object({
   meta: z.object({
     name: z.string(),
     description: z.string(),
-    image: z.string(),
+    image: z.object({
+      source: z.string(),
+      cdn: z.object({
+        original: z.object({
+          main: z.string().optional(),
+          thumb: z.string().optional()
+        }),
+        frozen: z.object({
+          main: z.string().optional(),
+          thumb: z.string().optional()
+        })
+      })
+    }),
     chainId: z.number(),
-    external_url: z.string().optional(),
-    itemCount: z.number().default(0)
+    tokens: z.array(z.string()),
+    external_url: z.string().optional()
   }),
-  items: z.record(InventoryAssetSchema)
+  items: z.array(InventoryAssetSchema)
 })
 
 const InventorySchema = z.record(InventoryCollectionSchema)
