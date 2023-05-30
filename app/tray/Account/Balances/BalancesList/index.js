@@ -28,20 +28,28 @@ const BalancesList = ({ balances }) => {
         const tokenId = `${chainId}:${address}`
         const hidden = hiddenTokens.includes(tokenId)
         return (
-          <>
-            <ClusterRow key={chainId + symbol}>
+          <React.Fragment key={tokenId}>
+            <ClusterRow>
               <ClusterValue
                 onClick={() => {
                   setOpen(open === i ? -1 : i)
                 }}
               >
                 {hidden && <HiddenOverlay />}
-                <Balance chainId={chainId} symbol={symbol} balance={balance} i={i} scanning={false} />
+                <Balance
+                  key={chainId + address}
+                  chainId={chainId}
+                  symbol={symbol}
+                  address={address}
+                  balance={balance}
+                  i={i}
+                  scanning={false}
+                />
               </ClusterValue>
             </ClusterRow>
             {i === open &&
               (confirming ? (
-                <ClusterRow key={chainId + symbol + 'drawerconfirm'}>
+                <ClusterRow>
                   <ClusterValue grow={3}>
                     <div className='signerBalanceDrawerItem' style={{ color: 'var(--moon)' }}>
                       {hidden ? 'unhide this balance?' : 'hide this balance?'}
@@ -67,7 +75,7 @@ const BalancesList = ({ balances }) => {
                   </ClusterValue>
                 </ClusterRow>
               ) : (
-                <ClusterRow key={chainId + symbol + 'drawer'}>
+                <ClusterRow>
                   <ClusterValue
                     grow={3}
                     onClick={() => {
@@ -82,9 +90,16 @@ const BalancesList = ({ balances }) => {
                     onClick={() => {
                       setOpen(-1)
                       if (address === '0x0000000000000000000000000000000000000000') {
-                        link.send('tray:openExplorer', { type: 'ethereum', id: chainId })
+                        link.send('tray:openExplorer', {
+                          type: 'token',
+                          chain: { type: 'ethereum', id: chainId }
+                        })
                       } else {
-                        link.send('tray:openExplorer', { type: 'ethereum', id: chainId }, null, address)
+                        link.send('tray:openExplorer', {
+                          type: 'token',
+                          chain: { type: 'ethereum', id: chainId },
+                          address
+                        })
                       }
                     }}
                   >
@@ -100,7 +115,7 @@ const BalancesList = ({ balances }) => {
                   </ClusterValue>
                 </ClusterRow>
               ))}
-          </>
+          </React.Fragment>
         )
       })}
     </Cluster>

@@ -239,7 +239,11 @@ class ChainSummaryComponent extends Component {
               explorer
                 ? () => {
                     if (address) {
-                      link.send('tray:openExplorer', currentChain, null, address)
+                      link.send('tray:openExplorer', {
+                        type: 'address',
+                        chain: currentChain,
+                        address
+                      })
                     } else {
                       link.rpc('openExplorer', currentChain, () => {})
                     }
@@ -254,7 +258,7 @@ class ChainSummaryComponent extends Component {
         </ClusterRow>
         {this.state.expanded && (
           <ClusterRow>
-            <ClusterValue pointerEvents={true}>
+            <ClusterValue allowPointer={true}>
               <div className='sliceGasBlock'>
                 {displayFeeMarket ? (
                   <GasFeesMarket gasPrice={gasPrice} fees={fees} color={this.props.color} />

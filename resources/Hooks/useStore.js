@@ -4,6 +4,10 @@ export const StoreContext = createContext(null)
 
 const useStore = (...args) => {
   const store = useContext(StoreContext)
+  if (!store) {
+    console.warn('useStore must be used within a store Provider')
+    return undefined
+  }
   const [value, setValue] = useState(store(...args))
 
   useEffect(() => {

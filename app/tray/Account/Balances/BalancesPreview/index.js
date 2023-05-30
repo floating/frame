@@ -25,6 +25,7 @@ const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, fil
         <span>{'Balances'}</span>
       </div>
       <BalancesList balances={balances} />
+      {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
       <div className='signerBalanceTotal'>
         <div className='signerBalanceButtons'>
           <div
@@ -57,7 +58,6 @@ const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, fil
           <div className='signerBalanceLoading'>{svg.sine()}</div>
         )}
       </div>
-      {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
     </div>
   )
 }

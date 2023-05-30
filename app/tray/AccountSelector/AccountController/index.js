@@ -213,20 +213,16 @@ class Account extends React.Component {
   getAddressSize() {
     const ensName = this.store('main.accounts', this.props.id, 'ensName')
     if (ensName) {
-      if (ensName.length <= 13) {
-        return 17
-      } else {
-        let size = 17 - (ensName.length - 13)
-        if (size < 8) size = 8
-        return size
-      }
-    } else {
-      return 17
+      if (ensName.length <= 13) return 17
+      if (ensName.length <= 16) return 16
+      if (ensName.length <= 19) return 15
+      return 14
     }
+    return 17
   }
 
   renderDetails() {
-    const { address, ensName } = this.store('main.accounts', this.props.id)
+    const { address, ensName = '' } = this.store('main.accounts', this.props.id)
     const showLocal = this.store('main.showLocalNameWithENS')
     const formattedAddress = getAddress(address)
 
@@ -271,7 +267,7 @@ class Account extends React.Component {
               }}
               style={{ fontSize: this.getAddressSize() + 'px' }}
             >
-              {ensName}
+              {ensName.length > 25 ? ensName.slice(0, 23) + '..' : ensName}
             </div>
           </div>
         )
