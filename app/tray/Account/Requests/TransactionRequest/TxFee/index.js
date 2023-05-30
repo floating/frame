@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import { DisplayCoinBalance, DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import { GasFeesSource, usesBaseFee } from '../../../../../../resources/domain/transaction'
 import { displayValueData } from '../../../../../../resources/utils/displayValue'
+import { hexToInt } from '../../../../../../resources/utils'
 import link from '../../../../../../resources/link'
 import {
   ClusterBox,
@@ -40,15 +41,26 @@ const FeeRange = ({ max, min }) => (
 )
 
 const USDEstimateDisplay = ({ minFee, maxFee, nativeCurrency }) => {
-  const { value: maxFeeValue, displayValue, approximationSymbol: maxFeeApproximation } = maxFee.fiat()
+  const {
+    value: minFeeValue,
+    displayValue: minFeeDisplayValue,
+    approximationSymbol: minFeeApproximation
+  } = minFee.fiat()
+  const {
+    value: maxFeeValue,
+    displayValue: maxFeeDisplayValue,
+    approximationSymbol: maxFeeApproximation
+  } = maxFee.fiat()
   const displayMaxFeeWarning = maxFeeValue > FEE_WARNING_THRESHOLD_USD
-  const maxFeeIsUnknownValue = displayValue === '?'
+  const maxFeeIsUnknownValue = maxFeeDisplayValue === '?'
+  const maxFeeIsSameAsMinFee =
+    maxFeeDisplayValue === minFeeDisplayValue && maxFeeApproximation === minFeeApproximation
 
   return (
     <div data-testid='usd-estimate-display' className='clusterTag'>
       <div className={`_txFeeValueDefault${displayMaxFeeWarning ? ' _txFeeValueDefaultWarn' : ''}`}>
         <span>{maxFeeIsUnknownValue ? '=' : '≈'}</span>
-        {maxFeeApproximation === '<' || maxFeeIsUnknownValue ? (
+        {maxFeeApproximation === '<' || maxFeeIsUnknownValue || maxFeeIsSameAsMinFee ? (
           <FeeDisplay fee={maxFee} />
         ) : (
           <FeeRange max={maxFee} min={minFee} />
@@ -64,6 +76,20 @@ class TxFee extends React.Component {
     super(props, context)
   }
 
+  getOptimismFee = (l2Price, l2Limit, reqType) => {
+    const l1GasLimitMap = {
+      NATIVE_TRANSFER: 4300,
+      SEND_DATA: 5100,
+      CONTRACT_CALL: 6900
+    }
+
+    const l1Limit = l1GasLimitMap[reqType]
+    const ethPriceLevels = this.store('main.networksMeta.ethereum', 1, 'gas.price.levels')
+    const l1Price = hexToInt(ethPriceLevels.fast) || 0
+
+    return l1Price * l1Limit * 1.5 + l2Price * l2Limit
+  }
+
   render() {
     const req = this.props.req
     const chain = {
@@ -75,7 +101,11 @@ class TxFee extends React.Component {
 
     const maxGas = BigNumber(req.data.gasLimit, 16)
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
-    const maxFee = displayValueData(maxFeePerGas.multipliedBy(maxGas), {
+    const maxFeeSourceValue =
+      chain.id === 10
+        ? this.getOptimismFee(maxFeePerGas, maxGas, req.classification)
+        : maxFeePerGas.multipliedBy(maxGas)
+    const maxFee = displayValueData(maxFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
     })
@@ -86,7 +116,11 @@ class TxFee extends React.Component {
 
     // accounts for the 50% padding in the gas estimate in the provider
     const minGas = maxGas.dividedBy(BigNumber(1.5))
-    const minFee = displayValueData(minFeePerGas.multipliedBy(minGas), {
+    const minFeeSourceValue =
+      chain.id === 10
+        ? this.getOptimismFee(minFeePerGas, minGas, req.classification)
+        : minFeePerGas.multipliedBy(minGas)
+    const minFee = displayValueData(minFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
     })

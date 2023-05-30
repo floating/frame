@@ -2,6 +2,7 @@ import { randomInt } from 'crypto'
 import { addHexPrefix, intToHex, stripHexPrefix } from '@ethereumjs/util'
 import { getAddress as getChecksumAddress } from '@ethersproject/address'
 import { v5 as uuidv5 } from 'uuid'
+import BigNumber from 'bignumber.js'
 
 const weiToGwei = (wei: number) => wei / 1e9
 const weiToHex = (wei: number) => addHexPrefix(wei.toString(16))
@@ -89,6 +90,10 @@ function isNonZeroHex(hex: string) {
   return !!hex && !['0x', '0x0'].includes(hex)
 }
 
+function minimumHex(hexValue: string, min = 0) {
+  return addHexPrefix(BigNumber.maximum(hexValue, min).toString(16))
+}
+
 const frameOriginId = uuidv5('frame-internal', uuidv5.DNS)
 
 export {
@@ -112,5 +117,6 @@ export {
   stripHexPrefix,
   matchFilter,
   isNonZeroHex,
-  frameOriginId
+  frameOriginId,
+  minimumHex
 }
