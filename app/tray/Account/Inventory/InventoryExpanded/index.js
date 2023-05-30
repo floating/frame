@@ -76,6 +76,8 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
     contract
   }))
 
+  const filteredCollections = filterCollectionsToDisplay(collections)
+
   return (
     <div className='accountViewScroll'>
       {renderAccountFilter()}
@@ -86,7 +88,7 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
               expandedData={expandedData}
               moduleId={moduleId}
               account={account}
-              collections={filterCollectionsToDisplay(collections)}
+              collections={filteredCollections.map((c) => c.contract)}
             />
           ) : inventory ? (
             <ClusterRow>

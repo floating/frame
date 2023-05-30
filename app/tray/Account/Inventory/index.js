@@ -17,12 +17,12 @@ class Inventory extends React.Component {
     return this.props.expanded ? (
       this.props.expandedData.currentCollection ? (
         <InventoryItems
-          key={'expandedCollection'}
           {...this.props}
           onAssetClick={onAssetClick}
           expandedData={expandedData}
           inventory={inventory}
           account={this.props.account}
+          key={'expandedCollection'}
         />
       ) : (
         <InventoryExpanded {...this.props} key={'expandedList'} />

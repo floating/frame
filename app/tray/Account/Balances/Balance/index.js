@@ -4,6 +4,20 @@ import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import useStore from '../../../../../resources/Hooks/useStore'
 
+const displayName = (name = '') => {
+  if (name.length > 24) {
+    return name.slice(0, 22) + '..'
+  }
+  return name
+}
+
+const displayChain = (name = '') => {
+  if (name.length > 14) {
+    return name.slice(0, 12) + '..'
+  }
+  return name
+}
+
 const Balance = (props) => {
   const { symbol = '', balance, i, scanning, chainId, address } = props
 
@@ -52,8 +66,8 @@ const Balance = (props) => {
           />
         </div>
         <div className='signerBalanceChain'>
-          <span style={{ color: chainColor ? `var(--${chainColor})` : '' }}>{chainName}</span>
-          <span>{name}</span>
+          <span style={{ color: chainColor ? `var(--${chainColor})` : '' }}>{displayChain(chainName)}</span>
+          <span>{displayName(name)}</span>
         </div>
         <div className='signerBalanceMain'>
           <div style={{ letterSpacing: '1px' }}>{displaySymbol}</div>
