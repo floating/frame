@@ -18,8 +18,15 @@ import {
 } from './styled'
 
 const displayName = (name = '') => {
-  if (name.length > 19) {
-    return name.slice(0, 25) + '...'
+  if (name.length > 24) {
+    return name.slice(0, 22) + '..'
+  }
+  return name
+}
+
+const displayChain = (name = '') => {
+  if (name.length > 14) {
+    return name.slice(0, 12) + '..'
   }
   return name
 }
@@ -67,7 +74,8 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
             data: {
               id: moduleId,
               account: account,
-              currentCollection: collectionId
+              currentCollection: collectionId,
+              title: 'Inventory Items'
             }
           }
           link.send('nav:forward', 'panel', crumb)
@@ -101,7 +109,9 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
               <CollectionCount>{Object.keys(collection.meta.tokens).length}</CollectionCount>
             </CollectionMain>
             <div className='signerBalanceChain'>
-              <span style={{ color: chainColor ? `var(--${chainColor})` : '' }}>{chain.name}</span>
+              <span style={{ color: chainColor ? `var(--${chainColor})` : '' }}>
+                {displayChain(chain.name)}
+              </span>
               <span>{displayName(collection.meta.name)}</span>
             </div>
           </CollectionInner>
