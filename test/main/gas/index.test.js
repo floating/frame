@@ -1,6 +1,6 @@
 import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import store from '../../../main/store'
-import { init } from '../../../main/gas/index'
+import { init, populateTransaction } from '../../../main/gas/index'
 import { gweiToHex } from '../../../resources/utils'
 import { Common } from '@ethereumjs/common'
 import { GasFeesSource } from '../../../resources/domain/transaction'
@@ -134,11 +134,9 @@ describe('#getFeeHistory', () => {
 })
 
 describe('#populateTransaction', () => {
-  let gas
   let rawTx
 
   beforeEach(() => {
-    gas = init(testConnection, '1')
     rawTx = {
       chainId: '0xa',
       gasLimit: '0x61a8',
@@ -154,7 +152,7 @@ describe('#populateTransaction', () => {
     const chainConfig = new Common({ chain: 'mainnet', hardfork: 'istanbul' })
 
     it('sets the transaction type', () => {
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.type).toBe('0x0')
     })
@@ -162,7 +160,7 @@ describe('#populateTransaction', () => {
     it('uses Frame-supplied gasPrice when the dapp did not specify a value', () => {
       const fastLevel = addHexPrefix((7e9).toString(16))
       store.setGasPrices('ethereum', parseInt(rawTx.chainId), { fast: fastLevel })
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.gasPrice).toBe(fastLevel)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
@@ -172,7 +170,7 @@ describe('#populateTransaction', () => {
       const fastLevel = addHexPrefix((7e9).toString(16))
       store.setGasPrices('ethereum', parseInt(rawTx.chainId), { fast: fastLevel })
       rawTx.gasPrice = ''
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.gasPrice).toBe(fastLevel)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
@@ -181,7 +179,7 @@ describe('#populateTransaction', () => {
     it('uses dapp-supplied gasPrice when the dapp specified a valid value', () => {
       store.setGasPrices('ethereum', rawTx.chainId, { fast: addHexPrefix((7e9).toString(16)) })
       rawTx.gasPrice = (6e9).toString(16)
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.gasPrice).toBe(rawTx.gasPrice)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
@@ -199,7 +197,7 @@ describe('#populateTransaction', () => {
     })
 
     it('sets the transaction type', () => {
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.type).toBe('0x2')
     })
@@ -209,7 +207,7 @@ describe('#populateTransaction', () => {
         maxPriorityFeePerGas: addHexPrefix((3e9).toString(16)),
         maxBaseFeePerGas: addHexPrefix((7e9).toString(16))
       })
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 3e9).toString(16)))
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
@@ -221,7 +219,7 @@ describe('#populateTransaction', () => {
         maxBaseFeePerGas: addHexPrefix((7e9).toString(16))
       })
       rawTx.maxFeePerGas = ''
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 3e9).toString(16)))
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
@@ -233,7 +231,7 @@ describe('#populateTransaction', () => {
         maxBaseFeePerGas: addHexPrefix((7e9).toString(16))
       })
       rawTx.maxPriorityFeePerGas = addHexPrefix((4e9).toString(16))
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 4e9).toString(16)))
       expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
@@ -245,7 +243,7 @@ describe('#populateTransaction', () => {
         maxBaseFeePerGas: addHexPrefix((7e9).toString(16))
       })
       rawTx.maxFeePerGas = (6e9).toString(16)
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.maxFeePerGas).toBe(rawTx.maxFeePerGas)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
@@ -254,7 +252,7 @@ describe('#populateTransaction', () => {
     it('uses Frame-supplied maxPriorityFeePerGas when the dapp did not specify a value', () => {
       const maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       store.setGasFees('ethereum', parseInt(rawTx.chainId), { maxPriorityFeePerGas })
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.maxPriorityFeePerGas).toBe(maxPriorityFeePerGas)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
@@ -264,7 +262,7 @@ describe('#populateTransaction', () => {
       const maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       store.setGasFees('ethereum', parseInt(rawTx.chainId), { maxPriorityFeePerGas })
       rawTx.maxFeePerGas = ''
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.maxPriorityFeePerGas).toBe(maxPriorityFeePerGas)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
@@ -276,7 +274,7 @@ describe('#populateTransaction', () => {
         maxPriorityFeePerGas: addHexPrefix((3e9).toString(16))
       })
       rawTx.maxPriorityFeePerGas = (6e9).toString(16)
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.maxPriorityFeePerGas).toBe(rawTx.maxPriorityFeePerGas)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
@@ -287,7 +285,7 @@ describe('#populateTransaction', () => {
     const chainConfig = new Common({ chain: 'mainnet', hardfork: 'berlin' })
 
     it('sets the transaction type', () => {
-      const tx = gas.populateTransaction(rawTx, chainConfig)
+      const tx = populateTransaction(rawTx, chainConfig)
 
       expect(tx.type).toBe('0x1')
     })

@@ -53,7 +53,7 @@ import {
 } from '../accounts/types'
 import * as sigParser from '../signatures'
 import { mapRequest } from '../requests'
-import { checkExistingNonceGas, feeTotalOverMax, init as initGas } from '../gas'
+import { checkExistingNonceGas, feeTotalOverMax, init as initGas, populateTransaction } from '../gas'
 import { hasAddress } from '../../resources/domain/account'
 import { getMaxTotalFee } from '../../resources/gas'
 import type { Origin, Token } from '../store/state'
@@ -455,7 +455,7 @@ export class Provider extends EventEmitter {
       const tx = { ...rawTx, gasLimit, recipientType }
 
       try {
-        const populatedTransaction = gas.populateTransaction(tx, chainConfig)
+        const populatedTransaction = populateTransaction(tx, chainConfig)
         const checkedTransaction = checkExistingNonceGas(populatedTransaction)
 
         log.verbose('Succesfully populated transaction', checkedTransaction)
