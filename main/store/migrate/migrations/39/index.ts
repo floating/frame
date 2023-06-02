@@ -1,6 +1,7 @@
 import log from 'electron-log'
 import { z } from 'zod'
 import { AddressSchema, HexStringSchema } from '../../../state/types/utils'
+type WithLogo = { logoURI: string }
 
 const v38CustomTokenSchema = z.object({
   name: z.string(),
@@ -22,7 +23,7 @@ const v38KnownTokenSchema = z.object({
   displayBalance: z.string()
 })
 
-const v39MediaSchema = z.object({
+export const v39MediaSchema = z.object({
   source: z.string(),
   format: z.union([z.literal('image'), z.literal('video'), z.literal('')]),
   cdn: z.object({
@@ -32,7 +33,7 @@ const v39MediaSchema = z.object({
   })
 })
 
-const v39KnownTokenSchema = z.object({
+export const v39KnownTokenSchema = z.object({
   chainId: z.number(),
   address: AddressSchema,
   name: z.string(),
@@ -43,74 +44,66 @@ const v39KnownTokenSchema = z.object({
   displayBalance: z.string()
 })
 
-const v39CustomTokenSchema = z.object({
+export const v39CustomTokenSchema = z.object({
   name: z.string(),
   symbol: z.string(),
   chainId: z.number(),
-  address: z.string(), //TODO: could/should we apply the regex here too - maybe not if we let users enter arbitrary strings for address
+  address: z.string(),
   decimals: z.number(),
   media: v39MediaSchema
 })
 
-type v39KnownToken = z.infer<typeof v39KnownTokenSchema>
-type v39CustomToken = z.infer<typeof v39CustomTokenSchema>
-
-export const v39MainSchema = z
-  .object({
+const v38StateSchema = z.object({
+  main: z.object({
     tokens: z.object({
-      known: z.record(
-        z.array(
-          z.union([
-            v39KnownTokenSchema,
-            v38KnownTokenSchema.transform((v) => {
-              const { logoURI = '', ...knownToken } = v
-              return {
-                ...knownToken,
-                media: {
-                  source: logoURI,
-                  format: 'image',
-                  cdn: {}
-                }
-              }
-            })
-          ])
-        )
-      ),
-      custom: z.array(
-        z.union([
-          v39CustomTokenSchema,
-          v38CustomTokenSchema.transform((v) => {
-            const { logoURI = '', ...customToken } = v
-            return {
-              ...customToken,
-              media: {
-                source: logoURI,
-                format: 'image',
-                cdn: {}
-              }
-            }
-          })
-        ])
-      )
+      known: z.record(z.array(v38KnownTokenSchema)),
+      custom: z.array(v38CustomTokenSchema)
     })
   })
-  .passthrough()
+})
 
-export const v39StateSchema = z
-  .object({
-    main: v39MainSchema
-  })
-  .passthrough()
+const transformToken = <T extends WithLogo>(token: T) => {
+  const { logoURI = '', ...restToken } = token
+  return {
+    ...restToken,
+    media: {
+      source: logoURI,
+      format: 'image',
+      cdn: {}
+    }
+  }
+}
+
+const migrateKnownToken = (token: any) => {
+  try {
+    v38KnownTokenSchema.parse(token)
+    return transformToken(token)
+  } catch {
+    return token
+  }
+}
+
+const migrateCustomToken = (token: any) => {
+  try {
+    v38CustomTokenSchema.parse(token)
+    return transformToken(token)
+  } catch {
+    return { ...token, media: { source: '', format: 'image', cdn: {} } }
+  }
+}
 
 const migrate = (initial: unknown) => {
   try {
-    const migrated = v39StateSchema.parse(initial)
-    return migrated
+    const state = v38StateSchema.parse(initial)
+    for (const key in state.main.tokens.known) {
+      state.main.tokens.known[key] = state.main.tokens.known[key].map(migrateKnownToken)
+    }
+    state.main.tokens.custom = state.main.tokens.custom.map(migrateCustomToken)
+    return state
   } catch (e) {
     log.error('Migration 39: could not parse state', e)
+    return initial
   }
-
-  return initial
 }
 
 export default {

@@ -1,20 +1,5 @@
-import { string, z } from 'zod'
-import { MediaSchema } from './media'
+import { z } from 'zod'
+import { v39KnownTokenSchema } from '../../migrate/migrations/39'
 
-const prefixedHexRegex = new RegExp('^0x[a-fA-F0-9]+$')
-const addressRegex = new RegExp('^0x[a-fA-F0-9]{40}$')
-
-const HexString = string().regex(prefixedHexRegex)
-
-export const KnownTokenSchema = z.object({
-  chainId: z.number(),
-  address: z.string().regex(addressRegex),
-  name: z.string(),
-  symbol: z.string(),
-  decimals: z.number(),
-  media: MediaSchema,
-  balance: HexString,
-  displayBalance: z.string() //TODO IntString schema?
-})
-
+export const KnownTokenSchema = v39KnownTokenSchema
 export type KnownToken = z.infer<typeof KnownTokenSchema>

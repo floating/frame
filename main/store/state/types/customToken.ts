@@ -1,13 +1,5 @@
 import { z } from 'zod'
-import { MediaSchema } from './media'
+import { v39CustomTokenSchema } from '../../migrate/migrations/39'
 
-export const CustomTokenSchema = z.object({
-  name: z.string(),
-  symbol: z.string(),
-  chainId: z.number(),
-  address: z.string(), //TODO: could/should we apply the address regex here too - maybe not if we let users enter arbitrary strings for address
-  decimals: z.number(),
-  media: MediaSchema
-})
-
+export const CustomTokenSchema = v39CustomTokenSchema
 export type CustomToken = z.infer<typeof CustomTokenSchema>

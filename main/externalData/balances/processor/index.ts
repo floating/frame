@@ -51,7 +51,6 @@ const getTokenChanges = (
   api: ReturnType<typeof BalancesStoreApi>
 ) => {
   const knownTokens = new Set(api.getKnownTokens(address).map(toTokenId))
-  const customTokens = new Set(api.getCustomTokens().map(toTokenId))
   const isKnown = (balance: TokenBalance) => knownTokens.has(toTokenId(balance))
 
   // add any non-zero balances to the list of known tokens

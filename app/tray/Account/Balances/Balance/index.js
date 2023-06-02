@@ -25,7 +25,8 @@ const Balance = (props) => {
   const chainColor = useStore('main.networksMeta.ethereum', chainId, 'primaryColor')
 
   const displaySymbol = symbol.substring(0, 10)
-  const { priceChange, decimals, balance: balanceValue, usdRate: currencyRate, logoURI } = balance
+  const { priceChange, decimals, balance: balanceValue, usdRate: currencyRate, media } = balance
+  const logoURI = media.cdn?.thumb || media.source
   const change = parseFloat(priceChange)
   const direction = change < 0 ? -1 : change > 0 ? 1 : 0
   let priceChangeClass = 'signerBalanceCurrentPriceChange'

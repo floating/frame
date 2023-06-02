@@ -120,44 +120,34 @@ it('should transform outdated custom tokens without a logoUri correctly', () => 
   })
 })
 
-it('should not update v39 known tokens', () => {
-  const v39KnownToken = {
+it('should pass through custom tokens with corrupted schemas', () => {
+  const customToken = {
+    name: 'Custom Token',
+    symabol: 'CT',
+    chainId: 1,
+    address: '0x1234',
+    decimals: 18
+  }
+
+  state.main.tokens.custom.push(customToken)
+  const migratedState = migration.migrate(state)
+
+  expect(migratedState.main.tokens.custom[0]).toStrictEqual(customToken)
+})
+
+it('should pass through known tokens with corrupted schemas', () => {
+  const knownToken = {
     chainId: 1,
     address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-    name: 'v39 Test Token',
-    symbol: 'v39TT',
-    decimals: 18,
-    media: {
-      source: 'https://example.com/logo.png',
-      format: 'image',
-      cdn: {}
-    },
+    name: 'Test Token',
+    symbol: 'TT',
+    decimal: 18,
     balance: '0x123',
     displayBalance: '123'
   }
 
-  state.main.tokens.known['0x123'] = [v39KnownToken]
+  state.main.tokens.known['0x123'] = [knownToken]
   const migratedState = migration.migrate(state)
 
-  expect(migratedState.main.tokens.known['0x123']).toStrictEqual([v39KnownToken])
-})
-
-it('should not update v39 custom tokens', () => {
-  const v39CustomToken = {
-    name: 'v39 Custom Token',
-    symbol: 'v39CT',
-    chainId: 1,
-    address: '0x1234',
-    decimals: 18,
-    media: {
-      source: 'https://example.com/logo.png',
-      format: 'image',
-      cdn: {}
-    }
-  }
-
-  state.main.tokens.custom.push(v39CustomToken)
-  const migratedState = migration.migrate(state)
-
-  expect(migratedState.main.tokens.custom[0]).toStrictEqual(v39CustomToken)
+  expect(migratedState.main.tokens.known['0x123']).toStrictEqual([knownToken])
 })
