@@ -194,7 +194,7 @@ class TxFeeOverlay extends Component {
       req: { data, handlerId }
     } = this.props
     const { baseFee, gasLimit, priorityFee, gasPrice } = this.state
-    const maxTotalFee = BigNumber(getMaxTotalFee(data))
+    const maxTotalFee = getMaxTotalFee(this.store, data.chainId)
 
     const displayBaseFee = toDisplayFromWei(baseFee)
     const baseFeeLimiter = (rawBaseFee) => {

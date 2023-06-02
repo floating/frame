@@ -189,7 +189,9 @@ export const ChainMetadataSchema = z
     gas: GasSchema,
     icon: z.string().optional(),
     primaryColor: ColorwayPaletteSchema.keyof(),
-    nativeCurrency: NativeCurrencySchema
+    nativeCurrency: NativeCurrencySchema,
+    maxTotalFee: z.string().default('0'),
+    maxTotalFeeExpiry: z.number().default(0)
   })
   .transform((metadata) => {
     // remove stale price data

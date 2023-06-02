@@ -1,36 +1,76 @@
-import { addHexPrefix } from '@ethereumjs/util/dist'
+import store from '../../../main/store'
 import { getMaxTotalFee } from '../../../resources/gas'
 
+jest.mock('../../../main/store/persist')
+
 describe('#getMaxTotalFee', () => {
-  it('sets the max fee as 2 ETH on mainnet', () => {
-    const tx = {
-      chainId: addHexPrefix((1).toString(16))
-    }
-
-    expect(getMaxTotalFee(tx)).toBe(2e18)
+  beforeEach(() => {
+    store.setNativeCurrencyData('ethereum', '1', { usd: { price: 0.5 } })
+    store.setMaxTotalFee('ethereum', '1', '10000e18', Date.now() + 5000)
   })
 
-  it('sets the max fee as 14000 FTM on Fantom', () => {
-    const tx = {
-      chainId: addHexPrefix((250).toString(16))
-    }
-
-    expect(getMaxTotalFee(tx)).toBe(14000e18)
+  it('should return the stored max fee', () => {
+    const maxTotalFee = getMaxTotalFee(store, 1)
+    expect(maxTotalFee.toNumber()).toBe(10000e18)
   })
 
-  it('sets the max fee as 100000000000 PLS on PulseChain', () => {
-    const tx = {
-      chainId: addHexPrefix((369).toString(16))
-    }
+  describe('when the stored max fee has expired', () => {
+    const expiredDateTime = Date.now() - 60 * 1000
 
-    expect(getMaxTotalFee(tx)).toBe(1e29)
-  })
+    beforeEach(() => {
+      store.setMaxTotalFee('ethereum', '1', '10000e18', expiredDateTime)
+      store.setNativeCurrencyData('ethereum', '1', { usd: { price: 2 } })
+    })
 
-  it('sets the max fee as 50 on other chains', () => {
-    const tx = {
-      chainId: addHexPrefix((255).toString(16))
-    }
+    it('should recalculate and return a new max fee', () => {
+      const maxTotalFee = getMaxTotalFee(store, 1)
+      expect(maxTotalFee.toNumber()).toBe(2500e18)
+    })
 
-    expect(getMaxTotalFee(tx)).toBe(5e19)
+    it('should recalculate and store a new max fee', () => {
+      getMaxTotalFee(store, 1)
+      const networksMeta = store('main.networksMeta.ethereum.1')
+      expect(networksMeta.maxTotalFee).toBe('2.5e+21')
+      expect(networksMeta.maxTotalFeeExpiry).toBe(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    })
+
+    describe('and the native currency USD price is not known', () => {
+      beforeEach(() => {
+        store.setNativeCurrencyData('ethereum', '1', { usd: { price: 0 } })
+      })
+
+      it('should return the stored max fee', () => {
+        const maxTotalFee = getMaxTotalFee(store, 1)
+        expect(maxTotalFee.toNumber()).toBe(10000e18)
+      })
+
+      it('should not recalculate and store a new max fee', () => {
+        getMaxTotalFee(store, 1)
+        const networksMeta = store('main.networksMeta.ethereum.1')
+        expect(networksMeta.maxTotalFee).toBe('10000e18')
+        expect(networksMeta.maxTotalFeeExpiry).toBe(expiredDateTime)
+      })
+    })
+
+    describe('and the chain is a testnet', () => {
+      beforeEach(() => {
+        store.updateNetwork(
+          { id: 1, type: 'ethereum', explorer: '', symbol: 'ETH', name: '' },
+          { id: 1, type: 'ethereum', explorer: '', symbol: 'ETH', name: '', isTestnet: true }
+        )
+      })
+
+      it('should return undefined', () => {
+        const maxTotalFee = getMaxTotalFee(store, 1)
+        expect(maxTotalFee).toBe(undefined)
+      })
+
+      it('should not recalculate and store a new max fee', () => {
+        getMaxTotalFee(store, 1)
+        const networksMeta = store('main.networksMeta.ethereum.1')
+        expect(networksMeta.maxTotalFee).toBe('10000e18')
+        expect(networksMeta.maxTotalFeeExpiry).toBe(expiredDateTime)
+      })
+    })
   })
 })

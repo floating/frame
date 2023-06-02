@@ -4,6 +4,7 @@ import log from 'electron-log'
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util'
 import { isAddress } from '@ethersproject/address'
 import crypto from 'crypto'
+import { BigNumber } from 'bignumber.js'
 import { addHexPrefix, intToHex, isHexString, isHexPrefixed, fromUtf8 } from '@ethereumjs/util'
 
 import store from '../store'
@@ -23,7 +24,6 @@ import reveal from '../reveal'
 import { getSignerType, Type as SignerType } from '../../resources/domain/signer'
 import { normalizeChainId, TransactionData } from '../../resources/domain/transaction'
 import { classifyTransaction } from '../transaction'
-import { getMaxTotalFee } from '../../resources/gas'
 import { capitalize } from '../../resources/utils'
 import { ApprovalType } from '../../resources/constants'
 import { createObserver as AssetsObserver, loadAssets } from './assets'
@@ -53,8 +53,9 @@ import {
 } from '../accounts/types'
 import * as sigParser from '../signatures'
 import { mapRequest } from '../requests'
-import { hasAddress } from '../../resources/domain/account'
 import { checkExistingNonceGas, feeTotalOverMax, init as initGas } from '../gas'
+import { hasAddress } from '../../resources/domain/account'
+import { getMaxTotalFee } from '../../resources/gas'
 import type { Origin, Token } from '../store/state'
 
 interface RequiredApproval {
@@ -302,12 +303,14 @@ export class Provider extends EventEmitter {
     }
 
     const payload = req.payload
-    const maxTotalFee = getMaxTotalFee(rawTx)
+    const maxTotalFee = getMaxTotalFee(store, parseInt(rawTx.chainId, 16))
 
     if (feeTotalOverMax(rawTx, maxTotalFee)) {
       const chainId = parseInt(rawTx.chainId)
       const symbol = store(`main.networks.ethereum.${chainId}.symbol`)
-      const displayAmount = symbol ? ` (${Math.floor(maxTotalFee / 1e18)} ${symbol})` : ''
+      const displayAmount = symbol
+        ? ` (${(maxTotalFee as BigNumber).precision(1, BigNumber.ROUND_DOWN).div(1e18)} ${symbol})`
+        : ''
 
       const err = `Max fee is over hard limit${displayAmount}`
 

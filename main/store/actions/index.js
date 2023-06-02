@@ -235,6 +235,13 @@ module.exports = {
   setErrorReporting: (u, enable) => {
     u('main.privacy.errorReporting', () => enable)
   },
+  setMaxTotalFee: (u, netType, netId, maxTotalFee, expiryDateTime) => {
+    u('main.networksMeta', netType, netId, (existing) => ({
+      ...existing,
+      maxTotalFee,
+      maxTotalFeeExpiry: expiryDateTime
+    }))
+  },
   setGasFees: (u, netType, netId, fees) => {
     u('main.networksMeta', netType, netId, 'gas.price.fees', () => fees)
   },

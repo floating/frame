@@ -16,7 +16,7 @@ import { isHexString } from 'ethers/lib/utils'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
-import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
+import { TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
 
 import type { Chain } from '../store/state'

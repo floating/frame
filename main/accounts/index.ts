@@ -1009,10 +1009,10 @@ export class Accounts extends EventEmitter {
 
     // New max fee per gas
     const newMaxFeePerGas = newBaseFee + maxPriorityFeePerGas
-    const maxTotalFee = getMaxTotalFee(tx)
+    const maxTotalFee = getMaxTotalFee(store, parseInt(tx.chainId, 16))?.toNumber()
 
     // Limit max fee
-    if (newMaxFeePerGas * gasLimit > maxTotalFee) {
+    if (maxTotalFee && newMaxFeePerGas * gasLimit > maxTotalFee) {
       tx.maxFeePerGas = intToHex(Math.floor(maxTotalFee / gasLimit))
     } else {
       tx.maxFeePerGas = intToHex(newMaxFeePerGas)
@@ -1045,10 +1045,10 @@ export class Accounts extends EventEmitter {
 
     // New max fee per gas
     const newMaxFeePerGas = currentBaseFee + newMaxPriorityFeePerGas
-    const maxTotalFee = getMaxTotalFee(tx)
+    const maxTotalFee = getMaxTotalFee(store, parseInt(tx.chainId, 16))?.toNumber()
 
     // Limit max fee
-    if (newMaxFeePerGas * gasLimit > maxTotalFee) {
+    if (maxTotalFee && newMaxFeePerGas * gasLimit > maxTotalFee) {
       const limitedMaxFeePerGas = Math.floor(maxTotalFee / gasLimit)
       const limitedMaxPriorityFeePerGas = limitedMaxFeePerGas - currentBaseFee
       tx.maxPriorityFeePerGas = intToHex(limitedMaxPriorityFeePerGas)
@@ -1079,10 +1079,10 @@ export class Accounts extends EventEmitter {
 
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
     const tx = txRequest.data
-    const maxTotalFee = getMaxTotalFee(tx)
+    const maxTotalFee = getMaxTotalFee(store, parseInt(tx.chainId, 16))?.toNumber()
 
     // Limit max fee
-    if (newGasPrice * gasLimit > maxTotalFee) {
+    if (maxTotalFee && newGasPrice * gasLimit > maxTotalFee) {
       tx.gasPrice = intToHex(Math.floor(maxTotalFee / gasLimit))
     } else {
       tx.gasPrice = intToHex(newGasPrice)
@@ -1105,10 +1105,10 @@ export class Accounts extends EventEmitter {
 
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
     const tx = txRequest.data
-    const maxTotalFee = getMaxTotalFee(tx)
+    const maxTotalFee = getMaxTotalFee(store, parseInt(tx.chainId, 16))?.toNumber()
 
     const fee = txType === '0x2' ? maxFeePerGas : gasPrice
-    if (newGasLimit * fee > maxTotalFee) {
+    if (maxTotalFee && newGasLimit * fee > maxTotalFee) {
       tx.gasLimit = intToHex(Math.floor(maxTotalFee / fee))
     } else {
       tx.gasLimit = intToHex(newGasLimit)

@@ -1499,9 +1499,17 @@ describe('#signAndSend', () => {
       payload: { jsonrpc: '2.0', id: 2, method: 'eth_sendTransaction' },
       data: tx
     }
+    store.set('main.networksMeta.ethereum.1', {
+      maxTotalFee: '1000e18',
+      maxTotalFeeExpiry: Date.now()
+    })
   })
 
   it('allows a Fantom transaction with fees over the mainnet hard limit', (done) => {
+    store.set('main.networksMeta.ethereum.250', {
+      maxTotalFee: '1000e18',
+      maxTotalFeeExpiry: Date.now()
+    })
     // 200 gwei * 10M gas = 2 FTM
     tx.chainId = '0xfa'
     tx.type = '0x0'
@@ -1514,6 +1522,10 @@ describe('#signAndSend', () => {
   })
 
   it('does not allow a pre-EIP-1559 transaction with fees that exceeds the hard limit', (done) => {
+    store.set('main.networksMeta.ethereum.1', {
+      maxTotalFee: '2e18',
+      maxTotalFeeExpiry: Date.now()
+    })
     // 200 gwei * 10M gas = 2 ETH
     tx.chainId = '0x1'
     tx.type = '0x0'
@@ -1531,6 +1543,10 @@ describe('#signAndSend', () => {
   })
 
   it('does not allow a post-EIP-1559 transaction with fees that exceed the hard limit', (done) => {
+    store.set('main.networksMeta.ethereum.1', {
+      maxTotalFee: '2e18',
+      maxTotalFeeExpiry: Date.now()
+    })
     // 200 gwei * 10M gas = 2 ETH
     tx.chainId = '0x1'
     tx.type = '0x2'
@@ -1597,6 +1613,7 @@ describe('#signAndSend', () => {
 
     describe('success', () => {
       beforeEach(() => {
+        tx.chainId = '0x1'
         connection.send.mockImplementation((payload, cb) => {
           expect(payload).toEqual(
             expect.objectContaining({
@@ -1640,6 +1657,7 @@ describe('#signAndSend', () => {
       let errorMessage = 'invalid transaction!'
 
       beforeEach(() => {
+        tx.chainId = '0x1'
         mockConnectionError(errorMessage)
       })
 

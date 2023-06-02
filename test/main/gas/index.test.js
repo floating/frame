@@ -133,33 +133,6 @@ describe('#getFeeHistory', () => {
   })
 })
 
-describe('#getMaxTotalFee', () => {
-  let gas
-
-  beforeEach(() => {
-    gas = init(testConnection, '1', {})
-  })
-
-  it('should return the expected max fee in the chain native currency', async () => {
-    store.setNativeCurrencyData('ethereum', '1', { usd: { price: 0.5 } })
-    expect(gas.getMaxTotalFee()).toBe(10000)
-  })
-
-  it('should return 50 when the native currency USD price is not known', async () => {
-    store.setNativeCurrencyData('ethereum', '1', { usd: { price: 0 } })
-    expect(gas.getMaxTotalFee()).toBe(50)
-  })
-
-  it('should return undefined for a testnet', async () => {
-    store.setNativeCurrencyData('ethereum', '1', { usd: { price: 0.5 } })
-    store.updateNetwork(
-      { id: 1, type: 'ethereum', explorer: '', symbol: 'ETH', name: '' },
-      { id: 1, type: 'ethereum', explorer: '', symbol: 'ETH', name: '', isTestnet: true }
-    )
-    expect(gas.getMaxTotalFee()).toBe(undefined)
-  })
-})
-
 describe('#populateTransaction', () => {
   let gas
   let rawTx

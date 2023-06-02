@@ -70,7 +70,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
   return tx
 }
 
-export function feeTotalOverMax(rawTx: TransactionData, maxTotalFee: number | undefined) {
+export function feeTotalOverMax(rawTx: TransactionData, maxTotalFee: BigNumber | undefined) {
   if (!maxTotalFee) {
     return false
   }
@@ -79,7 +79,7 @@ export function feeTotalOverMax(rawTx: TransactionData, maxTotalFee: number | un
     : parseInt(rawTx.gasPrice || '', 16)
   const gasLimit = parseInt(rawTx.gasLimit || '', 16)
   const totalFee = maxFeePerGas * gasLimit
-  return totalFee > maxTotalFee
+  return maxTotalFee.lte(totalFee)
 }
 
 async function getGasPrices(provider: Provider): Promise<GasPrices> {
@@ -281,20 +281,6 @@ class DefaultGas {
         targetChain as Chain
       )
     })
-  }
-
-  getMaxTotalFee() {
-    // returns the max fee of a chain in units of the native currency
-    const { nativeCurrency } = store('main.networksMeta', this.chainType, this.chainId)
-    const { isTestnet } = store('main.networks', this.chainType, this.chainId)
-
-    if (isTestnet) {
-      return undefined
-    }
-
-    const nativeUSD = nativeCurrency?.usd?.price
-
-    return nativeUSD ? this.maxFeeUSD / nativeUSD : 50
   }
 }
 
