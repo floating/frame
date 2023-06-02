@@ -23,6 +23,8 @@ export type { Rate } from './types/rate'
 export type { ColorwayPalette } from './types/colors'
 export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
 export type { Media } from './types/media'
+export type { TokenBalance } from './types/tokenBalance'
+export type { CustomToken } from './types/customToken'
 
 const StateSchema = z.object({
   main: MainSchema
@@ -96,7 +98,7 @@ type M = Main & {
 }
 
 const mainState: M = {
-  _version: main('_version', 38),
+  _version: main('_version', 39),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {

@@ -23,7 +23,7 @@ class AddToken extends React.Component {
       chainId: (Number.isInteger(chainId) && chainId) || this.chainDefault,
       address: (this.token.address || '').toLowerCase() || this.addressDefault,
       decimals: (Number.isInteger(decimals) && decimals) || this.decimalsDefault,
-      logoURI: this.token.logoURI || this.logoURIDefault
+      logoURI: this.token.media.cdn?.thumb || this.token.media.source || this.logoURIDefault
     }
   }
 
@@ -194,7 +194,14 @@ class AddToken extends React.Component {
                   className='addTokenSubmit addTokenSubmitEnabled'
                   onMouseDown={() => {
                     const { name, symbol, chainId, address, decimals, logoURI } = this.state
-                    const token = { name, symbol, chainId, address, decimals, logoURI }
+                    const isExistingMedia = [
+                      this.props.token.media.source,
+                      this.props.token.media.cdn?.thumb
+                    ].includes(logoURI)
+                    const media = isExistingMedia
+                      ? this.props.token.media
+                      : { source: logoURI, format: 'image', cdn: {} }
+                    const token = { name, symbol, chainId, address, decimals, media }
                     link.send('tray:addToken', token)
                     setTimeout(() => {
                       this.store.notify()

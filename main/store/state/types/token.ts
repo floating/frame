@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MediaSchema } from './media'
 
 export const TokenIdSchema = z.object({
   address: z.string(),
@@ -9,7 +10,7 @@ const CoreTokenSchema = z.object({
   name: z.string(),
   symbol: z.string(),
   decimals: z.number().positive(),
-  logoURI: z.string().default('').optional()
+  media: MediaSchema
 })
 
 export const TokenSchema = CoreTokenSchema.merge(TokenIdSchema)

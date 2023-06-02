@@ -10,7 +10,7 @@ import { groupByChain, TokensByChain } from './reducers'
 
 import type { BytesLike } from '@ethersproject/bytes'
 import type EthereumProvider from 'ethereum-provider'
-import type { Balance, Token } from '../../store/state'
+import type { Balance, Token, TokenBalance } from '../../store/state'
 
 const erc20Interface = new Interface(erc20TokenAbi)
 
@@ -19,19 +19,13 @@ interface ExternalBalance {
   displayBalance: string
 }
 
-export interface TokenDefinition extends Omit<Token, 'logoURI'> {
-  logoUri?: string
-}
-
-export interface TokenBalance extends TokenDefinition, ExternalBalance {}
-
 export interface CurrencyBalance extends ExternalBalance {
   chainId: number
 }
 
 export interface BalanceLoader {
   getCurrencyBalances: (address: Address, chains: number[]) => Promise<CurrencyBalance[]>
-  getTokenBalances: (address: Address, tokens: TokenDefinition[]) => Promise<TokenBalance[]>
+  getTokenBalances: (address: Address, tokens: Token[]) => Promise<TokenBalance[]>
 }
 
 function createBalance(rawBalance: string, decimals: number): ExternalBalance {
@@ -42,7 +36,7 @@ function createBalance(rawBalance: string, decimals: number): ExternalBalance {
 }
 
 export default function (eth: EthereumProvider) {
-  function balanceCalls(owner: string, tokens: TokenDefinition[]): Call<EthersBigNumber, ExternalBalance>[] {
+  function balanceCalls(owner: string, tokens: Token[]): Call<EthersBigNumber, ExternalBalance>[] {
     return tokens.map((token) => ({
       target: token.address,
       call: ['function balanceOf(address address) returns (uint256 value)', owner],
@@ -71,7 +65,7 @@ export default function (eth: EthereumProvider) {
     }
   }
 
-  async function getTokenBalance(token: TokenDefinition, owner: string) {
+  async function getTokenBalance(token: Token, owner: string) {
     const functionData = erc20Interface.encodeFunctionData('balanceOf', [owner])
 
     const response: BytesLike = await eth.request({
@@ -85,7 +79,7 @@ export default function (eth: EthereumProvider) {
     return result.balance.toHexString()
   }
 
-  async function getTokenBalancesFromContracts(owner: string, tokens: TokenDefinition[]) {
+  async function getTokenBalancesFromContracts(owner: string, tokens: Token[]) {
     const balances = tokens.map(async (token) => {
       try {
         const rawBalance = await getTokenBalance(token, owner)
@@ -102,10 +96,10 @@ export default function (eth: EthereumProvider) {
 
     const loadedBalances = await Promise.all(balances)
 
-    return loadedBalances.filter((bal) => bal !== undefined) as Balance[]
+    return loadedBalances.filter((bal) => bal !== undefined) as TokenBalance[]
   }
 
-  async function getTokenBalancesFromMulticall(owner: string, tokens: TokenDefinition[], chainId: number) {
+  async function getTokenBalancesFromMulticall(owner: string, tokens: Token[], chainId: number) {
     const calls = balanceCalls(owner, tokens)
 
     const results = await multicall(chainId, eth).batchCall(calls)
@@ -119,7 +113,7 @@ export default function (eth: EthereumProvider) {
       }
 
       return acc
-    }, [] as Balance[])
+    }, [] as TokenBalance[])
   }
 
   return {
@@ -128,7 +122,7 @@ export default function (eth: EthereumProvider) {
 
       return Promise.all(chains.map(fetchChainBalance))
     },
-    getTokenBalances: async function (owner: string, tokens: TokenDefinition[]) {
+    getTokenBalances: async function (owner: string, tokens: Token[]) {
       const tokensByChain = tokens.reduce(groupByChain, {} as TokensByChain)
 
       const tokenBalances = await Promise.all(
