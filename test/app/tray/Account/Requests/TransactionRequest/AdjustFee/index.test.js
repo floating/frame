@@ -10,12 +10,27 @@ import { gweiToHex } from '../../../../../../util'
 jest.mock('../../../../../../../main/store/persist')
 jest.mock('../../../../../../../resources/link', () => ({ rpc: jest.fn() }))
 
+beforeAll(() => {
+  store.addNetwork({
+    id: 1,
+    type: 'ethereum',
+    name: 'Mainnet',
+    explorer: 'https://etherscan.io',
+    symbol: 'ETH',
+    on: true,
+    isTestnet: false
+  })
+  store.setNativeCurrencyData('ethereum', '1', { usd: { price: 1884 } })
+  store.setMaxTotalFee('ethereum', '1', '2644579141675394000', Date.now() + 5000)
+})
+
 const AdjustFee = Restore.connect(AdjustFeeComponent, store)
 let req
 
 beforeEach(() => {
   req = {
     data: {
+      chainId: '1',
       type: '0x2',
       gasLimit: '0x61a8',
       maxPriorityFeePerGas: gweiToHex(3),
@@ -42,8 +57,8 @@ it('renders the gas limit input', () => {
 
 describe('base fee input', () => {
   const submittedAmounts = [
-    { amount: (100e9).toString(), submitted: '1999997' },
-    { amount: (1e9).toString(), submitted: '1999997' },
+    { amount: (100e9).toString(), submitted: '105780.165667015' },
+    { amount: (1e9).toString(), submitted: '105780.165667015' },
     { amount: '9.2', submitted: '9.2' },
     { amount: '9.222222222222222', submitted: '9.222222222' },
     { amount: '9.500000', submitted: '9.5' },
@@ -161,76 +176,26 @@ describe('base fee input', () => {
     expect(document.activeElement).not.toEqual(getBaseFeeInput())
   })
 
-  it('recalculates the base fee when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
+  it('recalculates the base fee when the total fee exceeds the maximum allowed', async () => {
     req.data.maxPriorityFeePerGas = gweiToHex(300)
     req.data.maxFeePerGas = gweiToHex(600)
-    req.data.gasLimit = intToHex(250000)
+    req.data.gasLimit = intToHex(2500000)
     req.data.chainId = '0x1'
 
     const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
 
     await clearBaseFee()
-    await enterBaseFee('7800')
+    await enterBaseFee('800')
 
-    expect(getBaseFeeInput().value).toBe('7700')
-    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', gweiToHex(7700), '1', expect.any(Function))
-  })
-
-  it('recalculates the base fee when the total fee exceeds the maximum allowed (FTM)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
-    req.data.gasLimit = addHexPrefix((30000000).toString(16))
-    req.data.chainId = '0xfa'
-
-    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
-
-    await clearBaseFee()
-    await enterBaseFee('660000')
-
-    expect(getBaseFeeInput().value).toBe('463666.666666666')
-    expect(link.rpc).toHaveBeenCalledWith(
-      'setBaseFee',
-      gweiToHex(463666.666666666),
-      '1',
-      expect.any(Function)
-    )
-  })
-
-  it('recalculates the base fee when the total fee exceeds the maximum allowed (PLS)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
-    req.data.gasLimit = addHexPrefix((30000000).toString(16))
-    req.data.chainId = '0x171'
-
-    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
-
-    await clearBaseFee()
-    await enterBaseFee('1200000000000000000')
-
-    expect(getBaseFeeInput().value).toBe('3333333330333.333333333')
-    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', '0xb4b34aeb2e68262555', '1', expect.any(Function))
-  })
-
-  it('recalculates the base fee when the total fee exceeds the maximum allowed (other chains)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
-    req.data.gasLimit = addHexPrefix((10000000).toString(16))
-    req.data.chainId = '0x89'
-
-    const { getBaseFeeInput, clearBaseFee, enterBaseFee } = setupComponent(req)
-
-    await clearBaseFee()
-    await enterBaseFee('2100')
-
-    expect(getBaseFeeInput().value).toBe('2000')
-    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', gweiToHex(2000), '1', expect.any(Function))
+    expect(getBaseFeeInput().value).toBe('761.571125265')
+    expect(link.rpc).toHaveBeenCalledWith('setBaseFee', gweiToHex(761.571125265), '1', expect.any(Function))
   })
 })
 
 describe('priority fee input', () => {
   const submittedAmounts = [
-    { amount: (100e9).toString(), submitted: '1999996' },
-    { amount: (1e9).toString(), submitted: '1999996' },
+    { amount: (100e9).toString(), submitted: '106153.112526539' },
+    { amount: (1e9).toString(), submitted: '106153.112526539' },
     { amount: '9.2', submitted: '9.2' },
     { amount: '9.222222222222222', submitted: '9.222222222' },
     { amount: '9.500000', submitted: '9.5' },
@@ -330,76 +295,31 @@ describe('priority fee input', () => {
     expect(document.activeElement).not.toEqual(getPriorityFeeInput())
   })
 
-  it('recalculates the priority fee when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
+  it('recalculates the priority fee when the total fee exceeds the maximum allowed', async () => {
     req.data.maxPriorityFeePerGas = addHexPrefix((300e9).toString(16))
     req.data.maxFeePerGas = addHexPrefix((600e9).toString(16))
-    req.data.gasLimit = addHexPrefix((250000).toString(16))
+    req.data.gasLimit = addHexPrefix((2500000).toString(16))
     req.data.chainId = '0x1'
 
     const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
 
     await clearPriorityFee()
-    await enterPriorityFee('7800')
+    await enterPriorityFee('800')
 
-    expect(getPriorityFeeInput().value).toBe('7700')
-    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', gweiToHex(7700), '1', expect.any(Function))
-  })
-
-  it('recalculates the priority fee when the total fee exceeds the maximum allowed (FTM)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
-    req.data.gasLimit = addHexPrefix((30000000).toString(16))
-    req.data.chainId = '0xfa'
-
-    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
-
-    await clearPriorityFee()
-    await enterPriorityFee('5600000')
-
-    expect(getPriorityFeeInput().value).toBe('463666.666666666')
+    expect(getPriorityFeeInput().value).toBe('761.571125265')
     expect(link.rpc).toHaveBeenCalledWith(
       'setPriorityFee',
-      gweiToHex(463666.666666666),
+      gweiToHex(761.571125265),
       '1',
       expect.any(Function)
     )
-  })
-
-  it('recalculates the priority fee when the total fee exceeds the maximum allowed (PLS)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
-    req.data.gasLimit = addHexPrefix((30000000).toString(16))
-    req.data.chainId = '0x171'
-
-    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
-
-    await clearPriorityFee()
-    await enterPriorityFee('5600000000000000')
-
-    expect(getPriorityFeeInput().value).toBe('3333333330333.333333333')
-    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', '0xb4b34aeb2e68262555', '1', expect.any(Function))
-  })
-
-  it('recalculates the priority fee when the total fee exceeds the maximum allowed (other chains)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
-    req.data.gasLimit = addHexPrefix((10000000).toString(16))
-    req.data.chainId = '0x89'
-
-    const { getPriorityFeeInput, clearPriorityFee, enterPriorityFee } = setupComponent(req)
-
-    await clearPriorityFee()
-    await enterPriorityFee('2100')
-
-    expect(getPriorityFeeInput().value).toBe('2000')
-    expect(link.rpc).toHaveBeenCalledWith('setPriorityFee', gweiToHex(2000), '1', expect.any(Function))
   })
 })
 
 describe('gas limit input', () => {
   const submittedAmounts = [
-    { amount: (100e9).toString(), submitted: '7142857142' },
-    { amount: (1e9).toString(), submitted: '1000000000' },
+    { amount: (100e9).toString(), submitted: '379132544' },
+    { amount: (1e9).toString(), submitted: '379132544' },
     { amount: '9.2', submitted: '92' },
     { amount: 'gh-5.86bf', submitted: '586' }
   ]
@@ -470,60 +390,18 @@ describe('gas limit input', () => {
     expect(document.activeElement).not.toEqual(getGasLimitInput())
   })
 
-  it('recalculates the gas limit when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
+  it('recalculates the gas limit when the total fee exceeds the maximum allowed', async () => {
     req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((6000e9).toString(16))
+    req.data.maxFeePerGas = addHexPrefix((60000e9).toString(16))
     req.data.chainId = '1'
 
     const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
     await clearGasLimit()
-    await enterGasLimit('334000')
+    await enterGasLimit('45000')
 
-    expect(getGasLimitInput().value).toBe('333333')
-    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x51615', '1', expect.any(Function))
-  })
-
-  it('recalculates the gas limit when the total fee exceeds the maximum allowed (FTM)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((22000e9).toString(16))
-    req.data.chainId = '250'
-
-    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
-
-    await clearGasLimit()
-    await enterGasLimit('11364000000')
-
-    expect(getGasLimitInput().value).toBe('636363636')
-    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x25ee2374', '1', expect.any(Function))
-  })
-
-  it('recalculates the gas limit when the total fee exceeds the maximum allowed (PLS)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((22000e9).toString(16))
-    req.data.chainId = '369'
-
-    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
-
-    await clearGasLimit()
-    await enterGasLimit('11364000000000000000')
-
-    expect(getGasLimitInput().value).toBe('4545454545454545')
-    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x1026111b8645d1', '1', expect.any(Function))
-  })
-
-  it('recalculates the gas limit when the total fee exceeds the maximum allowed (other chains)', async () => {
-    req.data.maxPriorityFeePerGas = addHexPrefix((3000e9).toString(16))
-    req.data.maxFeePerGas = addHexPrefix((9000e9).toString(16))
-    req.data.chainId = '6746754'
-
-    const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
-
-    await clearGasLimit()
-    await enterGasLimit('5556000')
-
-    expect(getGasLimitInput().value).toBe('5555555')
-    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x54c563', '1', expect.any(Function))
+    expect(getGasLimitInput().value).toBe('44232')
+    expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0xacc8', '1', expect.any(Function))
   })
 })
 
@@ -531,6 +409,7 @@ describe('legacy transactions', () => {
   beforeEach(() => {
     req = {
       data: {
+        chainId: '1',
         type: '0x0',
         gasLimit: '0x61a8',
         gasPrice: addHexPrefix((7e9).toString(16))
@@ -551,8 +430,8 @@ describe('legacy transactions', () => {
 
   describe('gas price input', () => {
     const submittedAmounts = [
-      { amount: (100e9).toString(), submitted: '2000000' },
-      { amount: (1e9).toString(), submitted: '2000000' },
+      { amount: (100e9).toString(), submitted: '106157.112526539' },
+      { amount: (1e9).toString(), submitted: '106157.112526539' },
       { amount: '9.2', submitted: '9.2' },
       { amount: '9.222222222222222', submitted: '9.222222222' },
       { amount: '9.500000', submitted: '9.5' },
@@ -652,115 +531,32 @@ describe('legacy transactions', () => {
       expect(document.activeElement).not.toEqual(getGasPriceInput())
     })
 
-    it('recalculates the gas price when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
-      req.data.gasLimit = addHexPrefix((250000000).toString(16))
+    it('recalculates the gas price when the total fee exceeds the maximum allowed', async () => {
+      req.data.gasLimit = addHexPrefix((2500000000).toString(16))
       req.data.chainId = '1'
 
       const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
 
       await clearGasPrice()
-      await enterGasPrice('9')
+      await enterGasPrice('2')
 
-      expect(getGasPriceInput().value).toBe('8')
-      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', gweiToHex(8), '1', expect.any(Function))
-    })
-
-    it('recalculates the gas price when the total fee exceeds the maximum allowed (FTM)', async () => {
-      req.data.gasLimit = addHexPrefix((3000000000).toString(16))
-      req.data.chainId = '250'
-
-      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
-
-      await clearGasPrice()
-      await enterGasPrice('85000')
-
-      expect(getGasPriceInput().value).toBe('4666.666666666')
-      expect(link.rpc).toHaveBeenCalledWith(
-        'setGasPrice',
-        gweiToHex(4666.666666666),
-        '1',
-        expect.any(Function)
-      )
-    })
-
-    it('recalculates the gas price when the total fee exceeds the maximum allowed (PLS)', async () => {
-      req.data.gasLimit = addHexPrefix((3000000000).toString(16))
-      req.data.chainId = '369'
-
-      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
-
-      await clearGasPrice()
-      await enterGasPrice('850000000000000000000000')
-
-      expect(getGasPriceInput().value).toBe('33333333333.333333333')
-      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', '0x1ce97ca0f21055555', '1', expect.any(Function))
-    })
-
-    it('recalculates the gas price when the total fee exceeds the maximum allowed (other chains)', async () => {
-      req.data.gasLimit = addHexPrefix((1000000000).toString(16))
-      req.data.chainId = '6746754'
-
-      const { getGasPriceInput, clearGasPrice, enterGasPrice } = setupComponent(req)
-
-      await clearGasPrice()
-      await enterGasPrice('51')
-
-      expect(getGasPriceInput().value).toBe('50')
-      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', gweiToHex(50), '1', expect.any(Function))
+      expect(getGasPriceInput().value).toBe('1.061571125')
+      expect(link.rpc).toHaveBeenCalledWith('setGasPrice', gweiToHex(1.061571125), '1', expect.any(Function))
     })
   })
 
   describe('gas limit input', () => {
-    it('recalculates the gas limit when the total fee exceeds the maximum allowed (ETH-based chains)', async () => {
-      req.data.gasPrice = addHexPrefix((250e9).toString(16))
+    it('recalculates the gas limit when the total fee exceeds the maximum allowed', async () => {
+      req.data.gasPrice = addHexPrefix((250e10).toString(16))
       req.data.chainId = '1'
 
       const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
 
       await clearGasLimit()
-      await enterGasLimit('8001000')
+      await enterGasLimit('1100000')
 
-      expect(getGasLimitInput().value).toBe('8000000')
-      expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x7a1200', '1', expect.any(Function))
-    })
-
-    it('recalculates the gas limit when the total fee exceeds the maximum allowed (FTM)', async () => {
-      req.data.gasPrice = addHexPrefix((87000e9).toString(16))
-      req.data.chainId = '250'
-
-      const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
-
-      await clearGasLimit()
-      await enterGasLimit('2874000000')
-
-      expect(getGasLimitInput().value).toBe('160919540')
-      expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x9976ff4', '1', expect.any(Function))
-    })
-
-    it('recalculates the gas limit when the total fee exceeds the maximum allowed (PLS)', async () => {
-      req.data.gasPrice = addHexPrefix((87000e9).toString(16))
-      req.data.chainId = '369'
-
-      const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
-
-      await clearGasLimit()
-      await enterGasLimit('187400000000000000000')
-
-      expect(getGasLimitInput().value).toBe('1149425287356321')
-      expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x415656df2dfa1', '1', expect.any(Function))
-    })
-
-    it('recalculates the gas limit when the total fee exceeds the maximum allowed (other chains)', async () => {
-      req.data.gasPrice = addHexPrefix((27000e9).toString(16))
-      req.data.chainId = '6746754'
-
-      const { getGasLimitInput, clearGasLimit, enterGasLimit } = setupComponent(req)
-
-      await clearGasLimit()
-      await enterGasLimit('1852000')
-
-      expect(getGasLimitInput().value).toBe('1851851')
-      expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x1c41cb', '1', expect.any(Function))
+      expect(getGasLimitInput().value).toBe('1061571')
+      expect(link.rpc).toHaveBeenCalledWith('setGasLimit', '0x1032c3', '1', expect.any(Function))
     })
   })
 })

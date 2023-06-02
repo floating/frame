@@ -1506,6 +1506,7 @@ describe('#signAndSend', () => {
   })
 
   it('allows a Fantom transaction with fees over the mainnet hard limit', (done) => {
+    store.set('main.networks.ethereum.250', { isTestnet: false })
     store.set('main.networksMeta.ethereum.250', {
       maxTotalFee: '1000e18',
       maxTotalFeeExpiry: Date.now()

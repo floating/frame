@@ -51,6 +51,8 @@ const account2 = {
   created: '15315799:1660153882707'
 }
 
+const maxTotal = 2e18 // 2 ETH
+const maxTotalBN = BigNumber(maxTotal)
 let request
 
 beforeAll(() => {
@@ -90,6 +92,7 @@ beforeEach((done) => {
   Accounts.add(account.address, 'Test Account 1', account, (err, account) => {
     Accounts.setSigner(account.address, done)
   })
+  getMaxTotalFee.mockReturnValue(maxTotalBN)
 })
 
 afterEach(() => {
@@ -223,13 +226,11 @@ describe('#setBaseFee', () => {
   })
 
   it('does not exceed the max allowable fee', () => {
-    const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
     const maxTotalFee = maxTotal / gasLimit
     const highBaseFee = intToHex(maxTotalFee + 10e9) // add 10 gwei to exceed the maximum limit
 
     request.data.gasLimit = intToHex(gasLimit)
-    getMaxTotalFee.mockReturnValue(maxTotal)
 
     setBaseFee(highBaseFee)
 
@@ -318,14 +319,12 @@ describe('#setPriorityFee', () => {
   })
 
   it('does not exceed the max allowable fee', () => {
-    const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
     const maxTotalFee = maxTotal / gasLimit
 
     request.data.gasLimit = intToHex(gasLimit)
     request.data.maxFeePerGas = gweiToHex(190)
     request.data.maxPriorityFeePerGas = gweiToHex(40)
-    getMaxTotalFee.mockReturnValue(maxTotal)
 
     const highPriorityFee = 60e9 // add 20 gwei to the above to exceed the maximum limit
     const expectedPriorityFee =
@@ -410,13 +409,11 @@ describe('#setGasPrice', () => {
   })
 
   it('does not exceed the max gas price', () => {
-    const maxTotal = 2e18 // 2 ETH
     const gasLimit = 1e7
     const maxTotalFee = maxTotal / gasLimit
     const highPrice = intToHex(maxTotalFee + 10e9) // 250 gwei
 
     request.data.gasLimit = intToHex(gasLimit)
-    getMaxTotalFee.mockReturnValue(maxTotal)
 
     setGasPrice(highPrice)
 
@@ -489,14 +486,12 @@ describe('#setGasLimit', () => {
   })
 
   it('does not exceed the max fee for pre-EIP-1559 transactions', () => {
-    const maxTotalFee = 2e18 // 2 ETH
     const gasPrice = 400e9 // 400 gwei
-    const maxLimit = maxTotalFee / gasPrice
+    const maxLimit = maxTotal / gasPrice
     const gasLimit = intToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x0'
     request.data.gasPrice = intToHex(gasPrice)
-    getMaxTotalFee.mockReturnValue(maxTotalFee)
 
     setGasLimit(gasLimit)
 
@@ -504,14 +499,12 @@ describe('#setGasLimit', () => {
   })
 
   it('does not exceed the max fee for post-EIP-1559 transactions', () => {
-    const maxTotalFee = 2e18 // 2 ETH
     const maxFeePerGas = 400e9 // 400 gwei
-    const maxLimit = maxTotalFee / maxFeePerGas
+    const maxLimit = maxTotal / maxFeePerGas
     const gasLimit = intToHex(maxLimit + 1e5) // add 10000 to exceed the maximum limit
 
     request.data.type = '0x2'
     request.data.maxFeePerGas = intToHex(maxFeePerGas)
-    getMaxTotalFee.mockReturnValue(maxTotalFee)
 
     setGasLimit(gasLimit)
 
