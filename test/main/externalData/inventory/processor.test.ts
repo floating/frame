@@ -10,7 +10,15 @@ const randomStr = () => randomBytes(32).toString('hex')
 const genInventoryAsset = (name = randomStr()) => ({
   name,
   tokenId: randomStr(),
-  img: randomStr(),
+  media: {
+    source: randomStr(),
+    format: 'image' as const,
+    cdn: {
+      main: randomStr(),
+      thumb: randomStr(),
+      frozenThumb: randomStr()
+    }
+  },
   contract: randomStr(),
   externalLink: randomStr()
 })
@@ -28,14 +36,22 @@ jest.mock('../../../../main/store', () => {
   return store
 })
 
-const Collection = (items: Record<string, InventoryAsset> = {}) => ({
+const Collection = (items: InventoryAsset[] = []) => ({
   meta: {
     name: randomStr(),
     description: randomStr(),
-    image: randomStr(),
+    media: {
+      source: randomStr(),
+      format: 'image' as const,
+      cdn: {
+        main: randomStr(),
+        thumb: randomStr(),
+        frozenThumb: randomStr()
+      }
+    },
     chainId: Math.floor(Math.random() * 10),
     external_url: randomStr(),
-    ownedItems: []
+    tokens: items.map((item) => item.tokenId)
   },
   items
 })
@@ -60,9 +76,7 @@ describe('#updateCollections', () => {
 
   it('preserves existing items when updating collection metadata', () => {
     const item = genInventoryAsset()
-    const existingCollection = Collection({
-      [item.tokenId]: item
-    })
+    const existingCollection = Collection([item])
 
     mockExistingInventory = {
       '0x1': existingCollection
@@ -74,7 +88,7 @@ describe('#updateCollections', () => {
           ...existingCollection.meta,
           name: 'newName'
         },
-        items: {}
+        items: existingCollection.items
       }
     }
 
@@ -90,7 +104,7 @@ describe('#updateCollections', () => {
 
   it('initializes new collections with an empty items dictionary when there is no existing inventory', () => {
     const updatedInventory = {
-      '0x1': Collection({})
+      '0x1': Collection([])
     }
 
     updateCollections(account, updatedInventory)
@@ -106,13 +120,29 @@ describe('#updateItems', () => {
         contract: '0x1',
         tokenId: '1',
         name: 'newName',
-        img: ''
+        media: {
+          source: '',
+          format: '' as const,
+          cdn: {
+            main: '',
+            thumb: '',
+            frozenThumb: ''
+          }
+        }
       },
       {
         contract: '0x1',
         tokenId: '2',
         name: 'name2',
-        img: ''
+        media: {
+          source: '',
+          format: '' as const,
+          cdn: {
+            main: '',
+            thumb: '',
+            frozenThumb: ''
+          }
+        }
       }
     ]
 

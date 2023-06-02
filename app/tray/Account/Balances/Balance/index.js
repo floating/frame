@@ -1,13 +1,25 @@
-import React, { useState, useEffect, useContext } from 'react'
-import Restore from 'react-restore'
-
+import React from 'react'
 import { DisplayFiatPrice, DisplayValue } from '../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import useStore from '../../../../../resources/Hooks/useStore'
 
+const displayName = (name = '') => {
+  if (name.length > 24) {
+    return name.slice(0, 22) + '..'
+  }
+  return name
+}
+
+const displayChain = (name = '') => {
+  if (name.length > 14) {
+    return name.slice(0, 12) + '..'
+  }
+  return name
+}
+
 const Balance = (props) => {
-  const { symbol = '', balance, i, scanning, chainId } = props
+  const { symbol = '', balance, i, scanning, chainId, address } = props
 
   const chain = useStore('main.networks.ethereum', chainId)
   const chainColor = useStore('main.networksMeta.ethereum', chainId, 'primaryColor')
@@ -36,7 +48,10 @@ const Balance = (props) => {
 
   const { name: chainName = '', isTestnet = false } = chain
 
-  const ethMatch = logoURI?.includes('/coins/images/279/large/ethereum.png')
+  const imageURL = logoURI
+
+  const isNative = address === '0x0000000000000000000000000000000000000000'
+  const isEth = isNative && [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)
 
   return (
     <div className={'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
@@ -44,14 +59,15 @@ const Balance = (props) => {
       <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
         <div className='signerBalanceIcon'>
           <RingIcon
-            img={symbol.toUpperCase() !== 'ETH' && !isTestnet && !ethMatch && logoURI}
+            img={!isEth && !isTestnet && imageURL}
+            svgName={isEth && 'eth'}
             alt={symbol.toUpperCase()}
             color={chainColor ? `var(--${chainColor})` : ''}
           />
         </div>
         <div className='signerBalanceChain'>
-          <span style={{ color: chainColor ? `var(--${chainColor})` : '' }}>{chainName}</span>
-          <span>{name}</span>
+          <span style={{ color: chainColor ? `var(--${chainColor})` : '' }}>{displayChain(chainName)}</span>
+          <span>{displayName(name)}</span>
         </div>
         <div className='signerBalanceMain'>
           <div style={{ letterSpacing: '1px' }}>{displaySymbol}</div>
