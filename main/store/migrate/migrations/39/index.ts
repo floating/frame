@@ -55,14 +55,18 @@ export const v39TokenSchema = z.object({
   media: v39MediaSchema
 })
 
-const v38StateSchema = z.object({
-  main: z.object({
-    tokens: z.object({
-      known: z.record(z.array(v38TokenBalanceSchema)),
-      custom: z.array(v38TokenSchema)
-    })
+const v38StateSchema = z
+  .object({
+    main: z
+      .object({
+        tokens: z.object({
+          known: z.record(z.array(v38TokenBalanceSchema)),
+          custom: z.array(v38TokenSchema)
+        })
+      })
+      .passthrough()
   })
-})
+  .passthrough()
 
 const transformToken = <T extends WithLogo>({ logoURI = '', ...token }: T) => ({
   ...token,
