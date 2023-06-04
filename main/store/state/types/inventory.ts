@@ -1,16 +1,5 @@
 import { z } from 'zod'
-
-const MediaFormatSchema = z.union([z.literal('image'), z.literal('video'), z.literal('')])
-
-const MediaSchema = z.object({
-  source: z.string(),
-  format: MediaFormatSchema,
-  cdn: z.object({
-    main: z.string().optional(),
-    thumb: z.string().optional(),
-    frozenThumb: z.string().optional()
-  })
-})
+import { MediaSchema } from './media'
 
 const InventoryAssetSchema = z.object({
   name: z.string(),

@@ -15,7 +15,7 @@ export type { Origin } from './types/origin'
 export type { Permission } from './types/permission'
 export type { Account, AccountMetadata } from './types/account'
 export type { Balance } from './types/balance'
-export type { WithTokenId, Token } from './types/token'
+export type { WithTokenId, Token, TokenBalance } from './types/token'
 export type { Dapp } from './types/dapp'
 export type { NativeCurrency } from './types/nativeCurrency'
 export type { Gas, GasFees } from './types/gas'
@@ -23,8 +23,6 @@ export type { Rate } from './types/rate'
 export type { ColorwayPalette } from './types/colors'
 export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
 export type { Media } from './types/media'
-export type { TokenBalance } from './types/tokenBalance'
-export type { CustomToken } from './types/customToken'
 
 const StateSchema = z.object({
   main: MainSchema

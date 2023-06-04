@@ -1,19 +1,21 @@
 import log from 'electron-log'
 import { z } from 'zod'
-import { AddressSchema, HexStringSchema } from '../../../state/types/utils'
-type WithLogo = { logoURI: string }
 
-const v38CustomTokenSchema = z.object({
+import { AddressSchema, ChainIdSchema, HexStringSchema } from '../../../state/types/utils'
+
+type WithLogo = { logoURI?: string }
+
+const v38TokenSchema = z.object({
   name: z.string(),
   symbol: z.string(),
-  chainId: z.number(),
+  chainId: ChainIdSchema,
   address: z.string(),
   decimals: z.number(),
   logoURI: z.string().optional()
 })
 
-const v38KnownTokenSchema = z.object({
-  chainId: z.number(),
+const v38TokenBalanceSchema = z.object({
+  chainId: ChainIdSchema,
   address: AddressSchema,
   name: z.string(),
   symbol: z.string(),
@@ -25,7 +27,7 @@ const v38KnownTokenSchema = z.object({
 
 export const v39MediaSchema = z.object({
   source: z.string(),
-  format: z.union([z.literal('image'), z.literal('video'), z.literal('')]),
+  format: z.enum(['image', 'video', '']),
   cdn: z.object({
     main: z.string().optional(),
     thumb: z.string().optional(),
@@ -33,8 +35,8 @@ export const v39MediaSchema = z.object({
   })
 })
 
-export const v39KnownTokenSchema = z.object({
-  chainId: z.number(),
+export const v39TokenBalanceSchema = z.object({
+  chainId: ChainIdSchema,
   address: AddressSchema,
   name: z.string(),
   symbol: z.string(),
@@ -44,10 +46,10 @@ export const v39KnownTokenSchema = z.object({
   displayBalance: z.string()
 })
 
-export const v39CustomTokenSchema = z.object({
+export const v39TokenSchema = z.object({
   name: z.string(),
   symbol: z.string(),
-  chainId: z.number(),
+  chainId: ChainIdSchema,
   address: z.string(),
   decimals: z.number(),
   media: v39MediaSchema
@@ -56,49 +58,29 @@ export const v39CustomTokenSchema = z.object({
 const v38StateSchema = z.object({
   main: z.object({
     tokens: z.object({
-      known: z.record(z.array(v38KnownTokenSchema)),
-      custom: z.array(v38CustomTokenSchema)
+      known: z.record(z.array(v38TokenBalanceSchema)),
+      custom: z.array(v38TokenSchema)
     })
   })
 })
 
-const transformToken = <T extends WithLogo>(token: T) => {
-  const { logoURI = '', ...restToken } = token
-  return {
-    ...restToken,
-    media: {
-      source: logoURI,
-      format: 'image',
-      cdn: {}
-    }
+const transformToken = <T extends WithLogo>({ logoURI = '', ...token }: T) => ({
+  ...token,
+  media: {
+    source: logoURI,
+    format: 'image',
+    cdn: {}
   }
-}
-
-const migrateKnownToken = (token: any) => {
-  try {
-    v38KnownTokenSchema.parse(token)
-    return transformToken(token)
-  } catch {
-    return token
-  }
-}
-
-const migrateCustomToken = (token: any) => {
-  try {
-    v38CustomTokenSchema.parse(token)
-    return transformToken(token)
-  } catch {
-    return { ...token, media: { source: '', format: 'image', cdn: {} } }
-  }
-}
+})
 
 const migrate = (initial: unknown) => {
   try {
     const state = v38StateSchema.parse(initial)
     for (const key in state.main.tokens.known) {
-      state.main.tokens.known[key] = state.main.tokens.known[key].map(migrateKnownToken)
+      state.main.tokens.known[key] = state.main.tokens.known[key].map(transformToken)
     }
-    state.main.tokens.custom = state.main.tokens.custom.map(migrateCustomToken)
+
+    state.main.tokens.custom = state.main.tokens.custom.map(transformToken)
     return state
   } catch (e) {
     log.error('Migration 39: could not parse state', e)

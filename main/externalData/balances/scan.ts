@@ -14,12 +14,7 @@ import type { Balance, Token, TokenBalance } from '../../store/state'
 
 const erc20Interface = new Interface(erc20TokenAbi)
 
-interface ExternalBalance {
-  balance: string
-  displayBalance: string
-}
-
-export interface CurrencyBalance extends ExternalBalance {
+export interface CurrencyBalance extends Balance {
   chainId: number
 }
 
@@ -28,7 +23,7 @@ export interface BalanceLoader {
   getTokenBalances: (address: Address, tokens: Token[]) => Promise<TokenBalance[]>
 }
 
-function createBalance(rawBalance: string, decimals: number): ExternalBalance {
+function createBalance(rawBalance: string, decimals: number): Balance {
   return {
     balance: rawBalance,
     displayBalance: new BigNumber(rawBalance).shiftedBy(-decimals).toString()
@@ -36,7 +31,7 @@ function createBalance(rawBalance: string, decimals: number): ExternalBalance {
 }
 
 export default function (eth: EthereumProvider) {
-  function balanceCalls(owner: string, tokens: Token[]): Call<EthersBigNumber, ExternalBalance>[] {
+  function balanceCalls(owner: string, tokens: Token[]): Call<EthersBigNumber, Balance>[] {
     return tokens.map((token) => ({
       target: token.address,
       call: ['function balanceOf(address address) returns (uint256 value)', owner],

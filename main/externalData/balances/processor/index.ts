@@ -20,7 +20,7 @@ const getChangedBalances = (
   const currentTokenBalances = api.getTokenBalances(address)
   const custom = api.getCustomTokens()
   const customTokens = new Set(custom.map(toTokenId))
-  const isCustomToken = (balance: Balance) => customTokens.has(toTokenId(balance))
+  const isCustomToken = (balance: TokenBalance) => customTokens.has(toTokenId(balance))
 
   //TODO: in here should we check the token data inside the store and adopt the existing name?
   const changedBalances = tokenBalances.reduce((balances, newBalance) => {

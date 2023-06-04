@@ -208,7 +208,7 @@ function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>) 
     const includesBlacklistedTokens = (arr: WithTokenId[]) =>
       arr.some((val) => tokensToRemove.has(toTokenId(val)))
 
-    const balances: Record<string, Balance[]> = store('main.balances')
+    const balances: Record<string, TokenBalance[]> = store('main.balances')
     const knownTokens: Record<string, Token[]> = store('main.tokens.known')
 
     Object.entries(balances).forEach(([accountAddress, balances]) => {

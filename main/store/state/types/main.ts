@@ -8,8 +8,7 @@ import { DappSchema } from './dapp'
 import { OriginSchema } from './origin'
 import { PermissionSchema } from './permission'
 import { ShortcutSchema } from './shortcuts'
-import { CustomTokenSchema } from './customToken'
-import { KnownTokenSchema } from './knownToken'
+import { TokenBalanceSchema, TokenSchema } from './token'
 
 const ShortcutsSchema = z.object({
   summon: ShortcutSchema
@@ -64,8 +63,8 @@ export const MainSchema = z.object({
     z.record(z.string().describe('Origin Id'), PermissionSchema)
   ),
   tokens: z.object({
-    custom: z.array(CustomTokenSchema),
-    known: z.record(z.string(), z.array(KnownTokenSchema))
+    custom: z.array(TokenSchema),
+    known: z.record(z.string(), z.array(TokenBalanceSchema))
   }),
   accounts: z.record(z.string(), AccountSchema),
   accountsMeta: z.record(z.string(), AccountMetadataSchema),
