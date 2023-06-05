@@ -200,8 +200,8 @@
     "url": false
   },
   "engines": {
-    "electron": "23",
-    "node": ">= 18.12.1"
+    "electron": "25",
+    "node": ">= 18.14.0"
   },
   "browserslist": [
     "last 1 Electron major version"
