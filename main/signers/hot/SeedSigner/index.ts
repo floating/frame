@@ -1,4 +1,5 @@
-import { validateMnemonic, mnemonicToSeed } from 'bip39'
+import { validateMnemonic, mnemonicToSeed } from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english'
 import hdKey from 'hdkey'
 import { utils } from 'ethers'
 
@@ -55,11 +56,11 @@ export default class SeedSigner extends HotSigner {
 
   async addPhrase(phrase: string, password: string, cb: ErrorOnlyCallback) {
     // Validate phrase
-    if (!validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
+    if (!validateMnemonic(phrase, wordlist)) return cb(new Error('Invalid mnemonic phrase'))
     // Get seed
     const seed = await mnemonicToSeed(phrase)
     // Add seed to signer
-    this.addSeed(seed.toString('hex'), password, cb)
+    this.addSeed(Buffer.from(seed).toString('hex'), password, cb)
   }
 
   protected save() {
