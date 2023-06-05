@@ -1,5 +1,5 @@
 import log from 'electron-log'
-import { Schema, z } from 'zod'
+import { z } from 'zod'
 
 import { AddressSchema, ChainIdSchema, HexStringSchema } from '../../../state/types/utils'
 
@@ -32,8 +32,6 @@ export const v39MediaSchema = z.object({
     frozenThumb: z.string().optional()
   })
 })
-
-type V39Media = z.infer<typeof v39MediaSchema>
 
 export const v39TokenBalanceSchema = z.object({
   chainId: ChainIdSchema,
@@ -79,60 +77,69 @@ const v38StateSchema = z
 const v39StateSchema = z.object({
   main: z
     .object({
-      tokens: z
-
-        .object({
-          known: z.record(z.array(v39TokenBalanceSchema)).catch({}),
-          custom: z.array(v39TokenSchema).catch([])
-        })
-        .catch(defaultTokensState)
-        .default(defaultTokensState)
+      tokens: z.object({
+        known: z.record(z.array(v39TokenBalanceSchema)),
+        custom: z.array(v39TokenSchema)
+      })
     })
     .passthrough()
 })
 
-const transformToken = <S extends Schema>(
-  token: unknown,
-  schemaIn: Schema,
-  schemaOut: S
-): Array<z.infer<S>> => {
-  const parsed = schemaIn.safeParse(token)
-  if (!parsed.success) {
-    log.error('Migration 39: could not parse token', token, parsed.error)
-    return []
-  }
+type v38Token = z.infer<typeof v38TokenSchema>
+type v39Token = z.infer<typeof v39TokenSchema>
+type v38TokenBalance = z.infer<typeof v38TokenBalanceSchema>
+type v39TokenBalance = z.infer<typeof v39TokenBalanceSchema>
+type v39State = z.infer<typeof v39StateSchema>
 
-  const { logoURI = '', ...tokenData } = parsed.data
-
-  const parsedOut = schemaOut.safeParse({
-    ...tokenData,
-    media: {
-      source: logoURI,
-      format: 'image',
-      cdn: {}
-    }
-  })
-
-  return parsedOut.success ? [parsedOut.data] : []
+interface WithLogoURI {
+  logoURI?: string
 }
 
-const transformKnownToken = (token: unknown) =>
-  transformToken(token, v38TokenBalanceSchema, v39TokenBalanceSchema)
+const migrateToken = <T extends WithLogoURI>({ logoURI, ...token }: T) => ({
+  ...token,
+  media: {
+    source: logoURI || '',
+    format: 'image' as const,
+    cdn: {}
+  }
+})
 
-const transformCustomToken = (token: unknown) => transformToken(token, v38TokenSchema, v39TokenSchema)
+const migrateKnownTokens = (knownTokens: Record<string, unknown[]>): Record<string, v39TokenBalance[]> =>
+  Object.entries(knownTokens).reduce((acc, [address, tokens]) => {
+    const migrated: v39TokenBalance[] = tokens
+      .map((token) => v38TokenBalanceSchema.safeParse(token))
+      .filter(({ success }) => !!success)
+      .map((result) => migrateToken((result.success && result.data) as v38TokenBalance))
+
+    return {
+      ...acc,
+      [address]: migrated
+    }
+  }, {} as Record<string, v39TokenBalance[]>)
+
+const migrateCustomTokens = (customTokens: unknown[]): v39Token[] =>
+  customTokens
+    .map((token) => v38TokenSchema.safeParse(token))
+    .filter(({ success }) => !!success)
+    .map((result) => migrateToken((result.success && result.data) as v38Token))
 
 const migrate = (initial: unknown) => {
   try {
-    const state = v38StateSchema.parse(initial)
-    const tokens = state.main.tokens
+    const v38State = v38StateSchema.parse(initial)
+    const { known: knownTokens, custom: customTokens } = v38State.main.tokens
 
-    for (const address in tokens.known) {
-      const knownTokensForAddress = tokens.known[address]
-      state.main.tokens.known[address] = knownTokensForAddress.flatMap(transformKnownToken)
+    const v39State: v39State = {
+      ...v38State,
+      main: {
+        ...v38State.main,
+        tokens: {
+          known: migrateKnownTokens(knownTokens),
+          custom: migrateCustomTokens(customTokens)
+        }
+      }
     }
 
-    state.main.tokens.custom = state.main.tokens.custom.flatMap(transformCustomToken)
-    return v39StateSchema.parse(state)
+    return v39State
   } catch (e) {
     log.error('Migration 39: could not parse state', e)
     return initial
