@@ -6,8 +6,8 @@ import { AddressSchema, ChainIdSchema, HexStringSchema } from '../../../state/ty
 type WithLogo = { logoURI?: string }
 
 const v38TokenSchema = z.object({
-  name: z.string(),
-  symbol: z.string(),
+  name: z.string().default(''),
+  symbol: z.string().default(''),
   chainId: ChainIdSchema,
   address: z.string(),
   decimals: z.number(),
@@ -17,12 +17,12 @@ const v38TokenSchema = z.object({
 const v38TokenBalanceSchema = z.object({
   chainId: ChainIdSchema,
   address: AddressSchema,
-  name: z.string(),
-  symbol: z.string(),
+  name: z.string().default(''),
+  symbol: z.string().default(''),
   decimals: z.number(),
   logoURI: z.string().optional(),
-  balance: HexStringSchema,
-  displayBalance: z.string()
+  balance: HexStringSchema.default('0x0'),
+  displayBalance: z.string().default('0')
 })
 
 export const v39MediaSchema = z.object({
@@ -47,8 +47,8 @@ export const v39TokenBalanceSchema = z.object({
 })
 
 export const v39TokenSchema = z.object({
-  name: z.string(),
-  symbol: z.string(),
+  name: z.string().default(''),
+  symbol: z.string().default(''),
   chainId: ChainIdSchema,
   address: z.string(),
   decimals: z.number(),
@@ -59,10 +59,15 @@ const v38StateSchema = z
   .object({
     main: z
       .object({
-        tokens: z.object({
-          known: z.record(z.array(v38TokenBalanceSchema)),
-          custom: z.array(v38TokenSchema)
-        })
+        tokens: z
+          .object({
+            known: z.record(z.array(z.unknown())).catch({}),
+            custom: z.array(z.unknown()).catch([])
+          })
+          .default({
+            known: {},
+            custom: []
+          })
       })
       .passthrough()
   })
@@ -77,11 +82,23 @@ const transformToken = <T extends WithLogo>({ logoURI = '', ...token }: T) => ({
   }
 })
 
+const transformKnownToken = (token: unknown) => {
+  try {
+    return v38TokenSchema.parse(token)
+  } catch (e) {
+    log.error('Migration 39: could not parse token', token, e)
+    return token
+  }
+}
+
 const migrate = (initial: unknown) => {
   try {
     const state = v38StateSchema.parse(initial)
-    for (const key in state.main.tokens.known) {
-      state.main.tokens.known[key] = state.main.tokens.known[key].map(transformToken)
+    const tokens = state.main.tokens
+
+    for (const address in tokens.known) {
+      const knownTokensForAddress = tokens.known[address]
+      state.main.tokens.known[address] = knownTokensForAddress.map(transformToken)
     }
 
     state.main.tokens.custom = state.main.tokens.custom.map(transformToken)
