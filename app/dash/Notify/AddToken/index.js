@@ -194,13 +194,7 @@ class AddToken extends React.Component {
                   className='addTokenSubmit addTokenSubmitEnabled'
                   onMouseDown={() => {
                     const { name, symbol, chainId, address, decimals, logoURI } = this.state
-                    const isExistingMedia = [
-                      this.props.token.media.source,
-                      this.props.token.media.cdn?.thumb
-                    ].includes(logoURI)
-                    const media = isExistingMedia
-                      ? this.props.token.media
-                      : { source: logoURI, format: 'image', cdn: {} }
+                    const media = { source: logoURI, format: 'image', cdn: {} }
                     const token = { name, symbol, chainId, address, decimals, media }
                     link.send('tray:addToken', token)
                     setTimeout(() => {

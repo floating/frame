@@ -426,7 +426,11 @@ describe('#addCustomTokens', () => {
           chainId: testTokens.badger.chainId,
           symbol: 'BDG',
           name: 'Old Badger',
-          logoURI: 'http://logo.io'
+          media: {
+            source: 'abc',
+            format: 'image',
+            cdn: {}
+          }
         }
       ]
     }
@@ -445,7 +449,11 @@ describe('#addCustomTokens', () => {
         chainId: testTokens.badger.chainId,
         symbol: 'BADGER',
         name: 'Badger Token',
-        logoURI: 'http://logo.io'
+        media: {
+          source: 'abc',
+          format: 'image',
+          cdn: {}
+        }
       }
     ])
   })

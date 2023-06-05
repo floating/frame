@@ -217,10 +217,8 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
     Number.isInteger(decimals)
 
   const saveAndClose = () => {
-    const isExistingMedia = [tokenData.media.source, tokenData.media.cdn?.thumb].includes(logoUri)
-
     const source = logoUri === tokenDetailsDefaults.logoURI ? '' : logoUri
-    const media = isExistingMedia ? this.props.token.media : { source, format: 'image', cdn: {} }
+    const media = { source, format: 'image', cdn: {} }
 
     const token = {
       name,

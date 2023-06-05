@@ -135,6 +135,39 @@ it('should pass through custom tokens with corrupted schemas', () => {
   expect(migratedState.main.tokens.custom[0]).toStrictEqual(customToken)
 })
 
+it.skip('should transform all correctly shaped custom tokens', () => {
+  const corruptedToken = {
+    name: 'Custom Token',
+    symabol: 'CT',
+    chainId: 1,
+    address: '0x1234',
+    decimals: 18
+  }
+
+  const validToken = {
+    chainId: 1,
+    address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+    name: 'Test Token',
+    symbol: 'TT',
+    decimals: 18,
+    logoURI: 'https://example.com/logo.png'
+  }
+
+  state.main.tokens.custom.push(corruptedToken, validToken)
+
+  const migratedState = migration.migrate(state)
+
+  expect(migratedState.main.tokens.custom[0]).toStrictEqual(corruptedToken)
+  expect(migratedState.main.tokens.custom[1]).toStrictEqual({
+    ...validToken,
+    media: {
+      source: validToken.logoURI,
+      format: 'image',
+      cdn: {}
+    }
+  })
+})
+
 it('should pass through known tokens with corrupted schemas', () => {
   const knownToken = {
     chainId: 1,
@@ -150,4 +183,41 @@ it('should pass through known tokens with corrupted schemas', () => {
   const migratedState = migration.migrate(state)
 
   expect(migratedState.main.tokens.known['0x123']).toStrictEqual([knownToken])
+})
+
+it.skip('should transform all correctly shaped known tokens', () => {
+  const corruptedKnownToken = {
+    chainId: 1,
+    address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+    name: 'Test Token',
+    symbol: 'TT',
+    decimal: 18,
+    balance: '0x123',
+    displayBalance: '123'
+  }
+
+  const validKnownToken = {
+    chainId: 1,
+    address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+    name: 'Test Token 2',
+    symbol: 'TT2',
+    decimals: 18,
+    logoURI: 'https://example.com/logo.png',
+    balance: '0x123',
+    displayBalance: '123'
+  }
+
+  state.main.tokens.known['0x123'] = [corruptedKnownToken, validKnownToken]
+
+  const migratedState = migration.migrate(state)
+
+  expect(migratedState.main.tokens.known['0x123'][0]).toStrictEqual(corruptedKnownToken)
+  expect(migratedState.main.tokens.known['0x123'][1]).toStrictEqual({
+    ...validKnownToken,
+    media: {
+      source: validKnownToken.logoURI,
+      format: 'image',
+      cdn: {}
+    }
+  })
 })
