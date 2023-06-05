@@ -1,9 +1,7 @@
 import log from 'electron-log'
-import { z } from 'zod'
+import { Schema, z } from 'zod'
 
 import { AddressSchema, ChainIdSchema, HexStringSchema } from '../../../state/types/utils'
-
-type WithLogo = { logoURI?: string }
 
 const v38TokenSchema = z.object({
   name: z.string().default(''),
@@ -35,6 +33,8 @@ export const v39MediaSchema = z.object({
   })
 })
 
+type V39Media = z.infer<typeof v39MediaSchema>
+
 export const v39TokenBalanceSchema = z.object({
   chainId: ChainIdSchema,
   address: AddressSchema,
@@ -55,6 +55,11 @@ export const v39TokenSchema = z.object({
   media: v39MediaSchema
 })
 
+const defaultTokensState = {
+  known: {},
+  custom: []
+}
+
 const v38StateSchema = z
   .object({
     main: z
@@ -64,32 +69,57 @@ const v38StateSchema = z
             known: z.record(z.array(z.unknown())).catch({}),
             custom: z.array(z.unknown()).catch([])
           })
-          .default({
-            known: {},
-            custom: []
-          })
+          .catch(defaultTokensState)
+          .default(defaultTokensState)
       })
       .passthrough()
   })
   .passthrough()
 
-const transformToken = <T extends WithLogo>({ logoURI = '', ...token }: T) => ({
-  ...token,
-  media: {
-    source: logoURI,
-    format: 'image',
-    cdn: {}
-  }
+const v39StateSchema = z.object({
+  main: z
+    .object({
+      tokens: z
+
+        .object({
+          known: z.record(z.array(v39TokenBalanceSchema)).catch({}),
+          custom: z.array(v39TokenSchema).catch([])
+        })
+        .catch(defaultTokensState)
+        .default(defaultTokensState)
+    })
+    .passthrough()
 })
 
-const transformKnownToken = (token: unknown) => {
-  try {
-    return v38TokenSchema.parse(token)
-  } catch (e) {
-    log.error('Migration 39: could not parse token', token, e)
-    return token
+const transformToken = <S extends Schema>(
+  token: unknown,
+  schemaIn: Schema,
+  schemaOut: S
+): Array<z.infer<S>> => {
+  const parsed = schemaIn.safeParse(token)
+  if (!parsed.success) {
+    log.error('Migration 39: could not parse token', token, parsed.error)
+    return []
   }
+
+  const { logoURI = '', ...tokenData } = parsed.data
+
+  const parsedOut = schemaOut.safeParse({
+    ...tokenData,
+    media: {
+      source: logoURI,
+      format: 'image',
+      cdn: {}
+    }
+  })
+
+  return parsedOut.success ? [parsedOut.data] : []
 }
+
+const transformKnownToken = (token: unknown) =>
+  transformToken(token, v38TokenBalanceSchema, v39TokenBalanceSchema)
+
+const transformCustomToken = (token: unknown) => transformToken(token, v38TokenSchema, v39TokenSchema)
 
 const migrate = (initial: unknown) => {
   try {
@@ -98,11 +128,11 @@ const migrate = (initial: unknown) => {
 
     for (const address in tokens.known) {
       const knownTokensForAddress = tokens.known[address]
-      state.main.tokens.known[address] = knownTokensForAddress.map(transformToken)
+      state.main.tokens.known[address] = knownTokensForAddress.flatMap(transformKnownToken)
     }
 
-    state.main.tokens.custom = state.main.tokens.custom.map(transformToken)
-    return state
+    state.main.tokens.custom = state.main.tokens.custom.flatMap(transformCustomToken)
+    return v39StateSchema.parse(state)
   } catch (e) {
     log.error('Migration 39: could not parse state', e)
     return initial
