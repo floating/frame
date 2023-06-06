@@ -1,7 +1,6 @@
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
-import type { Chain, Balance, Token } from '../../store/state'
-import { TokenBalance } from '../../store/state/types/token'
+import type { Chain, Token, TokenBalance } from '../../store/state'
 
 export const BalancesStoreApi = (store: Store) => ({
   getActiveAddress: () => (store('selected.current') || '') as Address,

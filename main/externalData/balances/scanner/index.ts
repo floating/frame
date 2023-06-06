@@ -1,11 +1,13 @@
 import log from 'electron-log'
+
+import processor from '../processor'
+import BalancesWorkerController from '../controller'
 import { BalancesStoreApi } from '..'
 import { NATIVE_CURRENCY } from '../../../../resources/constants'
 import { toTokenId } from '../../../../resources/domain/balance'
-import BalancesWorkerController from '../controller'
-import processor from '../processor'
-import { CurrencyBalance } from '../scan'
-import { Balance, Token, TokenBalance, WithTokenId } from '../../../store/state'
+
+import type { CurrencyBalance } from '../scan'
+import type { Token, TokenBalance, WithTokenId } from '../../../store/state'
 
 const RESTART_WAIT = 5 // seconds
 

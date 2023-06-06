@@ -34,7 +34,7 @@ const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
   let name = balance.name
   if (name.length > 21) name = name.substr(0, 19) + '..'
 
-  const displayPriceChange = () => (!priceChange ? '' : `(${direction === 1 ? '+' : ''}${priceChange}%)`)
+  const displayPriceChange = () => (priceChange ? `(${direction === 1 ? '+' : ''}${priceChange}%)` : '')
 
   const { name: chainName = '', isTestnet = false } = chain
   const imageURL = media.cdn.thumb || media.cdn.main || media.source //TODO: should proxy non-cdn assets

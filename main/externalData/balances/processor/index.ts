@@ -5,7 +5,7 @@ import surface from '../../surface'
 import { BalancesStoreApi } from '..'
 import { toTokenId } from '../../../../resources/domain/balance'
 
-import type { Balance, Token, TokenBalance } from '../../../store/state'
+import type { Token, TokenBalance } from '../../../store/state'
 
 const toExpiryWindow = {
   snapshot: 1000 * 60 * 5,
