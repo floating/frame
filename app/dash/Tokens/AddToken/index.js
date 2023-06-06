@@ -5,34 +5,45 @@ import RingIcon from '../../../../resources/Components/RingIcon'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
-const invalidFormatError = 'INVALID CONTRACT ADDRESS'
-const unableToVerifyError = `COULD NOT FIND TOKEN WITH ADDRESS`
+const ERRORS = {
+  invalidFormat: 'INVALID CONTRACT ADDRESS',
+  unableToVerify: `COULD NOT FIND TOKEN WITH ADDRESS`
+}
 
-const navForward = async (notifyData) =>
-  link.send('nav:forward', 'dash', {
-    view: 'tokens',
-    data: {
-      notify: 'addToken',
-      notifyData
-    }
-  })
+const TOKEN_DETAIL_DEFAULTS = {
+  name: 'Token Name',
+  symbol: 'Symbol',
+  decimals: '?',
+  logoURI: 'Logo URI'
+}
 
-const navBack = async (steps = 1) => link.send('nav:back', 'dash', steps)
+const navigate = {
+  forward: async (notifyData) =>
+    link.send('nav:forward', 'dash', {
+      view: 'tokens',
+      data: {
+        notify: 'addToken',
+        notifyData
+      }
+    }),
+
+  back: async (steps = 1) => link.send('nav:back', 'dash', steps)
+}
 
 const TokenError = ({ text, onContinue }) => {
   return (
     <div className='newTokenView cardShow'>
       <div className='newTokenErrorTitle'>{text}</div>
 
-      <div className='tokenSetAddress' role='button' onClick={() => navBack()}>
+      <div className='tokenSetAddress' role='button' onClick={() => navigate.back()}>
         {'BACK'}
       </div>
-      {text.includes(unableToVerifyError) && (
+      {text.includes(ERRORS.unableToVerify) && (
         <div
           className='tokenSetAddress'
           role='button'
           onClick={() => {
-            navBack()
+            navigate.back()
             onContinue()
           }}
         >
@@ -117,14 +128,19 @@ const EnterAddress = ({ chain }) => {
     setFetching(true)
 
     const tokenData = await link.invoke('tray:getTokenDetails', contractAddress, chain.id)
-    const error = tokenData.totalSupply ? null : `${unableToVerifyError} ${contractAddress}`
-    return navForward({ error, tokenData, address: contractAddress, chain })
+    const error = tokenData.totalSupply ? null : `${ERRORS.unableToVerify} ${contractAddress}`
+    return navigate.forward({
+      error,
+      tokenData: { ...tokenData, media: { source: '' } },
+      address: contractAddress,
+      chain
+    })
   }
 
   const submit = () => {
     if (!isValidAddress(contractAddress))
-      return navForward({
-        error: invalidFormatError,
+      return navigate.forward({
+        error: ERRORS.invalidFormat,
         address: contractAddress,
         chain
       })
@@ -190,18 +206,31 @@ const EnterAddress = ({ chain }) => {
   )
 }
 
-const tokenDetailsDefaults = {
-  name: 'Token Name',
-  symbol: 'Symbol',
-  decimals: '?',
-  logoURI: 'Logo URI'
-}
-
 const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
-  const [name, setName] = useState(tokenData.name || tokenDetailsDefaults.name)
-  const [symbol, setSymbol] = useState(tokenData.symbol || tokenDetailsDefaults.symbol)
-  const [decimals, setDecimals] = useState(tokenData.decimals || tokenDetailsDefaults.decimals)
-  const [logoUri, setLogoUri] = useState(tokenData.logoURI || tokenDetailsDefaults.logoURI)
+  const { name: tokenName, symbol: tokenSymbol, decimals: tokenDecimals, media = {} } = tokenData
+  const {
+    name: defaultName,
+    symbol: defaultSymbol,
+    decimals: defaultDecimals,
+    logoURI: defaultLogoURI
+  } = TOKEN_DETAIL_DEFAULTS
+
+  const [name, setName] = useState(tokenName || defaultName)
+  const [symbol, setSymbol] = useState(tokenSymbol || defaultSymbol)
+  const [decimals, setDecimals] = useState(tokenDecimals || defaultDecimals)
+  const [logoUri, setLogoUri] = useState(media?.source || defaultLogoURI)
+
+  // handle asynchronous loading of token data
+  useEffect(() => {
+    setName(tokenName || defaultName)
+    setSymbol(tokenSymbol || defaultSymbol)
+    setDecimals(tokenDecimals || defaultDecimals)
+    setLogoUri(media.source || defaultLogoURI)
+  }, [tokenData])
+
+  useEffect(() => {
+    focusSubmitButton()
+  }, [])
 
   const submitRef = useRef(null)
 
@@ -210,14 +239,14 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
 
   const newTokenReady =
     name &&
-    name !== tokenDetailsDefaults.name &&
+    name !== defaultName &&
     symbol &&
-    symbol !== tokenDetailsDefaults.symbol &&
+    symbol !== defaultSymbol &&
     Number.isInteger(chain.id) &&
     Number.isInteger(decimals)
 
   const saveAndClose = () => {
-    const source = logoUri === tokenDetailsDefaults.logoURI ? '' : logoUri
+    const source = logoUri === defaultLogoURI ? '' : logoUri
     const media = { source, format: 'image', cdn: {} }
 
     const token = {
@@ -234,7 +263,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
     link.send('tray:addToken', token, req)
 
     setTimeout(() => {
-      navBack(backSteps)
+      navigate.back(backSteps)
       link.send('nav:forward', 'dash', {
         view: 'tokens',
         data: {}
@@ -254,20 +283,6 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
       saveAndClose()
     }
   }
-
-  // handle asynchronous loading of token data
-  useEffect(() => {
-    const { name, symbol, decimals, logoURI } = tokenData
-
-    setName(name || tokenDetailsDefaults.name)
-    setSymbol(symbol || tokenDetailsDefaults.symbol)
-    setDecimals(decimals || tokenDetailsDefaults.decimals)
-    setLogoUri(logoURI || tokenDetailsDefaults.logoURI)
-  }, [tokenData])
-
-  useEffect(() => {
-    focusSubmitButton()
-  }, [])
 
   return (
     <div className='notifyBoxWrap cardShow' onMouseDown={(e) => e.stopPropagation()}>
@@ -299,17 +314,17 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
             <div className='tokenName'>
               <label className='tokenInputLabel'>
                 <input
-                  className={`tokenInput ${name === tokenDetailsDefaults.name ? 'tokenInputDim' : ''}`}
+                  className={`tokenInput ${name === defaultName ? 'tokenInputDim' : ''}`}
                   value={name}
                   spellCheck={false}
                   onChange={(e) => {
                     setName(e.target.value)
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === tokenDetailsDefaults.name) setName('')
+                    if (e.target.value === defaultName) setName('')
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') setName(tokenDetailsDefaults.name)
+                    if (e.target.value === '') setName(defaultName)
                     focusSubmitButton()
                   }}
                   onKeyDown={handleKeyPress}
@@ -323,7 +338,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
             <div className='tokenSymbol'>
               <label className='tokenInputLabel'>
                 <input
-                  className={`tokenInput ${symbol === tokenDetailsDefaults.symbol ? 'tokenInputDim' : ''}`}
+                  className={`tokenInput ${symbol === defaultSymbol ? 'tokenInputDim' : ''}`}
                   value={symbol}
                   spellCheck={false}
                   onChange={(e) => {
@@ -331,10 +346,10 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                     setSymbol(e.target.value)
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === tokenDetailsDefaults.symbol) setSymbol('')
+                    if (e.target.value === defaultSymbol) setSymbol('')
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') setSymbol(tokenDetailsDefaults.symbol)
+                    if (e.target.value === '') setSymbol(defaultSymbol)
                     focusSubmitButton()
                   }}
                   onKeyDown={handleKeyPress}
@@ -346,9 +361,7 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
             <div className='tokenDecimals'>
               <label className='tokenInputLabel'>
                 <input
-                  className={`tokenInput ${
-                    decimals === tokenDetailsDefaults.decimals ? 'tokenInputDim' : ''
-                  }`}
+                  className={`tokenInput ${decimals === defaultDecimals ? 'tokenInputDim' : ''}`}
                   value={decimals}
                   spellCheck={false}
                   onChange={(e) => {
@@ -361,10 +374,10 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
                     setDecimals(decimals)
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === tokenDetailsDefaults.decimals) setDecimals('')
+                    if (e.target.value === defaultDecimals) setDecimals('')
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') setDecimals(tokenDetailsDefaults.decimals)
+                    if (e.target.value === '') setDecimals(defaultDecimals)
                     focusSubmitButton()
                   }}
                   onKeyDown={handleKeyPress}
@@ -378,17 +391,17 @@ const TokenDetailsForm = ({ req, chain, tokenData, isEdit }) => {
             <div className='tokenLogoUri'>
               <label className='tokenInputLabel'>
                 <input
-                  className={`tokenInput ${logoUri === tokenDetailsDefaults.logoURI ? 'tokenInputDim' : ''}`}
+                  className={`tokenInput ${logoUri === defaultLogoURI ? 'tokenInputDim' : ''}`}
                   value={logoUri}
                   spellCheck={false}
                   onChange={(e) => {
                     setLogoUri(e.target.value)
                   }}
                   onFocus={(e) => {
-                    if (e.target.value === tokenDetailsDefaults.logoURI) setLogoUri('')
+                    if (e.target.value === defaultLogoURI) setLogoUri('')
                   }}
                   onBlur={(e) => {
-                    if (e.target.value === '') setLogoUri(tokenDetailsDefaults.logoURI)
+                    if (e.target.value === '') setLogoUri(defaultLogoURI)
                     focusSubmitButton()
                   }}
                   onKeyDown={handleKeyPress}
@@ -430,7 +443,7 @@ const AddToken = ({ data, req }) => {
 
   if (!chain) return <SelectChain />
   if (!address) return <EnterAddress chain={chain} />
-  if (error) return <TokenError text={error} onContinue={() => navForward({ address, chain })} />
+  if (error) return <TokenError text={error} onContinue={() => navigate.forward({ address, chain })} />
 
   return <TokenDetailsForm chain={chain} req={req} tokenData={{ ...tokenData, address }} isEdit={isEdit} />
 }
