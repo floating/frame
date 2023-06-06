@@ -10,7 +10,6 @@ import { BalancesStoreApi } from './balances'
 import { debounce } from '../../resources/utils'
 
 import {
-  createAccountsObserver,
   createActiveAccountObserver,
   createChainsObserver,
   createTokensObserver,

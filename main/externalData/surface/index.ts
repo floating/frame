@@ -6,8 +6,7 @@ import Networks from './networks'
 import bProcessor from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
 
-import type { TokenBalance } from '../balances/scan'
-import type { Inventory, InventoryAsset } from '../../store/state'
+import type { Inventory, InventoryAsset, TokenBalance } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
@@ -75,7 +74,7 @@ const toTokenBalance = (b: BalanceItem) => ({
   balance: b.amount,
   decimals: b.decimals || 18,
   displayBalance: formatUnits(b.amount, b.decimals),
-  logoURI: b.media?.cdn?.frozenThumb || b.media?.cdn?.thumb
+  media: b.media
 })
 
 const toInventoryAsset = (item: CollectionItem): InventoryAsset => ({

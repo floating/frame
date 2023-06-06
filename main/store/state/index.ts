@@ -15,7 +15,7 @@ export type { Origin } from './types/origin'
 export type { Permission } from './types/permission'
 export type { Account, AccountMetadata } from './types/account'
 export type { Balance } from './types/balance'
-export type { WithTokenId, Token } from './types/token'
+export type { WithTokenId, Token, TokenBalance } from './types/token'
 export type { Dapp } from './types/dapp'
 export type { NativeCurrency } from './types/nativeCurrency'
 export type { Gas, GasFees } from './types/gas'
@@ -96,7 +96,7 @@ type M = Main & {
 }
 
 const mainState: M = {
-  _version: main('_version', 38),
+  _version: main('_version', 39),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {

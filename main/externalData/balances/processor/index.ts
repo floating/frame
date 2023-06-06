@@ -5,8 +5,7 @@ import surface from '../../surface'
 import { BalancesStoreApi } from '..'
 import { toTokenId } from '../../../../resources/domain/balance'
 
-import type { Balance, Token } from '../../../store/state'
-import type { TokenBalance } from '../scan'
+import type { Token, TokenBalance } from '../../../store/state'
 
 const toExpiryWindow = {
   snapshot: 1000 * 60 * 5,
@@ -21,7 +20,7 @@ const getChangedBalances = (
   const currentTokenBalances = api.getTokenBalances(address)
   const custom = api.getCustomTokens()
   const customTokens = new Set(custom.map(toTokenId))
-  const isCustomToken = (balance: Balance) => customTokens.has(toTokenId(balance))
+  const isCustomToken = (balance: TokenBalance) => customTokens.has(toTokenId(balance))
 
   //TODO: in here should we check the token data inside the store and adopt the existing name?
   const changedBalances = tokenBalances.reduce((balances, newBalance) => {
@@ -52,7 +51,6 @@ const getTokenChanges = (
   api: ReturnType<typeof BalancesStoreApi>
 ) => {
   const knownTokens = new Set(api.getKnownTokens(address).map(toTokenId))
-  const customTokens = new Set(api.getCustomTokens().map(toTokenId))
   const isKnown = (balance: TokenBalance) => knownTokens.has(toTokenId(balance))
 
   // add any non-zero balances to the list of known tokens
