@@ -53,8 +53,8 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
         </ClusterValue>
       )
     }
-    const { tokenId, name, image } = item
-    const src = image?.cdn?.original?.main || image?.cdn?.frozen?.main || ''
+    const { tokenId, name, media } = item
+    const src = media.cdn.frozenThumb || media.cdn.thumb || media.source || ''
 
     return (
       <ClusterValue
