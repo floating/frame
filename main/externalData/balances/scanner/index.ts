@@ -1,11 +1,13 @@
 import log from 'electron-log'
+
+import processor from '../processor'
+import BalancesWorkerController from '../controller'
 import { BalancesStoreApi } from '..'
 import { NATIVE_CURRENCY } from '../../../../resources/constants'
 import { toTokenId } from '../../../../resources/domain/balance'
-import BalancesWorkerController from '../controller'
-import processor from '../processor'
-import { CurrencyBalance, TokenBalance } from '../scan'
-import { Balance, Token, WithTokenId } from '../../../store/state'
+
+import type { CurrencyBalance } from '../scan'
+import type { Token, TokenBalance, WithTokenId } from '../../../store/state'
 
 const RESTART_WAIT = 5 // seconds
 
@@ -208,7 +210,7 @@ function BalanceScanner(store: Store, api: ReturnType<typeof BalancesStoreApi>) 
     const includesBlacklistedTokens = (arr: WithTokenId[]) =>
       arr.some((val) => tokensToRemove.has(toTokenId(val)))
 
-    const balances: Record<string, Balance[]> = store('main.balances')
+    const balances: Record<string, TokenBalance[]> = store('main.balances')
     const knownTokens: Record<string, Token[]> = store('main.tokens.known')
 
     Object.entries(balances).forEach(([accountAddress, balances]) => {

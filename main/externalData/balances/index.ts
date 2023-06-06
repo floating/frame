@@ -1,6 +1,6 @@
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
-import type { Chain, Balance, Token } from '../../store/state'
+import type { Chain, Token, TokenBalance } from '../../store/state'
 
 export const BalancesStoreApi = (store: Store) => ({
   getActiveAddress: () => (store('selected.current') || '') as Address,
@@ -25,12 +25,12 @@ export const BalancesStoreApi = (store: Store) => ({
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
   getKnownTokens: (address?: Address): Token[] => (address && store('main.tokens.known', address)) || [],
   getCurrencyBalances: (address: Address) => {
-    return ((store('main.balances', address) || []) as Balance[]).filter(
+    return ((store('main.balances', address) || []) as TokenBalance[]).filter(
       (balance) => balance.address === NATIVE_CURRENCY
     )
   },
   getTokenBalances: (address: Address) => {
-    const balances = (store('main.balances', address) || []) as Balance[]
+    const balances = (store('main.balances', address) || []) as TokenBalance[]
     return balances.filter((balance) => balance.address !== NATIVE_CURRENCY)
   },
   getTrayOpened: () => store('tray.open'),

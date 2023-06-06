@@ -687,7 +687,7 @@ module.exports = {
           )
 
           if (matchingBalance) {
-            matchingBalance.logoURI = token.logoURI || matchingBalance.logoURI
+            matchingBalance.media = token.media || matchingBalance.media
             matchingBalance.symbol = token.symbol || matchingBalance.symbol
             matchingBalance.name = token.name || matchingBalance.symbol
           }

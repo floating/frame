@@ -12,6 +12,7 @@ import { KnownOriginsSchema } from './origin'
 import { PermissionSchema } from './permission'
 import { PrivacySchema } from './privacy'
 import { ShortcutsSchema } from './shortcuts'
+import { TokenBalanceSchema, TokenSchema } from './token'
 import { SignerSchema } from './signer'
 
 const UpdaterPreferencesSchema = z.object({
@@ -46,6 +47,10 @@ export const MainSchema = z.object({
     z.string().describe('Address'),
     z.record(z.string().describe('Origin Id'), PermissionSchema)
   ),
+  tokens: z.object({
+    custom: z.array(TokenSchema),
+    known: z.record(z.string(), z.array(TokenBalanceSchema))
+  }),
   accounts: z.record(z.string(), AccountSchema),
   accountsMeta: z.record(z.string(), AccountMetadataSchema),
   signers: z.record(z.string(), SignerSchema),

@@ -19,8 +19,7 @@ export type { Permission } from './types/permission'
 export type { HardwareSignerType, HotSignerType, SignerType, Signer } from './types/signer'
 export type { Account, AccountMetadata } from './types/account'
 export type { Balance } from './types/balance'
-export type { InventoryAsset, InventoryCollection } from './types/inventory'
-export type { WithTokenId, Token } from './types/token'
+export type { WithTokenId, Token, TokenBalance } from './types/token'
 export type { Dapp } from './types/dapp'
 export type { NativeCurrency } from './types/nativeCurrency'
 export type { Gas, GasFees } from './types/gas'
@@ -29,6 +28,7 @@ export type { Frame, ViewMetadata } from './types/frame'
 export type { Shortcut, ShortcutKey, ModifierKey } from './types/shortcuts'
 export type { ColorwayPalette } from './types/colors'
 export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
+export type { Media } from './types/media'
 
 const StateSchema = z.object({
   main: MainSchema.passthrough(), // TODO: remove passthrough once all pieces of state have been defined
@@ -88,7 +88,7 @@ const main = (path: string, def: any) => {
 }
 
 const mainState = {
-  _version: main('_version', 38),
+  _version: main('_version', 39),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {

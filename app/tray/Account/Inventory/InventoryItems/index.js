@@ -53,8 +53,8 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
         </ClusterValue>
       )
     }
-    const { tokenId, name, image } = item
-    const src = image?.cdn?.original?.main || image?.cdn?.frozen?.main || ''
+    const { tokenId, name, media } = item
+    const src = media.cdn.frozenThumb || media.cdn.thumb || media.source || ''
 
     return (
       <ClusterValue
@@ -130,13 +130,9 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                       <div
                         className='inventoryPreviewCollection'
                         style={
-                          inventory[k].meta.image
+                          inventory[k].meta.media
                             ? {
-                                backgroundImage: `url(${
-                                  inventory[k].meta.image.cdn.original.main ||
-                                  inventory[k].meta.image.cdn.frozen.main ||
-                                  ''
-                                })`
+                                backgroundImage: `url(${inventory[k].meta.media.cdn.main || ''})`
                               }
                             : {}
                         }
