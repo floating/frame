@@ -142,7 +142,10 @@ describe('setting token address', () => {
             decimals: 0,
             name: '',
             symbol: '',
-            totalSupply: ''
+            totalSupply: '',
+            media: {
+              source: ''
+            }
           }
         }
       }
@@ -154,7 +157,8 @@ describe('setting token address', () => {
       decimals: 420,
       name: 'FAKE COIN',
       symbol: 'FAKE',
-      totalSupply: '100000'
+      totalSupply: '100000',
+      media: { source: '' }
     }
 
     link.invoke.mockImplementationOnce((action, address, chainId) => {
@@ -234,7 +238,8 @@ describe('setting token details', () => {
               symbol: 'FAKE',
               name: 'FAKE',
               address: '0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D4',
-              totalSupply: '100'
+              totalSupply: '100',
+              media: {}
             }
           }
         }}
@@ -294,7 +299,13 @@ describe('setting token details', () => {
   it('should populate fields with token data', async () => {
     store.setPrimary('ethereum', 137, { connected: true })
 
-    const mockToken = { name: 'Frame Test on Polygon', symbol: 'mFRT', decimals: 18, totalSupply: '1066' }
+    const mockToken = {
+      name: 'Frame Test on Polygon',
+      symbol: 'mFRT',
+      decimals: 18,
+      totalSupply: '1066',
+      media: {}
+    }
 
     render(
       <AddToken

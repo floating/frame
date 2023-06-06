@@ -56,8 +56,8 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
     link.rpc('subscribeToItems', account, items, () => {})
   }, [])
 
-  const frozenSrc = collection?.meta?.image?.cdn?.frozen?.thumb || ''
-  const src = collection?.meta?.image?.cdn?.original?.thumb || ''
+  const frozenSrc = collection?.meta?.media?.cdn?.frozenThumb || ''
+  const src = collection?.meta?.media?.cdn?.thumb || ''
 
   return (
     <ClusterRow key={collectionId}>
@@ -97,7 +97,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
             <CollectionMain>
               <CollectionDots style={{ width: previewItems.length * 24 + 'px' }}>
                 {previewItems.map((item, i) => {
-                  const src = item.image?.cdn?.frozen?.thumb || ''
+                  const src = item.media?.cdn?.frozenThumb || ''
                   return (
                     <CollectionDot key={item.tokenId} active={active}>
                       {src ? <img src={src} alt={item.name} /> : null}

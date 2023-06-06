@@ -433,7 +433,11 @@ describe('#send', () => {
               symbol: 'BADGER',
               name: 'BadgerDAO Token',
               decimals: 18,
-              image: 'https://badgerdao.io/icon.jpg'
+              media: {
+                source: 'https://badgerdao.io/icon.jpg',
+                format: 'image',
+                cdn: {}
+              }
             },
             payload: request
           })

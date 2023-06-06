@@ -10,17 +10,13 @@ const randomStr = () => randomBytes(32).toString('hex')
 const genInventoryAsset = (name = randomStr()) => ({
   name,
   tokenId: randomStr(),
-  image: {
+  media: {
     source: randomStr(),
+    format: 'image' as const,
     cdn: {
-      original: {
-        main: randomStr(),
-        thumb: randomStr()
-      },
-      frozen: {
-        main: randomStr(),
-        thumb: randomStr()
-      }
+      main: randomStr(),
+      thumb: randomStr(),
+      frozenThumb: randomStr()
     }
   },
   contract: randomStr(),
@@ -44,17 +40,13 @@ const Collection = (items: InventoryAsset[] = []) => ({
   meta: {
     name: randomStr(),
     description: randomStr(),
-    image: {
+    media: {
       source: randomStr(),
+      format: 'image' as const,
       cdn: {
-        original: {
-          main: randomStr(),
-          thumb: randomStr()
-        },
-        frozen: {
-          main: randomStr(),
-          thumb: randomStr()
-        }
+        main: randomStr(),
+        thumb: randomStr(),
+        frozenThumb: randomStr()
       }
     },
     chainId: Math.floor(Math.random() * 10),
@@ -128,17 +120,13 @@ describe('#updateItems', () => {
         contract: '0x1',
         tokenId: '1',
         name: 'newName',
-        image: {
+        media: {
           source: '',
+          format: '' as const,
           cdn: {
-            original: {
-              main: '',
-              thumb: ''
-            },
-            frozen: {
-              main: '',
-              thumb: ''
-            }
+            main: '',
+            thumb: '',
+            frozenThumb: ''
           }
         }
       },
@@ -146,17 +134,13 @@ describe('#updateItems', () => {
         contract: '0x1',
         tokenId: '2',
         name: 'name2',
-        image: {
+        media: {
           source: '',
+          format: '' as const,
           cdn: {
-            original: {
-              main: '',
-              thumb: ''
-            },
-            frozen: {
-              main: '',
-              thumb: ''
-            }
+            main: '',
+            thumb: '',
+            frozenThumb: ''
           }
         }
       }

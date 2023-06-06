@@ -7,7 +7,7 @@ export const createState = (version = 0) => ({
     balances: {},
     mute: {},
     shortcuts: {},
-    tokens: { known: {} }
+    tokens: { known: {}, custom: [] }
   }
 })
 

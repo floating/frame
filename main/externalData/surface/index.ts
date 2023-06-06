@@ -6,22 +6,17 @@ import Networks from './networks'
 import bProcessor from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
 
-import type { TokenBalance } from '../balances/scan'
-import type { Inventory } from '../../store/state'
+import type { Inventory, InventoryAsset, TokenBalance } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
-type Image = {
+type Media = {
   source: string
+  format: 'image' | 'video' | ''
   cdn: {
-    original: {
-      main?: string
-      thumb?: string
-    }
-    frozen: {
-      main?: string
-      thumb?: string
-    }
+    main?: string
+    thumb?: string
+    frozenThumb?: string
   }
 }
 
@@ -30,7 +25,7 @@ type ItemCollection = {
   chainId: number
   name: string
   description: string
-  image: Image
+  media: Media
 }
 
 type CollectionMetdata = ItemCollection & {
@@ -39,7 +34,7 @@ type CollectionMetdata = ItemCollection & {
 
 type BalanceItem = {
   contract: string
-  image: Image
+  media: Media
   name: string
   symbol: string
   chainId: number
@@ -53,14 +48,14 @@ interface CollectionItem {
   contract: string
   tokenId: string
   name: string
-  image: Image
+  media: Media
   description: string
 }
 
 const toMeta = (collection: CollectionMetdata) => ({
   name: collection.name,
   description: collection.description,
-  image: collection.image,
+  media: collection.media,
   chainId: collection.chainId,
   external_url: '',
   tokens: collection.ownedItems
@@ -79,13 +74,13 @@ const toTokenBalance = (b: BalanceItem) => ({
   balance: b.amount,
   decimals: b.decimals || 18,
   displayBalance: formatUnits(b.amount, b.decimals),
-  image: b.image
+  media: b.media
 })
 
-const toInventoryAsset = (item: CollectionItem) => ({
+const toInventoryAsset = (item: CollectionItem): InventoryAsset => ({
   name: item.name,
   tokenId: item.tokenId,
-  image: item.image || {},
+  media: item.media || {},
   contract: item.contract,
   ...(item.link && { externalLink: item.link })
 })

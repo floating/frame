@@ -904,7 +904,11 @@ export class Provider extends EventEmitter {
           address,
           symbol,
           decimals,
-          image: tokenData.image
+          media: {
+            source: tokenData.image,
+            format: 'image',
+            cdn: {}
+          }
         }
 
         const handlerId = this.addRequestHandler(res)

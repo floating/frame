@@ -57,7 +57,8 @@ class Balances extends React.Component {
         const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
 
         const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
-        const logoURI = (isNative && nativeCurrencyInfo.icon) || rawBalance.logoURI
+        const logoURI =
+          (isNative && nativeCurrencyInfo.icon) || rawBalance.media?.cdn?.thumb || rawBalance.media?.source
 
         const name = isNative
           ? nativeCurrencyInfo.name || ethereumNetworks[rawBalance.chainId].name

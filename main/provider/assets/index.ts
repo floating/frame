@@ -2,7 +2,8 @@ import store from '../../store'
 
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
-import type { Balance, NativeCurrency, Rate } from '../../store/state'
+import type { NativeCurrency, Rate } from '../../store/state'
+import type { TokenBalance } from '../../store/state/types/token'
 
 export type UsdRate = { usd: Rate }
 
@@ -12,7 +13,7 @@ interface AssetsChangedHandler {
 
 // typed access to state
 const storeApi = {
-  getBalances: (account: Address): Balance[] => {
+  getBalances: (account: Address): TokenBalance[] => {
     return store('main.balances', account) || []
   },
   getNativeCurrency: (chainId: number): NativeCurrency => {
