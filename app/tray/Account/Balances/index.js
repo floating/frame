@@ -6,15 +6,43 @@ import BalancesPreview from './BalancesPreview'
 import BalancesExpanded from './BalancesExpanded'
 
 import { formatUsdRate } from '../../../../resources/domain/balance'
-
-import { isNetworkConnected } from '../../../../resources/utils/chains'
 import { matchFilter } from '../../../../resources/utils'
-
 import {
   createBalance,
   sortByTotalValue as byTotalValue,
   isNativeCurrency
 } from '../../../../resources/domain/balance'
+
+const shouldShow = (ethereumNetworks, hiddenTokens, populatedChains, returnHidden) => (rawBalance) => {
+  const { chainId, address } = rawBalance
+  const isHidden = hiddenTokens.includes(`${chainId}:${address}`)
+  const expires = populatedChains[chainId]?.expires > Date.now()
+
+  return ethereumNetworks[chainId] && expires && returnHidden === isHidden
+}
+
+const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
+  const isNative = isNativeCurrency(rawBalance.address)
+  const nativeCurrencyInfo = networksMeta[rawBalance.chainId]?.nativeCurrency || {}
+  const chain = ethereumNetworks[rawBalance.chainId]
+  const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
+
+  const logoURI =
+    (isNative && nativeCurrencyInfo.icon) || rawBalance.media?.cdn?.thumb || rawBalance.media?.source
+  const name = isNative ? nativeCurrencyInfo.name || chain.name : rawBalance.name
+  const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
+  const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
+
+  const balanceData = {
+    ...rawBalance,
+    logoURI,
+    name,
+    decimals,
+    symbol
+  }
+
+  return createBalance(balanceData, chain.isTestnet ? { price: 0 } : rate.usd)
+}
 
 class Balances extends React.Component {
   componentDidMount() {
@@ -26,7 +54,7 @@ class Balances extends React.Component {
     if (this.intervalId) clearInterval(this.intervalId)
   }
 
-  getBalances(filter, hiddenTokens = [], returnHidden = false) {
+  getStoreValues() {
     const { address } = this.store('main.accounts', this.props.account)
     const rawBalances = this.store('main.balances', address) || []
     const rates = this.store('main.rates')
@@ -37,40 +65,18 @@ class Balances extends React.Component {
       balances: { populatedChains = {} }
     } = this.store('main.accounts', this.props.account)
 
-    const balances = rawBalances
-      // only show balances from connected networks
-      .filter((rawBalance) => {
-        const chain = ethereumNetworks[rawBalance.chainId]
+    return { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains }
+  }
 
-        const isHidden = hiddenTokens.includes(`${rawBalance.chainId}:${rawBalance.address}`)
+  getBalances(filter, hiddenTokens = [], returnHidden = false) {
+    const { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains } = this.getStoreValues()
 
-        return (
-          !!chain &&
-          (returnHidden ? isHidden : !isHidden) &&
-          isNetworkConnected(ethereumNetworks[rawBalance.chainId]) &&
-          populatedChains[rawBalance.chainId] &&
-          populatedChains[rawBalance.chainId].expires > Date.now()
-        )
-      })
-      .map((rawBalance) => {
-        const isNative = isNativeCurrency(rawBalance.address)
-        const nativeCurrencyInfo = networksMeta[rawBalance.chainId].nativeCurrency || {}
+    const filteredBalances = rawBalances.filter(
+      shouldShow(ethereumNetworks, hiddenTokens, populatedChains, returnHidden)
+    )
 
-        const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
-        const logoURI =
-          (isNative && nativeCurrencyInfo.icon) || rawBalance.media?.cdn?.thumb || rawBalance.media?.source
-
-        const name = isNative
-          ? nativeCurrencyInfo.name || ethereumNetworks[rawBalance.chainId].name
-          : rawBalance.name
-        const decimals = isNative ? nativeCurrencyInfo.decimals || 18 : rawBalance.decimals
-        const symbol = (isNative && nativeCurrencyInfo.symbol) || rawBalance.symbol
-
-        return createBalance(
-          { ...rawBalance, logoURI, name, decimals, symbol },
-          ethereumNetworks[rawBalance.chainId].isTestnet ? { price: 0 } : rate.usd
-        )
-      })
+    const balances = filteredBalances
+      .map(toBalance(networksMeta, rates, ethereumNetworks))
       .filter((rawBalance) => {
         const chain = ethereumNetworks[rawBalance.chainId]
         return matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])

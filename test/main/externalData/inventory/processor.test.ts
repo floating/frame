@@ -16,7 +16,7 @@ const genInventoryAsset = (name = randomStr()) => ({
     cdn: {
       main: randomStr(),
       thumb: randomStr(),
-      frozenThumb: randomStr()
+      frozen: randomStr()
     }
   },
   contract: randomStr(),
@@ -46,7 +46,7 @@ const Collection = (items: InventoryAsset[] = []) => ({
       cdn: {
         main: randomStr(),
         thumb: randomStr(),
-        frozenThumb: randomStr()
+        frozen: randomStr()
       }
     },
     chainId: Math.floor(Math.random() * 10),
@@ -126,7 +126,7 @@ describe('#updateItems', () => {
           cdn: {
             main: '',
             thumb: '',
-            frozenThumb: ''
+            frozen: ''
           }
         }
       },
@@ -140,7 +140,7 @@ describe('#updateItems', () => {
           cdn: {
             main: '',
             thumb: '',
-            frozenThumb: ''
+            frozen: ''
           }
         }
       }

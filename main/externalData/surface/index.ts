@@ -6,19 +6,9 @@ import Networks from './networks'
 import bProcessor from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
 
-import type { Inventory, InventoryAsset, TokenBalance } from '../../store/state'
+import type { Inventory, InventoryAsset, Media, TokenBalance } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
-
-type Media = {
-  source: string
-  format: 'image' | 'video' | ''
-  cdn: {
-    main?: string
-    thumb?: string
-    frozenThumb?: string
-  }
-}
 
 type ItemCollection = {
   contract: string
