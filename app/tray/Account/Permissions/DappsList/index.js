@@ -141,7 +141,7 @@ const OriginDrawerMenuItem = styled.div`
 //   justify-content center
 //   align-items center
 //   font-size 11px
-//   font-weight 400
+//   font-weight 500
 //   letter-spacing 1px
 //   text-transform uppercase
 //   padding 1px 20px 0px 21px

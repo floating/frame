@@ -1,19 +1,29 @@
 import React from 'react'
+import styled from 'styled-components'
+
 import { DisplayFiatPrice, DisplayValue } from '../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 
 import useStore from '../../../../../resources/Hooks/useStore'
 
+const AccountOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  opacity: 0.02;
+  pointer-events: none;
+  background: ${({ color }) => `linear-gradient(90deg, transparent 0%, ${color} 20%, transparent 100%)`};
+`
+
 const displayName = (name = '') => {
   if (name.length > 24) {
-    return name.slice(0, 22) + '..'
+    return name.slice(0, 22).trim() + '..'
   }
   return name
 }
 
 const displayChain = (name = '') => {
   if (name.length > 14) {
-    return name.slice(0, 12) + '..'
+    return name.slice(0, 12).trim() + '..'
   }
   return name
 }
@@ -57,6 +67,7 @@ const Balance = (props) => {
     <div className={'signerBalance'} key={symbol} onMouseDown={() => this.setState({ selected: i })}>
       {scanning && <div className='signerBalanceLoading' style={{ animationDelay: 0.15 * i + 's' }} />}
       <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
+        <AccountOverlay color={chainColor ? `var(--${chainColor})` : ''} />
         <div className='signerBalanceIcon'>
           <RingIcon
             img={!isEth && !isTestnet && imageURL}
