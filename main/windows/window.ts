@@ -112,7 +112,7 @@ export function openExternal(url = '') {
   }
 }
 
-export function openBlockExplorer(openExplorer: OpenExplorer) {
+export async function openBlockExplorer(openExplorer: OpenExplorer) {
   const { chain, type, hash, address, tokenId } = openExplorer
 
   // remove trailing slashes from the base url
@@ -126,6 +126,8 @@ export function openBlockExplorer(openExplorer: OpenExplorer) {
     } else if (type === 'token' && address) {
       if (tokenId) {
         explorerUrl = `${explorer}/nft/${address}/${tokenId}`
+        const { status } = await fetch(explorerUrl, { method: 'HEAD' })
+        if (status !== 200) explorerUrl = `${explorer}/token/${address}`
       } else {
         explorerUrl = `${explorer}/token/${address}`
       }
