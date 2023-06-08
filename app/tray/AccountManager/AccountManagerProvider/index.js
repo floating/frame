@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useRef } from 'react'
 
 import useStore from '../../../../resources/hooks/useStore'
 
-import { findRoute, removeByRoute, addByRoute, moveItem, insertItemInGroup } from '../organize'
+import { moveItem, insertItemInGroup } from '../organize'
 
 const AccountManagerContext = createContext()
 
@@ -76,6 +76,9 @@ export const AccountManagerProvider = ({ children }) => {
   // Set Drag Over
   const [dragOver, setDragOver] = useState(null)
 
+  // Set Unsetting
+  const [unsetting, setUnsetting] = useState(false)
+
   const [state, setState] = useState(initialState) // initial state for your list
 
   const movePosition =
@@ -130,13 +133,17 @@ export const AccountManagerProvider = ({ children }) => {
   }
 
   const unsetDrag = () => {
-    setDragItem(null)
-    setDragInitialMousePosition(null)
-    setDragCurrentMousePosition(null)
-    setDragInitialItemPosition(null)
-    setDragItemBounds(null)
-    setDragOver(null)
-    setAnchorStyle(null)
+    setUnsetting(true)
+    setTimeout(() => {
+      setDragItem(null)
+      setDragInitialMousePosition(null)
+      setDragCurrentMousePosition(null)
+      setDragInitialItemPosition(null)
+      setDragItemBounds(null)
+      setDragOver(null)
+      setAnchorStyle(null)
+      setUnsetting(false)
+    }, 50)
   }
 
   const active = crumb.view === 'accountManager'
@@ -157,7 +164,8 @@ export const AccountManagerProvider = ({ children }) => {
         dragItemBounds,
         dragOver,
         anchorStyle,
-        setAnchorStyle
+        setAnchorStyle,
+        unsetting
       }}
     >
       {children}
