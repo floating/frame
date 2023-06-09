@@ -29,7 +29,7 @@ export const v39MediaSchema = z.object({
   cdn: z.object({
     main: z.string().optional(),
     thumb: z.string().optional(),
-    frozenThumb: z.string().optional()
+    frozen: z.string().optional()
   })
 })
 

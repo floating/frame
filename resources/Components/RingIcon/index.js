@@ -2,10 +2,18 @@ import React from 'react'
 
 import svg from '../../svg'
 
-const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, active, imgFrozen }) => {
-  if (imgFrozen && !active) {
-    return <img src={imgFrozen} alt={alt} />
-  } else if (img) {
+import DisplayMedia from '../DisplayMedia'
+
+const mediaExists = (media) => {
+  return media?.source && media?.type
+}
+
+const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, frozen, media }) => {
+  if (mediaExists(media)) {
+    return <DisplayMedia media={media} thumb={true} frozen={frozen} />
+  }
+
+  if (img) {
     return <img src={img} alt={alt} />
   }
 
@@ -20,7 +28,7 @@ const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, active, imgFro
   return svg.missing(small ? 8 : 12)
 }
 
-const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft, active, imgFrozen }) => {
+const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft, frozen, media }) => {
   let ringIconClass = 'ringIcon'
   if (small) ringIconClass += ' ringIconSmall'
   if (block) ringIconClass += ' ringIconBlock'
@@ -38,11 +46,11 @@ const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft
           svgName={svgName}
           svgSize={svgSize}
           img={img}
-          imgFrozen={imgFrozen}
           alt={alt}
           small={small}
           nft={nft}
-          active={active}
+          frozen={frozen}
+          media={media}
         />
       </div>
     </div>
