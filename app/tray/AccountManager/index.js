@@ -1,6 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../resources/Components/Cluster'
+
 import { AccountManagerProvider, useAccountManager } from './AccountManagerProvider'
 
 import { AccountManagerWrap, AccountManagerMain } from './styled'
@@ -19,7 +21,7 @@ const Debug = styled.div`
 `
 
 export const AccountManagerController = () => {
-  const { dragItem, active, state, unsetDrag, setDragCurrentMousePosition, dragOver, floatingItemPosition } =
+  const { dragItem, active, state, unsetDrag, setDragCurrentMousePosition, setFloatActive } =
     useAccountManager()
 
   return (
@@ -41,6 +43,7 @@ export const AccountManagerController = () => {
         onMouseMove={(e) => {
           if (dragItem) {
             setDragCurrentMousePosition({ x: e.clientX, y: e.clientY })
+            setFloatActive(true)
           }
         }}
         onMouseUp={(e) => {
@@ -51,6 +54,20 @@ export const AccountManagerController = () => {
         {state.map((item) => {
           return <Item item={item} />
         })}
+        <div style={{ height: '60px' }}></div>
+
+        <Cluster>
+          <ClusterRow>
+            <ClusterValue onClick={() => {}}>
+              <div style={{ height: '40px', pointerEvents: 'none' }}>add group</div>
+            </ClusterValue>
+            <ClusterValue onClick={() => {}}>
+              <div style={{ height: '40px', pointerEvents: 'none' }}>add account</div>
+            </ClusterValue>
+          </ClusterRow>
+        </Cluster>
+
+        <div style={{ height: '60px' }}></div>
       </AccountManagerMain>
     </AccountManagerWrap>
   )

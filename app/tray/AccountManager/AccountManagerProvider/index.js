@@ -6,53 +6,100 @@ import { moveItem, insertItemInGroup } from '../organize'
 
 const AccountManagerContext = createContext()
 
-const initialState = [
-  {
-    id: 'g1',
-    type: 'group',
-    name: 'Primary Accounts',
-    items: [
-      { id: 'i3', type: 'item', content: 'Item 3' },
-      { id: 'i4', type: 'item', content: 'Item 4' }
-    ]
-  },
-  {
-    id: 'g2',
-    type: 'group',
-    name: 'Hidden Accounts',
-    items: [
-      { id: 'i126', type: 'item', name: '', content: 'Item 13' },
-      { id: 'i124', type: 'item', name: '', content: 'Item 24' }
-    ]
-  },
-  {
-    id: 'g3',
-    type: 'group',
-    name: 'Other Accounts',
-    items: [
-      { id: 'i6', type: 'item', content: 'Item 6' },
-      { id: 'i7', type: 'item', content: 'Item 7' },
-      { id: 'i001', type: 'item', content: 'Item 001' },
-      { id: 'i003', type: 'item', content: 'Item 003' }
-    ]
-  },
+// const initialState = [
+//   {
+//     id: 'g1',
+//     type: 'group',
+//     name: 'Primary Accounts',
+//     items: [
+//       { id: 'i3', type: 'item', content: 'Item 3' },
+//       { id: 'i4', type: 'item', content: 'Item 4' }
+//     ]
+//   },
+//   {
+//     id: 'g2',
+//     type: 'group',
+//     name: 'Hidden Accounts',
+//     items: [
+//       { id: 'i126', type: 'item', name: '', content: 'Item 13' },
+//       { id: 'i124', type: 'item', name: '', content: 'Item 24' }
+//     ]
+//   },
+//   {
+//     id: 'g3',
+//     type: 'group',
+//     name: 'Other Accounts',
+//     items: [
+//       { id: 'i6', type: 'item', content: 'Item 6' },
+//       { id: 'i7', type: 'item', content: 'Item 7' },
+//       { id: 'i001', type: 'item', content: 'Item 001' },
+//       { id: 'i003', type: 'item', content: 'Item 003' }
+//     ]
+//   },
 
-  {
-    id: 'g4',
-    type: 'group',
-    name: 'Testnet Accounts',
-    items: [
-      { id: 'i123', type: 'item', content: 'Item 123' },
-      { id: 'i1234', type: 'item', content: 'Item 1234' }
-    ]
-  }
-]
+//   {
+//     id: 'g4',
+//     type: 'group',
+//     name: 'Testnet Accounts',
+//     items: [
+//       { id: 'i123', type: 'item', content: 'Item 123' },
+//       { id: 'i1234', type: 'item', content: 'Item 1234' }
+//     ]
+//   }
+// ]
 
 // Provider Component
 let lastMovePosition = {}
 let direction = 'down'
 
 export const AccountManagerProvider = ({ children }) => {
+  const groups = [
+    {
+      id: 'g1',
+      type: 'group',
+      name: 'Primary Accounts',
+      accounts: Object.keys(useStore('main.accounts'))
+    },
+    {
+      id: 'g2',
+      type: 'group',
+      name: 'Hidden Accounts',
+      accounts: []
+    },
+    {
+      id: 'g3',
+      type: 'group',
+      name: 'Other Accounts',
+      accounts: []
+    },
+
+    {
+      id: 'g4',
+      type: 'group',
+      name: 'Testnet Accounts',
+      accounts: []
+    }
+  ]
+
+  const accountToItem = (account) => {
+    // get account from store
+    return {
+      type: 'item',
+      ...account
+    }
+  }
+
+  const initialState = groups.map(({ accounts, ...group }) => {
+    return {
+      ...group,
+      items: accounts
+        .map((address) => {
+          return useStore('main.accounts', address.toLowerCase())
+        })
+        .map(accountToItem)
+    }
+  })
+
   const crumb = useStore('windows.panel.nav')[0] || {}
 
   // Set Item Details
@@ -76,8 +123,8 @@ export const AccountManagerProvider = ({ children }) => {
   // Set Drag Over
   const [dragOver, setDragOver] = useState(null)
 
-  // Set Unsetting
-  const [unsetting, setUnsetting] = useState(false)
+  // Set Float Active
+  const [floatActive, setFloatActive] = useState(null)
 
   const [state, setState] = useState(initialState) // initial state for your list
 
@@ -133,17 +180,14 @@ export const AccountManagerProvider = ({ children }) => {
   }
 
   const unsetDrag = () => {
-    setUnsetting(true)
-    setTimeout(() => {
-      setDragItem(null)
-      setDragInitialMousePosition(null)
-      setDragCurrentMousePosition(null)
-      setDragInitialItemPosition(null)
-      setDragItemBounds(null)
-      setDragOver(null)
-      setAnchorStyle(null)
-      setUnsetting(false)
-    }, 50)
+    setDragItem(null)
+    setDragInitialMousePosition(null)
+    setDragCurrentMousePosition(null)
+    setDragInitialItemPosition(null)
+    setDragItemBounds(null)
+    setDragOver(null)
+    setAnchorStyle(null)
+    setFloatActive(false)
   }
 
   const active = crumb.view === 'accountManager'
@@ -165,7 +209,8 @@ export const AccountManagerProvider = ({ children }) => {
         dragOver,
         anchorStyle,
         setAnchorStyle,
-        unsetting
+        floatActive,
+        setFloatActive
       }}
     >
       {children}

@@ -16,19 +16,31 @@ const AccountManagerFloat = styled.div`
 `
 
 export const FloatingValue = () => {
-  const { dragItem, movePosition, dragItemBounds: rect, anchorStyle } = useAccountManager()
-  if (!dragItem) {
+  const { dragItem, movePosition, dragItemBounds: rect, anchorStyle, floatActive } = useAccountManager()
+  if (!dragItem || !floatActive) {
     return null
   } else if (rect) {
     return (
       <div
         style={{
           left: rect.left - 3 + movePosition.x,
-          top: rect.top - 1 + movePosition.y,
+          top: rect.top - 3 + movePosition.y,
           width: rect.width + 6,
           height: rect.height + 6,
-          position: 'absolute',
-          pointerEvents: 'none'
+          position: 'relative',
+          pointerEvents: 'none',
+          fontSize: '17px',
+          fontWeight: 400,
+          borderRadius: '20px',
+          WebkitAppRegion: 'no-drag',
+          transition: 'none',
+          transform: 'translate3d(0, 0, 0)',
+          fontFamily: 'MainFont',
+          display: 'flow-root',
+          padding: '1px 0px 1px 0px',
+          textAlign: 'center'
+          // background: 'var(--ghostB05)',
+          // backdropFilter: 'blur(2px)'
         }}
       >
         {dragItem.type === 'group' ? (

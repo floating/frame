@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { useAccountManager } from '../AccountManagerProvider'
 
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
+import svg from '../../../../resources/svg'
 
 const Copy = styled.div`
   position: absolute;
@@ -20,6 +21,81 @@ const Copy = styled.div`
   }
 `
 
+const GroupHeader = styled.div`
+  display: flex;
+  position: relative;
+  padding: 16px 16px;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: -8px;
+  align-items: center;
+`
+
+const GroupExpand = styled.div`
+  height: 20px;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: var(--standard);
+  transform: ${({ expanded }) => (expanded ? 'rotate(180deg)' : 'rotate(90deg)')};
+  * {
+    pointer-events: none;
+  }
+`
+
+const Group = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
+  const [expanded, setExpanded] = useState(true)
+  return (
+    <ClusterBox style={style} ref={_ref} onMouseUp={onMouseUp} onMouseDown={onMouseDown}>
+      <GroupHeader>
+        <GroupExpand
+          expanded={expanded}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setExpanded(!expanded)
+          }}
+        >
+          {svg.chevron(20)}
+        </GroupExpand>
+        <div style={{ marginLeft: '8px' }}>{item.name}</div>
+      </GroupHeader>
+      {item?.items?.length > 0 && expanded ? (
+        <Cluster>
+          {item?.items?.map((item) => {
+            return <Item item={item} />
+          })}
+        </Cluster>
+      ) : (
+        <div style={{ height: '8px' }} />
+      )}
+    </ClusterBox>
+  )
+}
+
+const Account = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
+  return (
+    <ClusterRow>
+      <ClusterValue
+        onClick={() => {}}
+        style={style}
+        ref={_ref}
+        onMouseUp={onMouseUp}
+        onMouseDown={onMouseDown}
+      >
+        <div style={{ padding: '20px' }}>
+          <div>{item.address}</div>
+          <div>{item.ensName}</div>
+        </div>
+      </ClusterValue>
+    </ClusterRow>
+  )
+}
+
 const timers = {}
 
 export const Item = ({ item, floating }) => {
@@ -32,7 +108,7 @@ export const Item = ({ item, floating }) => {
     floatingItemPosition,
     anchorStyle,
     setAnchorStyle,
-    unsetting
+    floatActive
   } = useAccountManager()
 
   const ref = useRef(null)
@@ -73,9 +149,9 @@ export const Item = ({ item, floating }) => {
         setDraggingOverItem(item, position, itemOverEmptyGroup)
       }
     }
-  }, [floatingItemPosition.y]) // Depend on floatingItemPosition
+  }, [floatingItemPosition.y])
 
-  const hide = dragItem && dragItem.id === item.id && !floating && !unsetting
+  const hide = dragItem && dragItem.id === item.id && !floating && floatActive
 
   let style = { flexDirection: 'column' }
 
@@ -96,13 +172,12 @@ export const Item = ({ item, floating }) => {
     Object.assign(style, { pointerEvents: 'none' })
   }
   if (hide) {
-    Object.assign(style, { opacity: 0, transition: '0s linear all' })
+    Object.assign(style, { opacity: 0.3, pointerEvents: 'none' })
   }
 
   const onMouseUp = (e) => {
     clearTimeout(timers[item.id])
-    // console.log('onMouseUp', moving && floating && dragItem.id === item.id)
-    if (!moving && !floating && dragItem.id === item.id) {
+    if (!moving && !floating && dragItem?.id === item.id) {
       console.log(moving)
       if (Math.abs(e.clientX - grab.x) < 10 && Math.abs(e.clientY - grab.y) < 10) {
         console.log('click item ' + item.id)
@@ -127,42 +202,8 @@ export const Item = ({ item, floating }) => {
   }
 
   if (item.type === 'group') {
-    return (
-      <ClusterBox style={style} ref={ref} onMouseUp={onMouseUp} onMouseDown={onMouseDown}>
-        <div style={{ display: 'flex', position: 'relative', padding: '20px' }}>{item.name}</div>
-        {item?.items?.length > 0 && (
-          <Cluster>
-            {item?.items?.map((item) => {
-              return <Item item={item} />
-            })}
-          </Cluster>
-        )}
-      </ClusterBox>
-    )
+    return <Group _ref={ref} item={item} style={style} onMouseUp={onMouseUp} onMouseDown={onMouseDown} />
   } else if (item.type === 'item') {
-    return (
-      <ClusterRow>
-        <ClusterValue
-          onClick={() => {}}
-          style={style}
-          ref={ref}
-          onMouseUp={onMouseUp}
-          onMouseDown={onMouseDown}
-        >
-          <div style={{ display: 'flex', position: 'relative', padding: '20px' }}>{item.id}</div>
-        </ClusterValue>
-      </ClusterRow>
-    )
+    return <Account _ref={ref} item={item} style={style} onMouseUp={onMouseUp} onMouseDown={onMouseDown} />
   }
-
-  return (
-    <ClusterBox style={style} ref={ref} onClick={onClick} onMouseDown={onMouseDown} onMouseMove={onMouseMove}>
-      <div style={{ display: 'flex', position: 'relative', padding: '20px' }}>{item.name}</div>
-      <Cluster>
-        {item?.items?.map((item) => {
-          return <Item item={item} />
-        })}
-      </Cluster>
-    </ClusterBox>
-  )
 }
