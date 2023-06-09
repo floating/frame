@@ -31,35 +31,22 @@ export const PreviewDisplay = styled.div`
   justify-content: center;
   align-items: center;
   padding: 8px;
+  background: var(--ghostB);
+`
 
-  img {
-    height: 100%;
-    object-fit: contain;
-    border-radius: 26px;
-    overflow: hidden;
-  }
-
-  img:before {
-    content: attr(alt);
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: var(--ghostA);
-    color: var(--outerspace);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 17px;
-    font-weight: 300;
-    letter-spacing: -0.5px;
-    margin-left: -0.5px;
-    font-family: 'VCR';
-  }
+export const CollectionMedia = styled.div`
+  height: 100px;
+  width: 100px;
+  object-fit: contain;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  z-index: 2;
+  box-shadow: 0px 5px 10px var(--ghostY);
+  border: 6px solid var(--ghostB);
 `
 
 export const PreviewOptions = styled.div`

@@ -4,9 +4,8 @@ import link from '../../../../../resources/link'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import useStore from '../../../../../resources/Hooks/useStore'
 import { ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
-import RingIcon from '../../../../../resources/Components/RingIcon'
-import useStore from '../../../../../resources/Hooks/useStore'
 
+import DisplayMedia from '../../../../../resources/Components/DisplayMedia'
 import {
   CollectionInner,
   CollectionIcon,
@@ -56,8 +55,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
     link.rpc('subscribeToItems', account, items, () => {})
   }, [])
 
-  const frozenSrc = collection?.meta?.media?.cdn?.frozenThumb || ''
-  const src = collection?.meta?.media?.cdn?.thumb || ''
+  const media = collection?.meta?.media
 
   return (
     <ClusterRow key={collectionId}>
@@ -86,21 +84,20 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
           <CollectionInner>
             <CollectionIcon>
               <RingIcon
-                img={src}
-                imgFrozen={frozenSrc}
                 alt={collection.meta.name}
+                media={media}
                 color={chainColor ? `var(--${chainColor})` : ''}
+                thumb={true}
+                frozen={!active}
                 nft={true}
-                active={active}
               />
             </CollectionIcon>
             <CollectionMain>
               <CollectionDots style={{ width: previewItems.length * 24 + 'px' }}>
                 {previewItems.map((item, i) => {
-                  const src = item.media?.cdn?.frozenThumb || ''
                   return (
-                    <CollectionDot key={item.tokenId} active={active}>
-                      {src ? <img src={src} alt={item.name} /> : null}
+                    <CollectionDot key={item.tokenId}>
+                      <DisplayMedia media={item.media} thumb={true} frozen={true} />
                     </CollectionDot>
                   )
                 })}

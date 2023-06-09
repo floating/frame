@@ -103,6 +103,7 @@ export const ClusterValue = styled.div`
   border-bottom: 2px solid var(--ghostZ);
   overflow: hidden;
   margin-top: 1px;
+  pointer-events: auto;
 
   ${(props) => {
     return props.allowPointer

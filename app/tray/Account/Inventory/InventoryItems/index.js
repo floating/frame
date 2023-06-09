@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 import useStore from '../../../../../resources/Hooks/useStore'
+import DisplayMedia from '../../../../../resources/Components/DisplayMedia'
 
 import {
   ClusterBox,
@@ -11,7 +12,14 @@ import {
   ClusterValue
 } from '../../../../../resources/Components/Cluster'
 
-import { PulsateCircle, InventoryPreview, PreviewDisplay, PreviewOptions, Container } from './styled'
+import {
+  PulsateCircle,
+  InventoryPreview,
+  PreviewDisplay,
+  CollectionMedia,
+  PreviewOptions,
+  Container
+} from './styled'
 
 const previewTitle = (name = '') => {
   if (name.length > 29) {
@@ -54,7 +62,6 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
       )
     }
     const { tokenId, name, media } = item
-    const src = media.cdn.frozenThumb || media.cdn.thumb || media.source || ''
 
     return (
       <ClusterValue
@@ -72,14 +79,14 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
           setHoverAsset({
             name,
             tokenId,
-            src
+            media
           })
         }}
       >
         <div className='inventoryCollectionItem'>
-          {src ? (
+          {media ? (
             <div className='inventoryCollectionItemImage'>
-              <img src={src} loading='lazy' alt={(name || '').toUpperCase()} />
+              <DisplayMedia media={media} frozen={true} lazy={true} alt={(name || '').toUpperCase()} />
             </div>
           ) : (
             <PulsateCircle index={i} />
@@ -107,12 +114,17 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
       <InventoryPreview>
         <ClusterBox style={{ height: '100%' }}>
           <Cluster>
-            {hoverAsset && hoverAsset.src ? (
+            {hoverAsset && hoverAsset.media ? (
               <>
                 <ClusterRow>
                   <ClusterValue>
                     <PreviewDisplay>
-                      <img src={hoverAsset.src} alt={(hoverAsset.name || '').toUpperCase()} />
+                      <DisplayMedia
+                        media={hoverAsset.media}
+                        alt={(hoverAsset.name || '').toUpperCase()}
+                        audio={true}
+                        full={true}
+                      />
                     </PreviewDisplay>
                   </ClusterValue>
                 </ClusterRow>
@@ -127,16 +139,9 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                 <ClusterRow>
                   <ClusterValue>
                     <PreviewDisplay>
-                      <div
-                        className='inventoryPreviewCollection'
-                        style={
-                          inventory[k].meta.media
-                            ? {
-                                backgroundImage: `url(${inventory[k].meta.media.cdn.main || ''})`
-                              }
-                            : {}
-                        }
-                      />
+                      <CollectionMedia>
+                        <DisplayMedia media={inventory[k].meta.media} />
+                      </CollectionMedia>
                     </PreviewDisplay>
                   </ClusterValue>
                 </ClusterRow>
