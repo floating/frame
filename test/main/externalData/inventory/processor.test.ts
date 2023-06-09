@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto'
 
-import store from '../../../../main/store'
+import { storeApi } from '../../../../main/externalData/storeApi'
 import { updateCollections, updateItems } from '../../../../main/externalData/inventory/processor'
 
 import type { Inventory, InventoryAsset } from '../../../../main/store/state'
@@ -27,14 +27,14 @@ const account = '0xAddress'
 
 let mockExistingInventory = {} as Inventory
 
-jest.mock('../../../../main/store', () => {
-  const store = jest.fn(() => mockExistingInventory) as unknown as Store
-  store.setInventory = jest.fn()
-  store.getInventory = jest.fn()
-  store.setInventoryAssets = jest.fn()
-
-  return store
-})
+jest.mock('../../../../main/externalData/storeApi', () => ({
+  storeApi: {
+    setInventory: jest.fn(),
+    getInventory: jest.fn(() => mockExistingInventory),
+    setInventoryAssets: jest.fn(),
+    setAccountTokensUpdated: jest.fn()
+  }
+}))
 
 const Collection = (items: InventoryAsset[] = []) => ({
   meta: {
@@ -71,7 +71,7 @@ describe('#updateCollections', () => {
 
     updateCollections(account, updatedInventory)
 
-    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), updatedInventory)
+    expect(storeApi.setInventory).toHaveBeenCalledWith(account, updatedInventory)
   })
 
   it('preserves existing items when updating collection metadata', () => {
@@ -94,7 +94,7 @@ describe('#updateCollections', () => {
 
     updateCollections(account, newInventory)
 
-    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), {
+    expect(storeApi.setInventory).toHaveBeenCalledWith(account, {
       '0x1': {
         meta: newInventory['0x1'].meta,
         items: existingCollection.items
@@ -109,7 +109,7 @@ describe('#updateCollections', () => {
 
     updateCollections(account, updatedInventory)
 
-    expect(store.setInventory).toHaveBeenCalledWith(account.toLowerCase(), updatedInventory)
+    expect(storeApi.setInventory).toHaveBeenCalledWith(account, updatedInventory)
   })
 })
 
@@ -152,6 +152,6 @@ describe('#updateItems', () => {
 
     updateItems(account, items)
 
-    expect(store.setInventoryAssets).toHaveBeenCalledWith(account.toLowerCase(), '0x1', [items[0], items[1]])
+    expect(storeApi.setInventoryAssets).toHaveBeenCalledWith(account, '0x1', [items[0], items[1]])
   })
 })

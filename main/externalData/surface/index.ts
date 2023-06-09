@@ -3,7 +3,7 @@ import createPylon, { Unsubscribable } from '@framelabs/pylon-api-client'
 import { formatUnits } from 'ethers/lib/utils'
 
 import Networks from './networks'
-import bProcessor from '../balances/processor'
+import { handleBalanceUpdate } from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
 
 import type { Inventory, InventoryAsset, Media, TokenBalance } from '../../store/state'
@@ -134,7 +134,7 @@ const Surface = () => {
           })
         })
 
-        bProcessor.handleBalanceUpdate(address, balances, chainIds, 'snapshot')
+        handleBalanceUpdate(address, balances, chainIds, 'snapshot')
         updateCollections(address, inventory)
         networks.update(address, chainIds)
       },

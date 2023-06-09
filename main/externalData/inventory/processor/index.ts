@@ -1,20 +1,8 @@
 import log from 'electron-log'
 
-import store from '../../../store'
+import { storeApi } from '../../storeApi'
 
 import type { Inventory, InventoryAsset } from '../../../store/state'
-
-const storeApi = {
-  getInventory(account: string) {
-    return (store('main.inventory', account.toLowerCase()) || {}) as Inventory
-  },
-  setInventory(account: string, inventory: Inventory) {
-    store.setInventory(account.toLowerCase(), inventory)
-  },
-  setInventoryAssets(account: string, collection: string, items: InventoryAsset[]) {
-    store.setInventoryAssets(account.toLowerCase(), collection, items)
-  }
-}
 
 export const updateCollections = (account: string, inventory: Inventory) => {
   const existingInventory = storeApi.getInventory(account)
