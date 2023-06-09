@@ -1,10 +1,11 @@
 import { z } from 'zod'
+import { MediaSchema } from './media'
 
 const InventoryAssetSchema = z.object({
   name: z.string(),
   tokenId: z.string(),
-  img: z.string(),
   contract: z.string(),
+  media: MediaSchema,
   externalLink: z.string().optional()
 })
 
@@ -12,12 +13,12 @@ const InventoryCollectionSchema = z.object({
   meta: z.object({
     name: z.string(),
     description: z.string(),
-    image: z.string(),
+    media: MediaSchema,
     chainId: z.number(),
-    external_url: z.string().optional(),
-    itemCount: z.number().default(0)
+    tokens: z.array(z.string()),
+    external_url: z.string().optional()
   }),
-  items: z.record(InventoryAssetSchema)
+  items: z.array(InventoryAssetSchema)
 })
 
 const InventorySchema = z.record(InventoryCollectionSchema)

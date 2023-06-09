@@ -2,8 +2,16 @@ import { NATIVE_CURRENCY } from '../../resources/constants'
 import { UsdRate } from '../provider/assets'
 import store from '../store'
 
-import type { Chain, Balance, Token, Rate, NativeCurrency, Inventory, InventoryAsset } from '../store/state'
-import { TokenBalance } from './balances/scan'
+import type {
+  Chain,
+  Balance,
+  Token,
+  Rate,
+  NativeCurrency,
+  Inventory,
+  InventoryAsset,
+  TokenBalance
+} from '../store/state'
 
 // Store API object
 export const storeApi = {
@@ -19,7 +27,7 @@ export const storeApi = {
   // Networks
   getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Chain,
   getNativeCurrency: (id: number) =>
-    (store('main.networksMeta.ethereum', id, 'nativeCurrency') || {}) as NativeCurrency,
+    (store('main.networksMeta.ethereum', id, 'nativeCurrency') || {}) as TokenBalance,
   getConnectedNetworks: () => {
     const networks = Object.values(store('main.networks.ethereum') || {}) as Chain[]
     return networks.filter(
@@ -50,16 +58,16 @@ export const storeApi = {
 
   // Blances
   getCurrencyBalances: (address: Address) => {
-    return ((store('main.balances', address) || []) as Balance[]).filter(
+    return ((store('main.balances', address) || []) as TokenBalance[]).filter(
       (balance) => balance.address === NATIVE_CURRENCY
-    ) as Balance[]
+    ) as TokenBalance[]
   },
   getAllBalances: () => {
     const balances = store('main.balances') || {}
-    return balances as Record<Address, Balance[]>
+    return balances as Record<Address, TokenBalance[]>
   },
   getTokenBalances: (address: Address) => {
-    const balances = (store('main.balances', address) || []) as Balance[]
+    const balances = (store('main.balances', address) || []) as TokenBalance[]
     return balances.filter((balance) => balance.address !== NATIVE_CURRENCY) as TokenBalance[]
   },
   setBalances: (address: Address, balances: TokenBalance[]) =>

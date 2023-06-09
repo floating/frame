@@ -4,8 +4,8 @@ import { NATIVE_CURRENCY } from '../../../../resources/constants'
 import { toTokenId } from '../../../../resources/domain/balance'
 import BalancesWorkerController from '../controller'
 import { handleBalanceUpdate } from '../processor'
-import { CurrencyBalance, TokenBalance } from '../scan'
-import { Token, WithTokenId } from '../../../store/state'
+import { CurrencyBalance } from '../scan'
+import { Token, TokenBalance, WithTokenId } from '../../../store/state'
 
 const RESTART_WAIT = 5 // seconds
 
@@ -188,13 +188,14 @@ function BalanceScanner() {
     for (const balance of balances) {
       const currentBalance = currentChainBalances.find((b) => b.chainId === balance.chainId)
       if (currentBalance) {
-        const { symbol, decimals, name } = storeApi.getNativeCurrency(balance.chainId)
+        const { symbol, decimals, name, media } = storeApi.getNativeCurrency(balance.chainId)
         storeApi.setBalance(address, {
           ...balance,
           symbol,
           decimals,
           name,
-          address: NATIVE_CURRENCY
+          address: NATIVE_CURRENCY,
+          media
         })
       }
     }

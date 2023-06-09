@@ -11,10 +11,13 @@ export const updateCollections = (account: string, inventory: Inventory) => {
   // this only updates collection metadata
   const updatedInventory = collectionContractAddresses.reduce((inv, [contractAddress, collection]) => {
     const existingCollection = existingInventory[contractAddress]
+    const updatedItems = (existingCollection?.items || []).filter((item) =>
+      collection.meta.tokens.some((t) => t === item.tokenId)
+    )
 
     inv[contractAddress] = {
       ...collection,
-      items: existingCollection?.items || {}
+      items: updatedItems
     }
 
     return inv

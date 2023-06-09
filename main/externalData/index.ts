@@ -10,7 +10,6 @@ import { storeApi } from './storeApi'
 import { debounce } from '../../resources/utils'
 
 import {
-  createAccountsObserver,
   createActiveAccountObserver,
   createChainsObserver,
   createTokensObserver,
@@ -56,9 +55,9 @@ const externalData = function () {
   const rates = RatesSubscriptions(pylon)
 
   rates.start()
-  const accounts = storeApi.getAccounts()
-
-  surface.updateSubscribers(accounts)
+  // NOTE: this should be uncommented when we allow surface to subscribe to multiple accounts...
+  // const accounts = storeApi.getAccounts()
+  // surface.updateSubscribers(accounts)
 
   surface.networks.on('updated', ({ account }) => {
     if (account === storeApi.getActiveAddress()) {
@@ -82,19 +81,19 @@ const externalData = function () {
     rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
   })
 
-  //TODO: extract observers similar to with the provider observers...
-
   const activeAccountObserver = createActiveAccountObserver({
     addressChanged(address) {
       updateAccount(address)
+      const subscribers = address ? [address] : []
+      surface.updateSubscribers(subscribers)
     }
   })
 
-  const accountsObserver = createAccountsObserver({
-    accountsChanged(accounts) {
-      surface.updateSubscribers(accounts)
-    }
-  })
+  // const accountsObserver = createAccountsObserver({
+  //   accountsChanged(accounts) {
+  //     surface.updateSubscribers(accounts)
+  //   }
+  // })
 
   const tokensObserver = createTokensObserver({
     customTokensChanged(address, tokens) {
@@ -134,7 +133,7 @@ const externalData = function () {
   //TODO: do we need to remove these???
   const observers = [
     activeAccountObserver,
-    accountsObserver,
+    // accountsObserver,
     tokensObserver,
     chainsObserver,
     trayObserver

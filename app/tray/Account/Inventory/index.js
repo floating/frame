@@ -3,7 +3,7 @@ import Restore from 'react-restore'
 
 import InventoryPreview from './InventoryPreview'
 import InventoryExpanded from './InventoryExpanded'
-import InventoryCollection from './InventoryCollection'
+import InventoryItems from './InventoryItems'
 
 class Inventory extends React.Component {
   render() {
@@ -11,22 +11,24 @@ class Inventory extends React.Component {
       this.store.notify('openExternal', { url })
     }
     const inventory = this.store('main.inventory', this.props.account)
+
     const expandedData = this.props.expandedData || {}
 
     return this.props.expanded ? (
       this.props.expandedData.currentCollection ? (
-        <InventoryCollection
+        <InventoryItems
           {...this.props}
           onAssetClick={onAssetClick}
           expandedData={expandedData}
           inventory={inventory}
           account={this.props.account}
+          key={'expandedCollection'}
         />
       ) : (
-        <InventoryExpanded {...this.props} />
+        <InventoryExpanded {...this.props} key={'expandedList'} />
       )
     ) : (
-      <InventoryPreview {...this.props} />
+      <InventoryPreview {...this.props} key={'previewList'} />
     )
   }
 }

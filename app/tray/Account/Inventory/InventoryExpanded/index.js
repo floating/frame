@@ -1,93 +1,150 @@
-import React from 'react'
-import Restore from 'react-restore'
+import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 
-import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+import svg from '../../../../../resources/svg'
+import useStore from '../../../../../resources/Hooks/useStore'
+import { matchFilter } from '../../../../../resources/utils'
 
-class Inventory extends React.Component {
-  constructor(...args) {
-    super(...args)
-    this.state = {
-      hoverAsset: false
-    }
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+import CollectionList from '../CollectionList'
+
+const InventoryExpanded = ({ expandedData, moduleId, account }) => {
+  const [collectionFilter, setCollectionFilter] = useState('')
+  const hiddenCollections = useStore('main.hiddenCollections') || []
+
+  const renderAccountFilter = () => {
+    return (
+      <div className='panelFilterAccount'>
+        <div className='panelFilterIcon'>{svg.search(12)}</div>
+        <div className='panelFilterInput'>
+          <input
+            tabIndex='-1'
+            type='text'
+            spellCheck='false'
+            onChange={(e) => {
+              const value = e.target.value
+              setCollectionFilter(value)
+            }}
+            value={collectionFilter}
+          />
+        </div>
+        {collectionFilter ? (
+          <div className='panelFilterClear' onClick={() => setCollectionFilter('')}>
+            {svg.close(12)}
+          </div>
+        ) : null}
+      </div>
+    )
   }
 
-  displayCollections() {
-    const inventory = this.store('main.inventory', this.props.account)
-    const collections = Object.keys(inventory || {})
+  const isFilterMatch = (collection = {}) => {
+    if (!collection.meta) return false
+    const collectionName = collection.meta.name || ''
+    const collectionChain =
+      collection.meta.chainId && useStore('main.networks.ethereum', collection.meta.chainId)
+    const itemNames = collection.items.map((item) => {
+      const { name } = collection.items[item] || {}
+      return name
+    })
+    return matchFilter(collectionFilter, [collectionName, collectionChain.name, ...itemNames])
+  }
+
+  let hiddenCount = 0
+
+  const filterCollectionsToDisplay = (collections) => {
     return collections
+      .filter((collection = {}) => {
+        if (!collection.meta) return false
+        const collectionId = `${collection.meta.chainId}:${collection.contract}`
+        const isHidden = hiddenCollections.includes(collectionId)
+        if (isHidden) hiddenCount++
+        return expandedData.hidden ? isHidden : !isHidden
+      })
       .sort((a, b) => {
-        const assetsLengthA = Object.keys(inventory[a].items).length
-        const assetsLengthB = Object.keys(inventory[b].items).length
+        const assetsLengthA = a.meta.tokens.length
+        const assetsLengthB = b.meta.tokens.length
         if (assetsLengthA > assetsLengthB) return -1
         if (assetsLengthA < assetsLengthB) return 1
         return 0
       })
-      .slice(0, this.props.expanded ? this.length : 6)
+      .filter((c) => isFilterMatch(c))
   }
 
-  renderInventoryList() {
-    const inventory = this.store('main.inventory', this.props.account)
-    const displayCollections = this.displayCollections()
-    return displayCollections.map((k) => {
-      const {
-        meta: { name, itemCount }
-      } = inventory[k]
-      return (
-        <ClusterRow key={k}>
-          <ClusterValue
-            onClick={() => {
-              const crumb = {
-                view: 'expandedModule',
-                data: {
-                  id: this.props.moduleId,
-                  account: this.props.account,
-                  currentCollection: k
-                }
-              }
-              link.send('nav:forward', 'panel', crumb)
-            }}
-          >
-            <div key={k} className='inventoryCollection'>
-              <div className='inventoryCollectionTop'>
-                <div className='inventoryCollectionName'>{name || k}</div>
-                <div className='inventoryCollectionCount'>{itemCount}</div>
-                <div className='inventoryCollectionLine' />
+  const inventory = useStore('main.inventory', account)
+  const collections = Object.entries(inventory || {}).map(([contract, collection]) => ({
+    ...collection,
+    contract
+  }))
+
+  const filteredCollections = filterCollectionsToDisplay(collections)
+
+  return (
+    <div className='accountViewScroll'>
+      {renderAccountFilter()}
+      <ClusterBox>
+        <Cluster>
+          {collections.length ? (
+            <CollectionList
+              expandedData={expandedData}
+              moduleId={moduleId}
+              account={account}
+              collections={filteredCollections.map((c) => c.contract)}
+            />
+          ) : inventory ? (
+            <ClusterRow>
+              <ClusterValue>
+                <div className='inventoryNotFound'>No Items Found</div>
+              </ClusterValue>
+            </ClusterRow>
+          ) : (
+            <ClusterRow>
+              <ClusterValue>
+                {/* <div className='signerBalanceLoading'>{svg.sine()}</div> */}
+                <div className='inventoryNotFound'>Loading Items</div>
+              </ClusterValue>
+            </ClusterRow>
+          )}
+        </Cluster>
+        {!expandedData.hidden ? (
+          <div className='signerBalanceTotal'>
+            <div className='signerBalanceButtons'>
+              <div
+                className='signerBalanceButton signerBalanceShowAll'
+                onClick={() => {
+                  const crumb = {
+                    view: 'expandedModule',
+                    data: {
+                      id: moduleId,
+                      title: 'Hidden Inventory',
+                      account: account,
+                      hidden: true
+                    }
+                  }
+                  link.send('nav:forward', 'panel', crumb)
+                }}
+              >
+                {`+${hiddenCount} Hidden`}
               </div>
             </div>
-          </ClusterValue>
-        </ClusterRow>
-      )
-    })
-  }
-
-  render() {
-    const inventory = this.store('main.inventory', this.props.account)
-    const collections = Object.keys(inventory || {})
-    return (
-      <div className='accountViewScroll'>
-        <ClusterBox style={{ marginTop: '20px' }}>
-          <Cluster>
-            {collections.length ? (
-              this.renderInventoryList()
-            ) : inventory ? (
-              <ClusterRow>
-                <ClusterValue>
-                  <div className='inventoryNotFound'>No Items Found</div>
-                </ClusterValue>
-              </ClusterRow>
-            ) : (
-              <ClusterRow>
-                <ClusterValue>
-                  <div className='inventoryNotFound'>Loading Items..</div>
-                </ClusterValue>
-              </ClusterRow>
-            )}
-          </Cluster>
-        </ClusterBox>
-      </div>
-    )
-  }
+          </div>
+        ) : null}
+      </ClusterBox>
+    </div>
+  )
 }
 
-export default Restore.connect(Inventory)
+export default InventoryExpanded
+
+// <div className='signerBalanceTotal'>
+//   <div className='signerBalanceButtons'>
+//     <div
+//       className='signerBalanceButton signerBalanceShowAll'
+//       onClick={() => {
+//         link.send('tray:action', 'collectionVisiblityReset')
+//         link.send('nav:back', 'panel')
+//       }}
+//     >
+//       {`Unhide All`}
+//     </div>
+//   </div>
+// </div>

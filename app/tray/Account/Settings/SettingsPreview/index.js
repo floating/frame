@@ -57,7 +57,7 @@ class Settings extends React.Component {
               <>
                 {this.state.editName ? (
                   <ClusterRow>
-                    <ClusterValue pointerEvents={true}>
+                    <ClusterValue allowPointer={true}>
                       <div key={'input'} className='moduleItem cardShow moduleItemInput'>
                         <div className='moduleItemEditName'>
                           <input

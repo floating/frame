@@ -26,7 +26,8 @@ import {
   navClearSigner as clearNavSignerAction,
   updateTypedDataRequest as updateTypedDataAction,
   removeNativeCurrencyRate as removeNativeCurrencyRateAction,
-  removeRate as removeRateAction
+  removeRate as removeRateAction,
+  setInventoryAssets as setInventoryAssetsAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -425,7 +426,11 @@ describe('#addCustomTokens', () => {
           chainId: testTokens.badger.chainId,
           symbol: 'BDG',
           name: 'Old Badger',
-          logoURI: 'http://logo.io'
+          media: {
+            source: 'abc',
+            format: 'image',
+            cdn: {}
+          }
         }
       ]
     }
@@ -444,7 +449,11 @@ describe('#addCustomTokens', () => {
         chainId: testTokens.badger.chainId,
         symbol: 'BADGER',
         name: 'Badger Token',
-        logoURI: 'http://logo.io'
+        media: {
+          source: 'abc',
+          format: 'image',
+          cdn: {}
+        }
       }
     ])
   })
@@ -1502,5 +1511,58 @@ describe('#removeNativeCurrencyRate', () => {
   it('should not remove the usd rate any other networks', () => {
     removeNativeCurrencyRate('ethereum', 1)
     expect(networksMeta.ethereum[2].nativeCurrency.usd).toBeDefined()
+  })
+})
+
+describe('#setInventoryAssets', () => {
+  let inventory
+  const account = '0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5'
+  const collection = '0x388C818CA8B9251b393131C08a736A67ccB19297'
+
+  const updaterFn = (node, address, updatedCollection, _, update) => {
+    expect(node).toBe('main.inventory')
+    expect(address).toBe(account)
+    expect(updatedCollection).toBe(collection)
+    inventory[address][updatedCollection] = update(inventory[address][updatedCollection])
+  }
+
+  const setInventoryAssets = (address, collection, items) =>
+    setInventoryAssetsAction(updaterFn, address, collection, items)
+
+  beforeEach(() => {
+    inventory = {
+      [account]: {
+        [collection]: []
+      }
+    }
+  })
+
+  it('should add new items to the collection', () => {
+    const item = {
+      name: 'my cool nft',
+      tokenId: '12'
+    }
+
+    setInventoryAssets(account, collection, [item])
+
+    expect(inventory[account][collection]).toStrictEqual([item])
+  })
+
+  it('should update existing items in the collection', () => {
+    const existingItem = {
+      name: 'my cool nft',
+      tokenId: '12'
+    }
+
+    const acquiredItem = {
+      name: 'your just ok nft',
+      tokenId: '34'
+    }
+
+    inventory[account][collection] = [existingItem]
+
+    setInventoryAssets(account, collection, [existingItem, acquiredItem])
+
+    expect(inventory[account][collection]).toStrictEqual([existingItem, acquiredItem])
   })
 })

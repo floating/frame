@@ -6,8 +6,7 @@ import Networks from './networks'
 import { handleBalanceUpdate } from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
 
-import type { TokenBalance } from '../balances/scan'
-import type { Inventory } from '../../store/state'
+import type { Inventory, InventoryAsset, Media, TokenBalance } from '../../store/state'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 
@@ -16,7 +15,7 @@ type ItemCollection = {
   chainId: number
   name: string
   description: string
-  image: string
+  media: Media
 }
 
 type CollectionMetdata = ItemCollection & {
@@ -25,7 +24,7 @@ type CollectionMetdata = ItemCollection & {
 
 type BalanceItem = {
   contract: string
-  image: string
+  media: Media
   name: string
   symbol: string
   chainId: number
@@ -39,22 +38,22 @@ interface CollectionItem {
   contract: string
   tokenId: string
   name: string
-  image: string
+  media: Media
   description: string
 }
 
 const toMeta = (collection: CollectionMetdata) => ({
   name: collection.name,
   description: collection.description,
-  image: collection.image,
+  media: collection.media,
   chainId: collection.chainId,
   external_url: '',
-  itemCount: collection.ownedItems.length
+  tokens: collection.ownedItems
 })
 
 const toInventoryCollection = (collection: CollectionMetdata) => ({
   meta: toMeta(collection),
-  items: {}
+  items: []
 })
 
 const toTokenBalance = (b: BalanceItem) => ({
@@ -65,13 +64,13 @@ const toTokenBalance = (b: BalanceItem) => ({
   balance: b.amount,
   decimals: b.decimals || 18,
   displayBalance: formatUnits(b.amount, b.decimals),
-  logoURI: b.image || ''
+  media: b.media
 })
 
-const toInventoryAsset = (item: CollectionItem) => ({
+const toInventoryAsset = (item: CollectionItem): InventoryAsset => ({
   name: item.name,
   tokenId: item.tokenId,
-  img: item.image,
+  media: item.media || {},
   contract: item.contract,
   ...(item.link && { externalLink: item.link })
 })
@@ -108,52 +107,32 @@ const Surface = () => {
         log.debug('Subscribed to Pylon data', { address })
       },
       onData: (data) => {
+        if (!data.length || !data[0]) return
         log.debug(`Got update from Pylon surface for account ${address}`, { data })
 
-        if (!data.length || !data[0]) return
         const [{ chainData: chains }] = data
-
         clearTimeout(fallback)
 
-        const [chainIds, balances, inventory] = Object.entries(chains).reduce(
-          (acc, [chainId, chain]) => {
-            // TODO: handle missing balances and inventory separately
-            if (!chain) {
-              log.verbose(`Missing chain data for chain ${chainId}`, { address })
-              return acc
+        const chainIds: number[] = []
+        const balances: TokenBalance[] = []
+        const inventory: Inventory = {}
+
+        Object.entries(chains).forEach(([chainId, chain]) => {
+          if (!chain || !chain.balances || !chain.inventory) {
+            log.verbose(`Missing data for chain ${chainId}`, { address })
+            return
+          }
+
+          chainIds.push(Number(chainId))
+
+          Object.values(chain.balances).forEach((balance) => balances.push(toTokenBalance(balance)))
+
+          Object.entries(chain.inventory).forEach(([collection, inventoryData]) => {
+            if (inventoryData) {
+              inventory[collection.toLowerCase()] = toInventoryCollection(inventoryData)
             }
-
-            if (!chain.balances) {
-              log.verbose(`No balances data for chain ${chainId}`, { address })
-              return acc
-            }
-
-            if (!chain.inventory) {
-              log.verbose(`No inventory data for chain ${chainId}`, { address })
-              return acc
-            }
-
-            acc[0].push(Number(chainId))
-            acc[1].push(...Object.values(chain.balances).map(toTokenBalance))
-
-            const chainInventory = Object.keys(chain.inventory).reduce((inventory, collection) => {
-              return {
-                ...inventory,
-                ...(chain.inventory?.[collection] && {
-                  [collection.toLowerCase()]: toInventoryCollection(chain.inventory[collection])
-                })
-              }
-            }, {} as Inventory)
-
-            acc[2] = {
-              ...acc[2],
-              ...chainInventory
-            }
-
-            return acc
-          },
-          [[] as number[], [] as TokenBalance[], {} as Inventory]
-        )
+          })
+        })
 
         handleBalanceUpdate(address, balances, chainIds, 'snapshot')
         updateCollections(address, inventory)
@@ -163,7 +142,7 @@ const Surface = () => {
       onStopped
     })
 
-    subscriptions[address] = Object.assign(sub, { unsubscribables: [], collectionItems: [] })
+    subscriptions[address] = { ...sub, unsubscribables: [], collectionItems: [] }
   }
 
   const unsubscribe = async (address: string) => {

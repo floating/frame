@@ -598,14 +598,14 @@ module.exports = {
   setInventory: (u, address, inventory) => {
     u('main.inventory', address, () => inventory)
   },
-  setInventoryAssets: (u, address, collection, assets) => {
-    u('main.inventory', address, collection, 'items', (existingItems) => {
-      const insertedAssets = assets.reduce((acc, asset) => {
-        acc[asset.id] = asset
-        return acc
-      }, {})
+  setInventoryAssets: (u, address, collection, items) => {
+    u('main.inventory', address, collection, 'items', (existingItems = []) => {
+      const mergedItems = items.reduce((collectionItems, item) => {
+        collectionItems[item.tokenId] = item
+        return collectionItems
+      }, Object.fromEntries(existingItems.map((item) => [item.tokenId, item])))
 
-      return { ...existingItems, ...insertedAssets }
+      return Object.values(mergedItems)
     })
   },
   setBalance: (u, address, balance) => {
@@ -687,7 +687,7 @@ module.exports = {
           )
 
           if (matchingBalance) {
-            matchingBalance.logoURI = token.logoURI || matchingBalance.logoURI
+            matchingBalance.media = token.media || matchingBalance.media
             matchingBalance.symbol = token.symbol || matchingBalance.symbol
             matchingBalance.name = token.name || matchingBalance.symbol
           }
@@ -997,6 +997,20 @@ module.exports = {
         hiddenTokens.push(tokenId)
       }
       return hiddenTokens
+    })
+  },
+  collectionVisiblity(u, chain, address, hidden) {
+    const collectionId = `${chain}:${address}`
+    u('main.hiddenCollections', (hiddenCollections) => {
+      const index = hiddenCollections.indexOf(collectionId)
+      // If it should be showing but is in the hidden array, remove it
+      if (index !== -1 && !hidden) {
+        hiddenCollections.splice(index, 1)
+        // If it should be hidden but isn't in the hidden array, add it
+      } else if (index === -1 && hidden) {
+        hiddenCollections.push(collectionId)
+      }
+      return hiddenCollections
     })
   }
   // toggleUSDValue: (u) => {
