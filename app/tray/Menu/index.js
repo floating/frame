@@ -79,16 +79,16 @@ class Menu extends React.Component {
                 clearTimeout(this.clickTimer)
                 this.clickTimer = setTimeout(() => {
                   this.setState({ glitchOnSend: false })
-                  if (accountManagerActive) {
-                    link.send('nav:back', 'panel')
-                  } else {
-                    const crumb = {
-                      view: 'accountManager',
-                      data: {}
-                    }
-                    link.send('nav:forward', 'panel', crumb)
-                  }
                 }, 50)
+                if (accountManagerActive) {
+                  link.send('nav:back', 'panel')
+                } else {
+                  const crumb = {
+                    view: 'accountManager',
+                    data: {}
+                  }
+                  link.send('nav:forward', 'panel', crumb)
+                }
               }}
               onMouseEnter={() => this.setState({ glitchOnAccounts: true })}
               onMouseOver={() => this.setState({ glitchOnAccounts: true })}

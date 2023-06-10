@@ -118,11 +118,11 @@ module.exports = {
       return dontRemind
     })
   },
-  setAccount: (u, account) => {
-    u('selected.current', () => account.id)
-    u('selected.minimized', () => false)
-    // u('selected.open', () => true)
-  },
+  // setAccount: (u, account) => {
+  //   // u('selected.current', () => account.id)
+  //   // u('selected.minimized', () => false)
+  //   // u('selected.open', () => true)
+  // },
   // setAccountSignerStatusOpen: (u, value) => {
   //   u('selected.signerStatusOpen', () => Boolean(value))
   // },
@@ -945,22 +945,22 @@ module.exports = {
       return views
     })
   },
-  unsetAccount: (u) => {
-    // u('selected.open', () => false)
-    u('selected.minimized', () => true)
-    u('selected.view', () => 'default')
-    u('selected.showAccounts', () => false)
-    u('windows.panel.nav', () => [])
-    setTimeout(() => {
-      u('selected', (signer) => {
-        signer.last = signer.current
-        signer.current = ''
-        signer.requests = {}
-        signer.view = 'default'
-        return signer
-      })
-    }, 320)
-  },
+  // unsetAccount: (u) => {
+  //   // u('selected.open', () => false)
+  //   u('selected.minimized', () => true)
+  //   u('selected.view', () => 'default')
+  //   u('selected.showAccounts', () => false)
+  //   u('windows.panel.nav', () => [])
+  //   setTimeout(() => {
+  //     u('selected', (signer) => {
+  //       signer.last = signer.current
+  //       signer.current = ''
+  //       signer.requests = {}
+  //       signer.view = 'default'
+  //       return signer
+  //     })
+  //   }, 320)
+  // },
   setAccountFilter: (u, value) => {
     u('panel.accountFilter', () => value)
   },

@@ -513,7 +513,7 @@ export class Accounts extends EventEmitter {
       previouslyActiveAccount.update()
     }
 
-    store.setAccount(summary)
+    // store.setAccount(summary)
 
     if (currentAccount.status === 'ok')
       this.verifyAddress(false, (err, verified) => {
@@ -568,7 +568,7 @@ export class Accounts extends EventEmitter {
     const summary = { id: '', status: '' }
     if (cb) cb(null, summary)
 
-    store.unsetAccount()
+    // store.unsetAccount()
 
     // setTimeout(() => { // Clear signer requests when unset
     //   if (s) {
@@ -897,7 +897,7 @@ export class Accounts extends EventEmitter {
 
     const currentAccount = this.current()
     if (currentAccount && currentAccount.address === address) {
-      store.unsetAccount()
+      // store.unsetAccount()
 
       const defaultAccount = (Object.values(this.accounts).filter((a) => a.address !== address) || [])[0]
       if (defaultAccount) {
