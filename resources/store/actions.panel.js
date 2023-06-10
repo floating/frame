@@ -27,7 +27,7 @@ module.exports = {
   setSigner: (u, signer) => {
     u('selected.current', () => signer.id)
     u('selected.minimized', () => false)
-    u('selected.open', () => true)
+    // u('selected.open', () => true)
   },
   setSettingsView: (u, index, subindex = 0) => {
     u('selected.settings.viewIndex', () => index)
@@ -87,7 +87,7 @@ module.exports = {
   },
   unsetSigner: (u) => {
     u('selected.minimized', () => true)
-    u('selected.open', () => false)
+    // u('selected.open', () => false)
     this.resetSigner(u)
     setTimeout(() => {
       u('selected', (signer) => {

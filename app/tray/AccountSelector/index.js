@@ -79,7 +79,6 @@ class AccountSelector extends React.Component {
     const displayAccounts = sortedAccounts.filter(({ address, name, ensName, lastSignerType }) => {
       return matchFilter(filter, [address, name, ensName, lastSignerType])
     })
-    console.log('displayAccounts', displayAccounts)
 
     return (
       <div

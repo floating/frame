@@ -121,7 +121,7 @@ module.exports = {
   setAccount: (u, account) => {
     u('selected.current', () => account.id)
     u('selected.minimized', () => false)
-    u('selected.open', () => true)
+    // u('selected.open', () => true)
   },
   // setAccountSignerStatusOpen: (u, value) => {
   //   u('selected.signerStatusOpen', () => Boolean(value))
@@ -946,7 +946,7 @@ module.exports = {
     })
   },
   unsetAccount: (u) => {
-    u('selected.open', () => false)
+    // u('selected.open', () => false)
     u('selected.minimized', () => true)
     u('selected.view', () => 'default')
     u('selected.showAccounts', () => false)
