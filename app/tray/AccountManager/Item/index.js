@@ -215,18 +215,17 @@ export const Item = ({ item, floating }) => {
     Object.assign(style, { opacity: 0.3, pointerEvents: 'none' })
   }
 
-  const onMouseUp = (e) => {
-    if (!moving && !floating && dragItem?.id === item.id) {
-      console.log(moving)
-      if (Math.abs(e.clientX - grab.x) < 10 && Math.abs(e.clientY - grab.y) < 10) {
-        link.rpc('setSigner', item.address, (err) => {
-          if (err) return console.log(err)
-        })
-        link.send('nav:back', 'panel')
+  const onMouseUp = (onClick) => {
+    return (e) => {
+      if (!moving && !floating && dragItem?.id === item.id) {
+        console.log(moving)
+        if (Math.abs(e.clientX - grab.x) < 10 && Math.abs(e.clientY - grab.y) < 10) {
+          onClick()
+        }
       }
+      setGrab(false)
+      setMoving(false)
     }
-    setGrab(false)
-    setMoving(false)
   }
 
   const onMouseDown = (e) => {
@@ -240,24 +239,31 @@ export const Item = ({ item, floating }) => {
   }
 
   if (item.type === 'group') {
+    const onClick = () => {}
     return (
       <Group
         key={item.id}
         _ref={ref}
         item={item}
         style={style}
-        onMouseUp={onMouseUp}
+        onMouseUp={onMouseUp(onClick)}
         onMouseDown={onMouseDown}
       />
     )
   } else if (item.type === 'item') {
+    const onClick = () => {
+      link.rpc('setSigner', item.address, (err) => {
+        if (err) return console.log(err)
+      })
+      link.send('nav:back', 'panel')
+    }
     return (
       <Account
         key={item.address}
         _ref={ref}
         item={item}
         style={style}
-        onMouseUp={onMouseUp}
+        onMouseUp={onMouseUp(onClick)}
         onMouseDown={onMouseDown}
       />
     )
