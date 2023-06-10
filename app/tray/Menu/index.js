@@ -33,7 +33,7 @@ class Menu extends React.Component {
     const accountManagerActive = crumb.view === 'accountManager'
     return (
       <PanelMenu>
-        <Cluster style={{ width: '100%' }}>
+        <Cluster>
           <ClusterRow>
             <ClusterValue
               width={60}
@@ -69,7 +69,10 @@ class Menu extends React.Component {
                 {this.glitch(svg.send(15), this.state.glitchOnSend)}
               </div>
             </ClusterValue>
-            <ClusterValue />
+          </ClusterRow>
+        </Cluster>
+        <Cluster>
+          <ClusterRow>
             <ClusterValue
               width={60}
               onClick={() => {
@@ -85,9 +88,6 @@ class Menu extends React.Component {
                     }
                     link.send('nav:forward', 'panel', crumb)
                   }
-
-                  // link.send('*:addFrame', 'dappLauncher')
-                  // link.send('tray:action', 'setDash', { showing: false })
                 }, 50)
               }}
               onMouseEnter={() => this.setState({ glitchOnAccounts: true })}
@@ -99,53 +99,6 @@ class Menu extends React.Component {
               </div>
             </ClusterValue>
           </ClusterRow>
-          {/* <PanelMenuGroup>
-            <PanelMenuItem
-              onClick={() => {
-                this.setState({ glitchOnSidebar: false })
-                link.send('tray:action', 'setDash', {
-                  showing: !this.store('windows.dash.showing')
-                })
-              }}
-              onMouseEnter={() => this.setState({ glitchOnSidebar: true })}
-              onMouseOver={() => this.setState({ glitchOnSidebar: true })}
-              onMouseLeave={() => this.setState({ glitchOnSidebar: false })}
-            >
-              {this.glitch(svg.sidebar(15), this.state.glitchOnSidebar)}
-            </PanelMenuItem>
-            <PanelMenuItem
-              onClick={() => {
-                clearTimeout(this.clickTimer)
-                this.clickTimer = setTimeout(() => {
-                  this.setState({ glitchOnSend: false })
-                  link.send('*:addFrame', 'dappLauncher')
-                  link.send('tray:action', 'setDash', { showing: false })
-                }, 50)
-              }}
-              onMouseEnter={() => this.setState({ glitchOnSend: true })}
-              onMouseOver={() => this.setState({ glitchOnSend: true })}
-              onMouseLeave={() => this.setState({ glitchOnSend: false })}
-            >
-              {this.glitch(svg.send(15), this.state.glitchOnSend)}
-            </PanelMenuItem>
-          </PanelMenuGroup>
-          <PanelMenuGroup>
-            <PanelMenuItem
-              onClick={() => {
-                clearTimeout(this.clickTimer)
-                this.clickTimer = setTimeout(() => {
-                  this.setState({ glitchOnSend: false })
-                  link.send('*:addFrame', 'dappLauncher')
-                  link.send('tray:action', 'setDash', { showing: false })
-                }, 50)
-              }}
-              onMouseEnter={() => this.setState({ glitchOnSend: true })}
-              onMouseOver={() => this.setState({ glitchOnSend: true })}
-              onMouseLeave={() => this.setState({ glitchOnSend: false })}
-            >
-              {this.glitch(svg.accounts(18), this.state.glitchOnSend)}
-            </PanelMenuItem>
-          </PanelMenuGroup> */}
         </Cluster>
       </PanelMenu>
     )

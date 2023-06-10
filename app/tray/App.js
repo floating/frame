@@ -80,7 +80,6 @@ class Panel extends React.Component {
         <Notify />
         <Menu />
         <Header />
-        <AccountManager />
         <Account />
         <Backdrop />
         <Footer />

@@ -5,6 +5,7 @@ import useStore from '../../../resources/Hooks/useStore'
 
 export const HeaderWrap = styled.div`
   position: absolute;
+  animation: cardShow 400ms linear both;
   left: 8px;
   right: 8px;
   top: 58px;
@@ -16,6 +17,9 @@ export const HeaderWrap = styled.div`
   z-index: 1000000000;
   opacity: 1;
   transform: translate3d(0, 0, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 export const Header = () => {
@@ -24,8 +28,16 @@ export const Header = () => {
   const currentAccount = Object.values(accounts).find((acct) => acct.active) || {}
 
   if (crumb.view === 'accountManager') {
-    return <HeaderWrap>{'account maanger'}</HeaderWrap>
+    return <HeaderWrap key={'accountManager'}>{'Account Manager'}</HeaderWrap>
   } else {
-    return <HeaderWrap>{currentAccount.address}</HeaderWrap>
+    const { address, ensName } = currentAccount
+    return (
+      <HeaderWrap key={'accountInfo'}>
+        <div>
+          <div>{ensName}</div>
+          <div>{`${address.substr(0, 6)}...${address.substr(address.length - 4, address.length)}`}</div>
+        </div>
+      </HeaderWrap>
+    )
   }
 }

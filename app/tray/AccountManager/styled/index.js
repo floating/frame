@@ -43,7 +43,7 @@ export const AccountManagerWrap = styled.div`
   /* transition: var(--standard); */
   /* opacity: ${({ active }) => (active ? 1 : 0)}; */
   pointer-events: none;
-
+  animation: cardShow 400ms linear both;
   * {
     pointer-events: ${({ active }) => (active ? 'auto' : 'none')};
   }

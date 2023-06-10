@@ -16,6 +16,9 @@ import Requests from './Requests'
 import Settings from './Settings'
 import Signer from './Signer'
 
+// AccountManager
+import { AccountManager } from '../AccountManager'
+
 // move
 import ProviderRequest from './Requests/ProviderRequest'
 import TransactionRequest from './Requests/TransactionRequest'
@@ -301,6 +304,8 @@ class _AccountBody extends React.Component {
           </div>
         </AccountView>
       )
+    } else if (crumb.view === 'accountManager') {
+      return <AccountManager />
     } else {
       return <AccountMain {...this.props} />
     }
