@@ -8,6 +8,8 @@ import svg from '../../../../resources/svg'
 
 import ethAddressToColor from '../AccountColor'
 
+import AccountAvatar from '../AccountAvatar'
+
 const Copy = styled.div`
   position: absolute;
   top: 0;
@@ -64,7 +66,7 @@ const Group = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
         >
           {svg.chevron(20)}
         </GroupExpand>
-        <div style={{ marginLeft: '8px' }}>{item.name}</div>
+        <div style={{ marginLeft: '8px', fontWeight: '600' }}>{item.name}</div>
       </GroupHeader>
       {item?.items?.length > 0 && expanded ? (
         <Cluster>
@@ -80,15 +82,15 @@ const Group = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
 }
 
 const Account = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
-  const [accountColor, setAccountColor] = useState('transparent')
-  useEffect(() => {
-    const getColor = async () => {
-      const color = await ethAddressToColor(item.address)
-      console.log(color)
-      setAccountColor(color)
-    }
-    getColor()
-  }, [item.address])
+  // const [accountColor, setAccountColor] = useState('transparent')
+  // useEffect(() => {
+  //   const getColor = async () => {
+  //     const color = await ethAddressToColor(item.address)
+  //     console.log(color)
+  //     setAccountColor(color)
+  //   }
+  //   getColor()
+  // }, [item.address])
 
   return (
     <ClusterRow>
@@ -99,7 +101,15 @@ const Account = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
         onMouseUp={onMouseUp}
         onMouseDown={onMouseDown}
       >
-        <div style={{ height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div
+          style={{
+            fontWeight: '400',
+            height: '60px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
           <div
             style={{
               position: 'absolute',
@@ -107,11 +117,15 @@ const Account = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
               top: '10px',
               width: '40px',
               height: '40px',
-              background: accountColor,
               marginRight: '16px',
-              borderRadius: '10px'
+              borderRadius: '8px',
+              overflow: 'hidden',
+              backgroundColor: 'var(--ghostB)',
+              boxShadow: '0px 1px 4px 0px var(--ghostY)'
             }}
-          ></div>
+          >
+            {/* <AccountAvatar address={item.address} /> */}
+          </div>
 
           <div>
             <div>{item.ensName}</div>
