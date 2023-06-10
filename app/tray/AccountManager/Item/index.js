@@ -6,6 +6,8 @@ import { useAccountManager } from '../AccountManagerProvider'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
 import svg from '../../../../resources/svg'
 
+import ethAddressToColor from '../AccountColor'
+
 const Copy = styled.div`
   position: absolute;
   top: 0;
@@ -78,6 +80,16 @@ const Group = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
 }
 
 const Account = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
+  const [accountColor, setAccountColor] = useState('transparent')
+  useEffect(() => {
+    const getColor = async () => {
+      const color = await ethAddressToColor(item.address)
+      console.log(color)
+      setAccountColor(color)
+    }
+    getColor()
+  }, [item.address])
+
   return (
     <ClusterRow>
       <ClusterValue
@@ -87,9 +99,27 @@ const Account = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
         onMouseUp={onMouseUp}
         onMouseDown={onMouseDown}
       >
-        <div style={{ padding: '20px' }}>
-          <div>{item.address}</div>
-          <div>{item.ensName}</div>
+        <div style={{ height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div
+            style={{
+              position: 'absolute',
+              left: '10px',
+              top: '10px',
+              width: '40px',
+              height: '40px',
+              background: accountColor,
+              marginRight: '16px',
+              borderRadius: '10px'
+            }}
+          ></div>
+
+          <div>
+            <div>{item.ensName}</div>
+            <div>{`${item.address.substr(0, 6)}...${item.address.substr(
+              item.address.length - 4,
+              item.address.length
+            )}`}</div>
+          </div>
         </div>
       </ClusterValue>
     </ClusterRow>
@@ -198,8 +228,26 @@ export const Item = ({ item, floating }) => {
   }
 
   if (item.type === 'group') {
-    return <Group _ref={ref} item={item} style={style} onMouseUp={onMouseUp} onMouseDown={onMouseDown} />
+    return (
+      <Group
+        key={item.id}
+        _ref={ref}
+        item={item}
+        style={style}
+        onMouseUp={onMouseUp}
+        onMouseDown={onMouseDown}
+      />
+    )
   } else if (item.type === 'item') {
-    return <Account _ref={ref} item={item} style={style} onMouseUp={onMouseUp} onMouseDown={onMouseDown} />
+    return (
+      <Account
+        key={item.address}
+        _ref={ref}
+        item={item}
+        style={style}
+        onMouseUp={onMouseUp}
+        onMouseDown={onMouseDown}
+      />
+    )
   }
 }
