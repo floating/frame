@@ -155,10 +155,6 @@ export const Item = ({ item, floating }) => {
 
   let style = { flexDirection: 'column' }
 
-  if (floating && anchorStyle) {
-    Object.assign(style, anchorStyle)
-  }
-
   if (floating) {
     if (anchorStyle) Object.assign(style, anchorStyle)
     if (item.type === 'group') {

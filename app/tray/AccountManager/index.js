@@ -21,7 +21,7 @@ const Debug = styled.div`
 `
 
 export const AccountManagerController = () => {
-  const { dragItem, active, state, unsetDrag, setDragCurrentMousePosition, setFloatActive } =
+  const { dragItem, active, state, unsetDrag, setDragCurrentMousePosition, floatActive, setFloatActive } =
     useAccountManager()
 
   return (
@@ -40,6 +40,7 @@ export const AccountManagerController = () => {
       <FloatingItem />
       <AccountManagerMain
         active={active}
+        grabbing={floatActive}
         onMouseMove={(e) => {
           if (dragItem) {
             setDragCurrentMousePosition({ x: e.clientX, y: e.clientY })

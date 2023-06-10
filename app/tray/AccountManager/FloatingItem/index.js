@@ -23,10 +23,11 @@ export const FloatingValue = () => {
     return (
       <div
         style={{
-          left: rect.left - 3 + movePosition.x,
-          top: rect.top - 3 + movePosition.y,
-          width: rect.width + 6,
-          height: rect.height + 6,
+          // TODO: Make this placement more generic
+          left: dragItem?.type === 'item' ? rect.left - 3 + movePosition.x : rect.left - 6 + movePosition.x,
+          top: dragItem?.type === 'item' ? rect.top - 3 + movePosition.y : rect.top - 6 + movePosition.y,
+          width: dragItem?.type === 'item' ? rect.width + 6 : rect.width + 12,
+          height: dragItem?.type === 'item' ? rect.height + 6 : rect.height + 12,
           position: 'relative',
           pointerEvents: 'none',
           fontSize: '17px',
@@ -37,10 +38,8 @@ export const FloatingValue = () => {
           transform: 'translate3d(0, 0, 0)',
           fontFamily: 'MainFont',
           display: 'flow-root',
-          padding: '1px 0px 1px 0px',
+          padding: dragItem?.type === 'item' ? '1px 0px 1px 0px' : '0px',
           textAlign: 'center'
-          // background: 'var(--ghostB05)',
-          // backdropFilter: 'blur(2px)'
         }}
       >
         {dragItem.type === 'group' ? (

@@ -139,11 +139,11 @@ export const ClusterValue = styled.div`
         `
       : css`
           * {
-            pointer-events: none;
+            pointer-events: none !important;
           }
         `
   }}
-    ${(props) => {
+  ${(props) => {
     return (
       props.onClick &&
       css`
@@ -170,7 +170,7 @@ export const ClusterValue = styled.div`
       `
     )
   }}
-    ${(props) => {
+  ${(props) => {
     return (
       props.transparent &&
       css`

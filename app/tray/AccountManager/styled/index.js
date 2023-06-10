@@ -78,6 +78,18 @@ export const AccountManagerMain = styled.div`
   * {
     pointer-events: ${({ active }) => (active ? 'auto' : 'none')};
   }
+
+  ${(props) => {
+    return (
+      props.grabbing &&
+      css`
+        cursor: grabbing !important;
+        * {
+          cursor: grabbing !important;
+        }
+      `
+    )
+  }};
 `
 
 export const Group = styled.div`
