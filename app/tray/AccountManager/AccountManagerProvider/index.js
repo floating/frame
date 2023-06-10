@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useRef } from 'react'
 
-import useStore from '../../../../resources/hooks/useStore'
+import useStore from '../../../../resources/Hooks/useStore'
 
 import { moveItem, insertItemInGroup } from '../organize'
 
@@ -204,6 +204,7 @@ export const AccountManagerProvider = ({ children }) => {
         movePosition,
         active,
         state,
+        dragInitialMousePosition,
         setDragCurrentMousePosition,
         dragItemBounds,
         dragOver,

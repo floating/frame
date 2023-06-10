@@ -21,8 +21,16 @@ const Debug = styled.div`
 `
 
 export const AccountManagerController = () => {
-  const { dragItem, active, state, unsetDrag, setDragCurrentMousePosition, floatActive, setFloatActive } =
-    useAccountManager()
+  const {
+    dragItem,
+    active,
+    state,
+    unsetDrag,
+    setDragCurrentMousePosition,
+    dragInitialMousePosition,
+    floatActive,
+    setFloatActive
+  } = useAccountManager()
 
   return (
     <AccountManagerWrap active={active}>
@@ -42,9 +50,15 @@ export const AccountManagerController = () => {
         active={active}
         grabbing={floatActive}
         onMouseMove={(e) => {
-          if (dragItem) {
-            setDragCurrentMousePosition({ x: e.clientX, y: e.clientY })
-            setFloatActive(true)
+          if (dragItem && dragInitialMousePosition) {
+            const newPosX = e.clientX
+            const newPosY = e.clientY
+            const dx = Math.abs(newPosX - dragInitialMousePosition.x)
+            const dy = Math.abs(newPosY - dragInitialMousePosition.y)
+            if (floatActive || dx >= 5 || dy >= 5) {
+              setDragCurrentMousePosition({ x: newPosX, y: newPosY })
+              setFloatActive(true)
+            }
           }
         }}
         onMouseUp={(e) => {

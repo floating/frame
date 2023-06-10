@@ -14,9 +14,6 @@ class Main extends React.Component {
   render() {
     const accounts = this.store('main.accounts')
     const current = this.store('selected.current')
-    const open = this.store('selected.open')
-    if (!open) return
-
     const currentAccount = accounts[current]
     if (!currentAccount) return null
 

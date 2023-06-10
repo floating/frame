@@ -315,13 +315,10 @@ const AccountBody = Restore.connect(_AccountBody)
 
 class Account extends React.Component {
   render() {
-    const minimized = this.store('selected.minimized')
-
     return (
       <AccountBody
         id={this.props.id}
         addresses={this.props.addresses}
-        minimized={minimized}
         status={this.props.status}
         signer={this.props.signer}
       />

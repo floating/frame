@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
 
+import link from '../../../../resources/link'
+
 import { useAccountManager } from '../AccountManagerProvider'
 
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
@@ -140,8 +142,6 @@ const Account = ({ item, style, onMouseUp, onMouseDown, _ref }) => {
   )
 }
 
-const timers = {}
-
 export const Item = ({ item, floating }) => {
   const [grab, setGrab] = useState(false)
   const [moving, setMoving] = useState(false)
@@ -216,11 +216,13 @@ export const Item = ({ item, floating }) => {
   }
 
   const onMouseUp = (e) => {
-    clearTimeout(timers[item.id])
     if (!moving && !floating && dragItem?.id === item.id) {
       console.log(moving)
       if (Math.abs(e.clientX - grab.x) < 10 && Math.abs(e.clientY - grab.y) < 10) {
-        console.log('click item ' + item.id)
+        link.rpc('setSigner', item.address, (err) => {
+          if (err) return console.log(err)
+        })
+        link.send('nav:back', 'panel')
       }
     }
     setGrab(false)
@@ -231,14 +233,10 @@ export const Item = ({ item, floating }) => {
     e.preventDefault()
     e.stopPropagation()
     setAnchor()
-    clearTimeout(timers[item.id])
     const boundingRect = ref.current.getBoundingClientRect()
     const initialPosition = { x: e.clientX, y: e.clientY }
     setDrag(item, boundingRect, initialPosition)
     setGrab({ x: e.clientX, y: e.clientY })
-    timers[item.id] = setTimeout(() => {
-      setMoving(true)
-    }, 400)
   }
 
   if (item.type === 'group') {
