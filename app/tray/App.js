@@ -5,10 +5,11 @@ import link from '../../resources/link'
 import Account from './Account'
 import Notify from './Notify'
 import Menu from './Menu'
+import { Header } from './Header'
 import Badge from './Badge'
 
 import Backdrop from './Backdrop'
-import AccountSelector from './AccountSelector'
+// import AccountSelector from './AccountSelector'
 import { AccountManager } from './AccountManager'
 import Footer from './Footer'
 
@@ -78,6 +79,7 @@ class Panel extends React.Component {
         <Badge />
         <Notify />
         <Menu />
+        <Header />
         <AccountManager />
         <Account />
         <Backdrop />
