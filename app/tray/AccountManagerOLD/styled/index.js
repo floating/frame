@@ -40,6 +40,8 @@ export const AccountManagerWrap = styled.div`
   position: absolute;
   inset: 0px;
   z-index: 99999999999;
+  /* transition: var(--standard); */
+  /* opacity: ${({ active }) => (active ? 1 : 0)}; */
   pointer-events: none;
   animation: cardShow 400ms linear both;
   * {
@@ -56,14 +58,38 @@ export const AccountManagerMain = styled.div`
   border-radius: 28px;
   overflow-x: hidden;
   overflow-y: scroll;
+  /* padding: 20px; */
+  /* backdrop-filter: blur(16px); */
   background: var(--ghostZ);
   transition: var(--standardFast);
   pointer-events: ${({ active }) => (active ? 'auto' : 'none')};
   opacity: ${({ active }) => (active ? '1' : '0')};
+  /* box-shadow: 0px 0px 16px var(--ghostY); */
+  /* animation: ${({ active, isExiting }) =>
+    (active || isExiting) &&
+    (isExiting
+      ? css`
+          ${cardDown} 400ms linear both
+        `
+      : css`
+          ${cardUp} 400ms linear both
+        `)}; */
 
   * {
     pointer-events: ${({ active }) => (active ? 'auto' : 'none')};
   }
+
+  ${(props) => {
+    return (
+      props.grabbing &&
+      css`
+        cursor: grabbing !important;
+        * {
+          cursor: grabbing !important;
+        }
+      `
+    )
+  }};
 `
 
 export const Group = styled.div`
@@ -86,55 +112,4 @@ export const ListItem = styled.li`
   border: 1px solid #000;
   margin-bottom: 10px;
   padding: 10px;
-`
-
-export const Debug = styled.div`
-  position: absolute;
-  z-index: 9999999999;
-  pointer-events: none;
-  background: black;
-  * {
-    pointer-events: none;
-  }
-`
-
-export const Copy = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  cursor: pointer;
-  width: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  * {
-    pointer-events: none;
-  }
-`
-
-export const GroupHeader = styled.div`
-  display: flex;
-  position: relative;
-  padding: 16px 16px;
-  text-transform: uppercase;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  margin-bottom: -8px;
-  align-items: center;
-`
-
-export const GroupExpand = styled.div`
-  height: 20px;
-  width: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: var(--standard);
-  transform: ${({ expanded }) => (expanded ? 'rotate(180deg)' : 'rotate(90deg)')};
-  * {
-    pointer-events: none;
-  }
 `

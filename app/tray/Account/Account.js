@@ -4,6 +4,8 @@ import Restore from 'react-restore'
 import svg from '../../../resources/svg'
 import link from '../../../resources/link'
 
+import { Fluid, Entity } from '../../../resources/Components/Fluid'
+
 import Default from './Default'
 
 import Activity from './Activity'
@@ -92,11 +94,21 @@ class _AccountModule extends React.Component {
     } else {
       return (
         <div className={'accountModule'} ref={this.moduleRef} style={style}>
-          <div className='accountModuleInner cardShow'>
-            <div className='accountModuleCard'>
-              {this.getModule(id, account, expanded, expandedData, filter)}
+          <Entity
+            key={id}
+            item={{ id }}
+            id={id} // This needs to be a completely uniquie id
+            type={'group'}
+            onOver={(dragItem, position) => {
+              this.props.updateModuleOrder(dragItem.id, id, position)
+            }}
+          >
+            <div className='accountModuleInner cardShow'>
+              <div className='accountModuleCard'>
+                {this.getModule(id, account, expanded, expandedData, filter)}
+              </div>
             </div>
-          </div>
+          </Entity>
         </div>
       )
     }
@@ -107,10 +119,11 @@ const AccountModule = Restore.connect(_AccountModule)
 
 // account module is position absolute and with a translateX
 class _AccountMain extends React.Component {
-  constructor(...args) {
-    super(...args)
+  constructor(props, context) {
+    super(props, context)
     this.state = {
-      expandedModule: ''
+      expandedModule: '',
+      moduleOrder: context.store('panel.account.moduleOrder')
     }
   }
   renderAccountFilter() {
@@ -145,7 +158,7 @@ class _AccountMain extends React.Component {
 
   render() {
     const accountModules = this.store('panel.account.modules')
-    const accountModuleOrder = this.store('panel.account.moduleOrder')
+    const accountModuleOrder = this.state.moduleOrder
     let slideHeight = 0
     const modules = accountModuleOrder.map((id, i) => {
       const module = accountModules[id] || { height: 0 }
@@ -159,19 +172,46 @@ class _AccountMain extends React.Component {
           top={slideHeight - module.height - 12}
           index={i}
           filter={this.state.accountModuleFilter}
+          updateModuleOrder={(dragId, overId, position) => {
+            this.setState((prevState) => {
+              let array = [...prevState.moduleOrder] // Create a copy of the array
+              let dragIndex = array.indexOf(dragId)
+              let overIndex = array.indexOf(overId)
+
+              if (dragIndex === -1 || overIndex === -1) {
+                throw new Error('DragId or OverId not found in the array')
+              }
+
+              array.splice(dragIndex, 1)
+
+              if (position === 'top' || position === 'left') {
+                if (dragIndex > overIndex) overIndex -= 1
+                array.splice(overIndex, 0, dragId)
+              } else if (position === 'bottom' || position === 'right') {
+                if (dragIndex < overIndex) overIndex += 1
+                array.splice(overIndex, 0, dragId)
+              } else {
+                throw new Error('Invalid position')
+              }
+
+              return { moduleOrder: array }
+            })
+          }}
         />
       )
     })
     const footerHeight = this.store('windows.panel.footer.height')
     return (
-      <div className='accountMain' style={{ bottom: footerHeight + 'px' }}>
-        <div className='accountMainScroll'>
-          {this.renderAccountFilter()}
-          <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
-            {modules}
+      <Fluid>
+        <div className='accountMain' style={{ bottom: footerHeight + 'px' }}>
+          <div className='accountMainScroll'>
+            {this.renderAccountFilter()}
+            <div className='accountMainSlide' style={{ height: slideHeight + 'px' }}>
+              {modules}
+            </div>
           </div>
         </div>
-      </div>
+      </Fluid>
     )
   }
 }
