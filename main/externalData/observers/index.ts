@@ -91,20 +91,6 @@ function createTokensObserver(handler: TokensChangedHandler) {
   }
 }
 
-// function createUsePylonObserver(handler: UsePylonChangedHandler) {
-//   let usingPylon = storeApi.getPylonEnabled()
-//   return function () {
-//     const currentUsingPylon = storeApi.getPylonEnabled()
-
-//     if (currentUsingPylon !== usingPylon) {
-//       usingPylon = currentUsingPylon
-//       setTimeout(() => {
-//         handler.pylonToggled(usingPylon)
-//       }, 0)
-//     }
-//   }
-// }
-
 function createTrayObserver(handler: TrayChangedHandler) {
   let trayOpen = storeApi.getTrayOpened()
 
