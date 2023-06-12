@@ -55,6 +55,15 @@ export const Fluid = ({ children }) => {
   // Set Float Active
   const [floatActive, setFloatActive] = useState(null)
 
+  // Track when Fluid is scrolling
+  const [scrollTrigger, _setScrollTrigger] = React.useState(null)
+
+  // TODO make this more comprehensive based on scroll direction to set over trigger
+  const setScrollTrigger = (value) => {
+    if (!floatActive) return
+    _setScrollTrigger(value)
+  }
+
   const movePosition =
     dragInitialMousePosition && dragCurrentMousePosition
       ? {
@@ -129,7 +138,9 @@ export const Fluid = ({ children }) => {
         floatActive,
         setFloatActive,
         clone,
-        setClone
+        setClone,
+        scrollTrigger,
+        setScrollTrigger
       }}
     >
       <FluidWrap

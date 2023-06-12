@@ -5,7 +5,7 @@ import { useFluid } from '../FluidProvider'
 export const Entity = ({ item, floating, onClick, onOver, children }) => {
   const [grab, setGrab] = useState(false)
   const [moving, setMoving] = useState(false)
-  const { dragItem, setDrag, floatingItemPosition, floatActive, setClone } = useFluid()
+  const { dragItem, setDrag, floatingItemPosition, floatActive, setClone, scrollTrigger } = useFluid()
 
   const ref = useRef(null)
 
@@ -34,7 +34,7 @@ export const Entity = ({ item, floating, onClick, onOver, children }) => {
         // if (reclone) clone the dragging entity again
       }
     }
-  }, [floatingItemPosition.y])
+  }, [floatingItemPosition.y, scrollTrigger])
 
   const hide = dragItem && dragItem.id === item.id && !floating && floatActive
 
