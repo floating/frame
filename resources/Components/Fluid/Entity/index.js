@@ -15,7 +15,7 @@ export const Entity = ({ item, floating, onClick, onOver, children }) => {
     if (item.type !== dragItem.type && !itemOverEmptyGroup) return
     const boundingRect = ref.current.getBoundingClientRect()
     if (item.id === dragItem.id) {
-      clone()
+      // clone() // TODO: remove this once reclone is implemented
     } else {
       const isOverCurrentItem =
         floatingItemPosition.x >= boundingRect.left &&
@@ -30,7 +30,8 @@ export const Entity = ({ item, floating, onClick, onOver, children }) => {
         }
         const minDistance = Math.min(distances.top, distances.bottom)
         const position = Object.keys(distances).find((key) => distances[key] === minDistance)
-        if (onOver) onOver(dragItem, position)
+        const reClone = onOver && onOver(dragItem, position)
+        // if (reclone) clone the dragging entity again
       }
     }
   }, [floatingItemPosition.y])

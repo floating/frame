@@ -9,7 +9,9 @@ const AccountManagerFloat = styled.div`
   z-index: 10000000000;
   pointer-events: none !important;
   transition: none !important;
+  animation: none !important;
   * {
+    animation: none !important;
     pointer-events: none !important;
     transition: none !important;
   }

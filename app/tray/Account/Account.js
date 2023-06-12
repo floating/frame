@@ -100,7 +100,7 @@ class _AccountModule extends React.Component {
             id={id} // This needs to be a completely uniquie id
             type={'group'}
             onOver={(dragItem, position) => {
-              this.props.updateModuleOrder(dragItem.id, id, position)
+              return this.props.updateModuleOrder(dragItem.id, id, position)
             }}
           >
             <div className='accountModuleInner cardShow'>
@@ -173,29 +173,39 @@ class _AccountMain extends React.Component {
           index={i}
           filter={this.state.accountModuleFilter}
           updateModuleOrder={(dragId, overId, position) => {
+            let hasOrderChanged = false
+
             this.setState((prevState) => {
-              let array = [...prevState.moduleOrder] // Create a copy of the array
+              let originalArray = [...prevState.moduleOrder] // Create a copy of the original array
+              let array = [...prevState.moduleOrder] // Create a copy of the array to be modified
               let dragIndex = array.indexOf(dragId)
-              let overIndex = array.indexOf(overId)
-
-              if (dragIndex === -1 || overIndex === -1) {
-                throw new Error('DragId or OverId not found in the array')
+              if (dragIndex === -1) {
+                console.error('dragId not found in the array')
+                return originalArray
               }
-
               array.splice(dragIndex, 1)
-
+              let overIndex = array.indexOf(overId)
+              if (overIndex === -1) {
+                console.error('overId not found in the array')
+                return originalArray
+              }
               if (position === 'top' || position === 'left') {
-                if (dragIndex > overIndex) overIndex -= 1
                 array.splice(overIndex, 0, dragId)
               } else if (position === 'bottom' || position === 'right') {
-                if (dragIndex < overIndex) overIndex += 1
-                array.splice(overIndex, 0, dragId)
+                array.splice(overIndex + 1, 0, dragId)
               } else {
                 throw new Error('Invalid position')
               }
-
+              // Check if the modified array is different from the original array
+              for (let i = 0; i < originalArray.length; i++) {
+                if (originalArray[i] !== array[i]) {
+                  hasOrderChanged = true
+                  break
+                }
+              }
               return { moduleOrder: array }
             })
+            return hasOrderChanged
           }}
         />
       )
