@@ -56,7 +56,7 @@ export const Fluid = ({ children }) => {
   const [floatActive, setFloatActive] = useState(null)
 
   // Track when Fluid is scrolling
-  const [scrollTrigger, _setScrollTrigger] = React.useState(null)
+  const [scrollTrigger, _setScrollTrigger] = useState(null)
 
   // TODO make this more comprehensive based on scroll direction to set over trigger
   const setScrollTrigger = (value) => {

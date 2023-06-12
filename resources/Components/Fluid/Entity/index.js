@@ -57,36 +57,32 @@ export const Entity = ({ item, floating, onClick, onOver, children }) => {
     setMoving(false)
   }
 
-  function copyWithStyles(sourceNode, top = false) {
-    // Create a clone of the source node
-    let clonedNode = sourceNode.cloneNode(true)
-
-    // Copy the computed styles of the source node to the clone
-    copyComputedStyles(window.getComputedStyle(sourceNode), clonedNode.style, top)
-
-    // Do the same for all children
-    let sourceChildren = sourceNode.children
-    let clonedChildren = clonedNode.children
-    for (let i = 0; i < sourceChildren.length; i++) {
-      copyWithStyles(sourceChildren[i], clonedChildren[i])
-    }
-
-    return clonedNode
-  }
-
-  function copyComputedStyles(computedStyle, style, top) {
+  const copyComputedStyles = (computedStyle, style) => {
     for (let key of computedStyle) {
       style[key] = computedStyle[key]
     }
+  }
 
-    if (top) {
-      style.opacity = '1'
+  const copyWithStyles = (sourceNode, targetNode) => {
+    const computedStyle = window.getComputedStyle(sourceNode)
+    copyComputedStyles(computedStyle, targetNode.style)
+
+    // Copy styles for children
+    let sourceChildren = sourceNode.children
+    let targetChildren = targetNode.children
+    for (let i = 0; i < sourceChildren.length; i++) {
+      copyWithStyles(sourceChildren[i], targetChildren[i])
     }
   }
 
   const clone = async (e) => {
     try {
-      setClone(copyWithStyles(ref.current, true))
+      let clonedNode = ref.current.cloneNode(true)
+      // Remove all classes from the cloned node
+      clonedNode.className = ''
+      // Copy styles recursively
+      copyWithStyles(ref.current, clonedNode)
+      setClone(clonedNode)
     } catch (e) {
       console.error(e)
     }
