@@ -327,7 +327,7 @@ export class Accounts extends EventEmitter {
 
                   // If Frame is hidden, trigger native notification
                   notify('Transaction Successful', body, () => {
-                    openBlockExplorer(targetChain, hash)
+                    openBlockExplorer({ type: 'tx', chain: targetChain, hash })
                   })
                 }
                 const blockHeight = parseInt(res.result, 16)

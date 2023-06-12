@@ -3,10 +3,11 @@ import log from 'electron-log'
 import legacyMigrations from './migrations/legacy'
 import migration37 from './migrations/37'
 import migration38 from './migrations/38'
+import migration39 from './migrations/39'
 
 import type { Migration } from '../state'
 
-const migrations: Migration[] = [...legacyMigrations, migration37, migration38].sort(
+const migrations: Migration[] = [...legacyMigrations, migration37, migration38, migration39].sort(
   (m1, m2) => m1.version - m2.version
 )
 

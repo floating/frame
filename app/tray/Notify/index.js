@@ -474,7 +474,11 @@ class Notify extends React.Component {
             <div
               className='notifyInputOption notifyInputProceed'
               onMouseDown={() => {
-                link.send('tray:openExplorer', chain, hash)
+                link.send('tray:openExplorer', {
+                  type: 'tx',
+                  chain,
+                  hash
+                })
                 this.store.notify()
               }}
             >

@@ -2,131 +2,153 @@ import log from 'electron-log'
 import Pylon from '@framelabs/pylon-client'
 
 import store from '../store'
-import Inventory from './inventory'
-import Rates from './assets'
-import Balances from './balances'
-import { arraysMatch, debounce } from '../../resources/utils'
+import RatesSubscriptions from './rates/subscriptions'
+import BalanceScanner from './balances/scanner'
+import { handleCustomTokenUpdate } from './balances/processor'
+import surface from './surface'
+import { storeApi } from './storeApi'
+import { debounce } from '../../resources/utils'
 
-import type { Chain, Token } from '../store/state'
+import {
+  createActiveAccountObserver,
+  createChainsObserver,
+  createTokensObserver,
+  createTrayObserver
+} from './observers'
+
+import type { Token } from '../store/state'
 
 export interface DataScanner {
   close: () => void
 }
 
-const storeApi = {
-  getActiveAddress: () => (store('selected.current') || '') as Address,
-  getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
-  getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
-  getConnectedNetworks: () => {
-    const networks = Object.values(store('main.networks.ethereum') || {}) as Chain[]
-    return networks.filter(
-      (n) => (n.connection.primary || {}).connected || (n.connection.secondary || {}).connected
-    )
-  }
-}
+//TODO: cleanup state now that we are using new observer pattern...
+const externalData = function () {
+  const scanner = BalanceScanner()
+  scanner.start()
 
-export default function () {
-  const pylon = new Pylon('wss://data.pylon.link')
+  //TODO: move this into the observer creation fn..
+  const updateNetworks = () => {
+    const chains = storeApi.getConnectedNetworkIds()
+    const activeAccount = storeApi.getActiveAddress()
+    const usingSurface = surface.networks.get(activeAccount)
+    const chainsToScan = chains.filter((chainId) => !usingSurface.includes(chainId))
 
-  const inventory = Inventory(pylon, store)
-  const rates = Rates(pylon, store)
-  const balances = Balances(store)
-
-  let connectedChains: number[] = [],
-    activeAccount: Address = ''
-  let pauseScanningDelay: NodeJS.Timeout | undefined
-
-  inventory.start()
-  rates.start()
-  balances.start()
-
-  const handleNetworkUpdate = debounce((newlyConnected: number[]) => {
-    log.verbose('updating external data due to network update(s)', { connectedChains, newlyConnected })
-
-    rates.updateSubscription(connectedChains, activeAccount)
-
-    if (newlyConnected.length > 0 && activeAccount) {
-      balances.addNetworks(activeAccount, newlyConnected)
-    }
-  }, 500)
-
-  const handleAddressUpdate = debounce(() => {
-    log.verbose('updating external data due to address update(s)', { activeAccount })
-
-    balances.setAddress(activeAccount)
-    inventory.setAddresses([activeAccount])
-    rates.updateSubscription(connectedChains, activeAccount)
-  }, 800)
-
-  const handleTokensUpdate = debounce((tokens: Token[]) => {
-    log.verbose('updating external data due to token update(s)', { activeAccount })
+    log.debug('updateNetworks', { usingSurface, activeAccount, chainsToScan })
 
     if (activeAccount) {
-      balances.addTokens(activeAccount, tokens)
+      scanner.setNetworks(activeAccount, chainsToScan)
     }
 
-    rates.updateSubscription(connectedChains, activeAccount)
+    rates.updateSubscription(chains)
+  }
+
+  const updateAccount = (account: string) => {
+    if (account) {
+      scanner.setAddress(account)
+    }
+
+    updateNetworks()
+  }
+
+  const pylon = new Pylon('wss://data.pylon.link')
+  const rates = RatesSubscriptions(pylon)
+
+  rates.start()
+  // NOTE: this should be uncommented when we allow surface to subscribe to multiple accounts...
+  // const accounts = storeApi.getAccounts()
+  // surface.updateSubscribers(accounts)
+
+  surface.networks.on('updated', ({ account }) => {
+    if (account === storeApi.getActiveAddress()) {
+      updateNetworks()
+    }
   })
 
-  const allNetworksObserver = store.observer(() => {
-    const connectedNetworkIds = storeApi
-      .getConnectedNetworks()
-      .map((n) => n.id)
-      .sort()
+  let pauseScanningDelay: NodeJS.Timeout | undefined
 
-    if (!arraysMatch(connectedChains, connectedNetworkIds)) {
-      const newlyConnectedNetworks = connectedNetworkIds.filter((c) => !connectedChains.includes(c))
-      connectedChains = connectedNetworkIds
+  //TODO: does this need to hit to t
+  const handleTokensUpdate = debounce((activeAccount: string, tokens: Token[]) => {
+    log.debug('Updating external data due to token updates', { activeAccount })
 
-      handleNetworkUpdate(newlyConnectedNetworks)
+    handleCustomTokenUpdate(tokens)
+
+    if (activeAccount) {
+      const tokensToScan = tokens.filter((token) => !surface.networks.has(activeAccount, token.chainId))
+      scanner.addTokens(activeAccount, tokensToScan)
     }
-  }, 'externalData:networks')
 
-  const activeAddressObserver = store.observer(() => {
-    const activeAddress = storeApi.getActiveAddress()
-    const knownTokens = storeApi.getKnownTokens(activeAddress)
+    rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
+  })
 
-    if (activeAddress !== activeAccount) {
-      activeAccount = activeAddress
-      handleAddressUpdate()
-    } else {
-      handleTokensUpdate(knownTokens)
+  const activeAccountObserver = createActiveAccountObserver({
+    addressChanged(address) {
+      updateAccount(address)
+      const subscribers = address ? [address] : []
+      surface.updateSubscribers(subscribers)
     }
-  }, 'externalData:activeAccount')
+  })
 
-  const customTokensObserver = store.observer(() => {
-    const customTokens = storeApi.getCustomTokens()
-    handleTokensUpdate(customTokens)
-  }, 'externalData:customTokens')
+  // const accountsObserver = createAccountsObserver({
+  //   accountsChanged(accounts) {
+  //     surface.updateSubscribers(accounts)
+  //   }
+  // })
 
-  const trayObserver = store.observer(() => {
-    const open = store('tray.open')
+  const tokensObserver = createTokensObserver({
+    customTokensChanged(address, tokens) {
+      handleTokensUpdate(address, tokens)
+    },
+    knownTokensChanged() {
+      rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
+    }
+  })
 
-    if (!open) {
-      // pause balance scanning after the tray is out of view for one minute
-      if (!pauseScanningDelay) {
-        pauseScanningDelay = setTimeout(balances.pause, 1000)
+  const chainsObserver = createChainsObserver({
+    chainsChanged(chains) {
+      updateNetworks()
+    }
+  })
+
+  const trayObserver = createTrayObserver({
+    trayToggled(open) {
+      if (!open) {
+        // pause balance scanning after the tray is out of view for one minute
+        if (!pauseScanningDelay) {
+          pauseScanningDelay = setTimeout(() => {
+            scanner.pause()
+          }, 1000)
+        }
+      } else {
+        if (pauseScanningDelay) {
+          clearTimeout(pauseScanningDelay)
+          pauseScanningDelay = undefined
+
+          scanner.resume()
+        }
       }
-    } else {
-      if (pauseScanningDelay) {
-        clearTimeout(pauseScanningDelay)
-        pauseScanningDelay = undefined
-
-        balances.resume()
-      }
     }
-  }, 'externalData:tray')
+  })
+
+  //TODO: do we need to remove these???
+  const observers = [
+    activeAccountObserver,
+    // accountsObserver,
+    tokensObserver,
+    chainsObserver,
+    trayObserver
+  ].map((obs) => store.observer(obs))
+
+  const removeObservers = () => {
+    observers.forEach((obs) => obs.remove())
+  }
 
   return {
     close: () => {
-      allNetworksObserver.remove()
-      activeAddressObserver.remove()
-      customTokensObserver.remove()
-      trayObserver.remove()
-
-      inventory.stop()
+      removeObservers()
+      scanner.stop()
+      surface.close()
       rates.stop()
-      balances.stop()
 
       if (pauseScanningDelay) {
         clearTimeout(pauseScanningDelay)
@@ -134,3 +156,5 @@ export default function () {
     }
   } as DataScanner
 }
+
+export default externalData

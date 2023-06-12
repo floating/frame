@@ -15,7 +15,8 @@ jest.mock('../../../main/provider', () => ({ send: jest.fn(), emit: jest.fn(), o
 jest.mock('../../../main/signers', () => ({ get: jest.fn() }))
 jest.mock('../../../main/windows', () => ({ broadcast: jest.fn(), showTray: jest.fn() }))
 jest.mock('../../../main/windows/nav', () => ({ on: jest.fn(), forward: jest.fn() }))
-jest.mock('../../../main/externalData')
+jest.mock('../../../main/externalData', () => jest.fn(() => ({ close: jest.fn() })))
+jest.mock('../../../main/externalData/surface')
 jest.mock('../../../main/transaction')
 jest.mock('../../../resources/gas')
 

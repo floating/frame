@@ -134,6 +134,36 @@ module.exports = {
       return updated
     })
   },
+  addPopulatedChains: (u, address, chains, expiryWindow) => {
+    u('main.accounts', address, (account) => {
+      const populatedChains = account.balances.populatedChains || {}
+
+      chains.forEach((chain) => {
+        const lastUpdated = Date.now()
+        const expires = lastUpdated + expiryWindow
+        populatedChains[chain] = {
+          lastUpdated,
+          expires
+        }
+      })
+      const balances = { ...account.balances, populatedChains }
+      const updated = { ...account, balances }
+
+      log.debug('addPopulatedChains', { address, chains, updated, populatedChains })
+
+      return updated
+    })
+  },
+  clearPopulatedChains: (u) => {
+    u('main.accounts', (accounts) => {
+      Object.values(accounts).forEach((account) => {
+        if (account.balances && account.balances.populatedChains) {
+          account.balances.populatedChains = {}
+        }
+      })
+      return accounts
+    })
+  },
   updateAccount: (u, updatedAccount) => {
     const { id, name } = updatedAccount
     u('main.accounts', id, (account = {}) => {
@@ -251,6 +281,9 @@ module.exports = {
   },
   setNativeCurrencyData: (u, netType, netId, currency) => {
     u('main.networksMeta', netType, netId, 'nativeCurrency', (existing) => ({ ...existing, ...currency }))
+  },
+  removeNativeCurrencyRate: (u, netType, netId) => {
+    u('main.networksMeta', netType, netId, 'nativeCurrency', ({ usd, ...currency }) => currency)
   },
   addNetwork: (u, net) => {
     try {
@@ -552,9 +585,25 @@ module.exports = {
   setRates: (u, rates) => {
     u('main.rates', (existingRates = {}) => ({ ...existingRates, ...rates }))
   },
+  removeRate: (u, contractAddress) => {
+    u('main.rates', (rates = {}) => {
+      delete rates[contractAddress]
+      return rates
+    })
+  },
   // Inventory
   setInventory: (u, address, inventory) => {
     u('main.inventory', address, () => inventory)
+  },
+  setInventoryAssets: (u, address, collection, items) => {
+    u('main.inventory', address, collection, 'items', (existingItems = []) => {
+      const mergedItems = items.reduce((collectionItems, item) => {
+        collectionItems[item.tokenId] = item
+        return collectionItems
+      }, Object.fromEntries(existingItems.map((item) => [item.tokenId, item])))
+
+      return Object.values(mergedItems)
+    })
   },
   setBalance: (u, address, balance) => {
     u('main.balances', address, (balances = []) => {
@@ -635,7 +684,7 @@ module.exports = {
           )
 
           if (matchingBalance) {
-            matchingBalance.logoURI = token.logoURI || matchingBalance.logoURI
+            matchingBalance.media = token.media || matchingBalance.media
             matchingBalance.symbol = token.symbol || matchingBalance.symbol
             matchingBalance.name = token.name || matchingBalance.symbol
           }
@@ -925,6 +974,40 @@ module.exports = {
       Object.assign(requests[reqId], data)
 
       return requests
+    })
+  },
+  setBalanceMode(u, newMode) {
+    u('main', (main) => {
+      main.balanceFetchMode = newMode
+      return main
+    })
+  },
+  tokenVisiblity(u, chain, address, hidden) {
+    const tokenId = `${chain}:${address}`
+    u('main.hiddenTokens', (hiddenTokens) => {
+      const index = hiddenTokens.indexOf(tokenId)
+      // If it should be showing but is in the hidden array, remove it
+      if (index !== -1 && !hidden) {
+        hiddenTokens.splice(index, 1)
+        // If it should be hidden but isn't in the hidden array, add it
+      } else if (index === -1 && hidden) {
+        hiddenTokens.push(tokenId)
+      }
+      return hiddenTokens
+    })
+  },
+  collectionVisiblity(u, chain, address, hidden) {
+    const collectionId = `${chain}:${address}`
+    u('main.hiddenCollections', (hiddenCollections) => {
+      const index = hiddenCollections.indexOf(collectionId)
+      // If it should be showing but is in the hidden array, remove it
+      if (index !== -1 && !hidden) {
+        hiddenCollections.splice(index, 1)
+        // If it should be hidden but isn't in the hidden array, add it
+      } else if (index === -1 && hidden) {
+        hiddenCollections.push(collectionId)
+      }
+      return hiddenCollections
     })
   }
   // toggleUSDValue: (u) => {

@@ -217,6 +217,10 @@ class ChainSummaryComponent extends Component {
     // fees is either a populated object (EIP-1559 compatible) or falsy
     const displayFeeMarket = !!fees
 
+    const actualFee = displayFeeMarket
+      ? Math.round(roundGwei(weiToGwei(hexToInt(fees.nextBaseFee))) + levelDisplay(fees.maxPriorityFeePerGas))
+      : gasPrice
+
     return (
       <>
         <ClusterRow>
@@ -229,7 +233,7 @@ class ChainSummaryComponent extends Component {
               <div className='sliceTileGasPriceIcon' style={{ color: this.props.color }}>
                 {svg.gas(12)}
               </div>
-              <div className='sliceTileGasPriceNumber'>{gasPrice || '‹0.001'}</div>
+              <div className='sliceTileGasPriceNumber'>{actualFee || '‹0.001'}</div>
               <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
             </div>
           </ClusterValue>
@@ -239,7 +243,11 @@ class ChainSummaryComponent extends Component {
               explorer
                 ? () => {
                     if (address) {
-                      link.send('tray:openExplorer', currentChain, null, address)
+                      link.send('tray:openExplorer', {
+                        type: 'address',
+                        chain: currentChain,
+                        address
+                      })
                     } else {
                       link.rpc('openExplorer', currentChain, () => {})
                     }
@@ -254,7 +262,7 @@ class ChainSummaryComponent extends Component {
         </ClusterRow>
         {this.state.expanded && (
           <ClusterRow>
-            <ClusterValue pointerEvents={true}>
+            <ClusterValue allowPointer={true}>
               <div className='sliceGasBlock'>
                 {displayFeeMarket ? (
                   <GasFeesMarket gasPrice={gasPrice} fees={fees} color={this.props.color} />
