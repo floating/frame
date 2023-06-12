@@ -1,18 +1,17 @@
-import { Component } from 'react'
 import Restore from 'react-restore'
+import styled from 'styled-components'
+import { Component } from 'react'
 
 import link from '../../../resources/link'
 import Dropdown from '../../../resources/Components/Dropdown'
 import KeyboardShortcutConfigurator from '../../../resources/Components/KeyboardShortcutConfigurator'
-
-import styled from 'styled-components'
 
 const EditShortcut = styled.div`
   position: absolute;
   top: 1px;
   bottom: 0px;
   left: calc(100% + 10px);
-  background: var(--ghostC);
+  background: var(--ghostB);
   height: 20px;
   width: 60px;
   border-radius: 10px;
