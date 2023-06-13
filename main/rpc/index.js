@@ -238,8 +238,8 @@ const rpc = {
       const address = await provider.resolveName(name)
       return cb(null, address)
     } catch (err) {
-      log.warn(`Could not resolve ENS name ${name}`, err)
-      return cb(new Error(err))
+      log.warn(`Could not resolve ENS name ${name}:`, err)
+      return cb(err)
     }
   },
   verifyAddress(cb) {
