@@ -678,7 +678,7 @@ const initial = {
     account: {
       moduleOrder: [
         'requests',
-        // 'activity',
+        'activity',
         // 'gas',
         'chains',
         'balances',

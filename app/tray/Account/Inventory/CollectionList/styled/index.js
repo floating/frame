@@ -52,7 +52,6 @@ export const CollectionDot = styled.div`
   overflow: hidden;
   justify-content: center;
   position: relative;
-  font-family: 'FiraCode';
   font-size: 10px;
   border: 1px solid var(--ghostB);
   background: var(--ghostB);
@@ -91,7 +90,8 @@ export const CollectionCount = styled.div`
   min-height: 20px;
   justify-content: center;
   align-items: center;
-  font-size: 16px;
-  font-family: 'FiraCode';
+  font-size: 17px;
+  font-family: 'VCR';
   padding-left: 4px;
+  margin-top: -1px;
 `
