@@ -112,28 +112,43 @@ export function openExternal(url = '') {
   }
 }
 
+async function urlExists(url: string) {
+  try {
+    const response = await fetch(url, { method: 'HEAD', redirect: 'manual' })
+    return !response.redirected && response.ok
+  } catch (error) {
+    console.log(error)
+    return false
+  }
+}
+
+async function getTokenUrl(explorer: string, address: string, tokenId?: string) {
+  const paths = {
+    tokenPath: `${explorer}/token/${address}`,
+    nftPath: `${explorer}/nft/${address}/${tokenId}`
+  }
+  if (!tokenId) return paths.tokenPath
+  const urls = [paths.nftPath, paths.tokenPath]
+  const urlExistenceList = await Promise.all(urls.map(urlExists))
+  const existingUrlIndex = urlExistenceList.findIndex((exists) => exists)
+  return existingUrlIndex >= 0 ? urls[existingUrlIndex] : `${explorer}/address/${address}`
+}
+
 export async function openBlockExplorer(openExplorer: OpenExplorer) {
   const { chain, type, hash, address, tokenId } = openExplorer
 
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', chain.type, chain.id, 'explorer') || '').replace(/\/+$/, '')
 
-  let explorerUrl = explorer
+  if (!explorer) return
 
-  if (explorer) {
-    if (type === 'tx' && hash) {
-      explorerUrl = `${explorer}/tx/${hash}`
-    } else if (type === 'token' && address) {
-      if (tokenId) {
-        explorerUrl = `${explorer}/nft/${address}/${tokenId}`
-        const { status } = await fetch(explorerUrl, { method: 'HEAD' })
-        if (status !== 200) explorerUrl = `${explorer}/token/${address}`
-      } else {
-        explorerUrl = `${explorer}/token/${address}`
-      }
-    } else if (type === 'address' && address) {
-      explorerUrl = `${explorer}/address/${address}`
-    }
-    shell.openExternal(explorerUrl)
+  const urlFormats = {
+    tx: () => hash && `${explorer}/tx/${hash}`,
+    token: async () => address && (await getTokenUrl(explorer, address, tokenId)),
+    address: () => address && `${explorer}/address/${address}`
   }
+
+  const explorerUrl = explorer && urlFormats[type] ? await urlFormats[type]() : explorer
+
+  shell.openExternal(explorerUrl)
 }
