@@ -12,7 +12,6 @@ const launch = require('../launch')
 const provider = require('../provider').default
 const store = require('../store').default
 const dapps = require('../dapps')
-const nebulaApi = require('../nebula').default
 
 const { arraysEqual, randomLetters } = require('../../resources/utils')
 const { isSignatureRequest } = require('../signatures')
@@ -235,16 +234,12 @@ const rpc = {
   async resolveEnsName(name, cb) {
     log.debug('Resolving ENS name', { name })
 
-    const nebula = nebulaApi()
-
     try {
-      const {
-        addresses: { eth: ethAddress }
-      } = await nebula.ens.resolve(name, { timeout: 8000 })
-      cb(null, ethAddress)
+      const address = await provider.resolveName(name)
+      return cb(null, address)
     } catch (err) {
-      log.warn(`Could not resolve ENS name ${name}:`, err)
-      return cb(err)
+      log.warn(`Could not resolve ENS name ${name}`, err)
+      return cb(new Error(err))
     }
   },
   verifyAddress(cb) {
