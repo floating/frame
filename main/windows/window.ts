@@ -127,7 +127,8 @@ async function getTokenUrl(explorer: string, address: string, tokenId?: string) 
     tokenPath: `${explorer}/token/${address}`,
     nftPath: `${explorer}/nft/${address}/${tokenId}`
   }
-  const urls = tokenId ? [paths.nftPath, paths.tokenPath] : [paths.tokenPath]
+  if (!tokenId) return paths.tokenPath
+  const urls = [paths.nftPath, paths.tokenPath]
   const urlExistenceList = await Promise.all(urls.map(urlExists))
   const existingUrlIndex = urlExistenceList.findIndex((exists) => exists)
   return existingUrlIndex >= 0 ? urls[existingUrlIndex] : `${explorer}/address/${address}`
