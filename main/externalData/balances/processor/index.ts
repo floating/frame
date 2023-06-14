@@ -38,24 +38,24 @@ const getChangedBalances = (address: string, tokenBalances: TokenBalance[]): Tok
   }, [] as TokenBalance[])
 }
 
-const getTokenChanges = (address: string, balances: TokenBalance[]) => {
-  const tokenBalances = balances.filter((b) => !isNativeCurrency(b.address))
-  const knownTokens = new Set(storeApi.getKnownTokens(address).map(toTokenId))
+//Splits token balances into non-zero and zero balance tokens
+const splitTokenBalances = (balances: TokenBalance[]) => {
+  return balances.reduce(
+    (acc, balance) => {
+      // ignore native currencies
+      if (isNativeCurrency(balance.address)) return acc
 
-  const isKnown = (balance: TokenBalance) => knownTokens.has(toTokenId(balance))
+      const { toAdd: nonZeroBalanceTokens, toRemove: zeroBalanceTokens } = acc
 
-  // add any non-zero balances to the list of known tokens
-  const unknownBalances = tokenBalances.filter((b) => parseInt(b.balance) > 0 && !isKnown(b))
-
-  const zeroBalances = tokenBalances.reduce((zeroBalSet, balance) => {
-    const tokenId = toTokenId(balance)
-    if (parseInt(balance.balance) === 0 && knownTokens.has(tokenId)) {
-      zeroBalSet.add(tokenId)
+      return parseInt(balance.balance)
+        ? { toAdd: [...nonZeroBalanceTokens, balance], toRemove: zeroBalanceTokens }
+        : { toAdd: nonZeroBalanceTokens, toRemove: [...zeroBalanceTokens, balance] }
+    },
+    {
+      toAdd: [] as TokenBalance[],
+      toRemove: [] as TokenBalance[]
     }
-    return zeroBalSet
-  }, new Set<string>())
-
-  return { unknownBalances, zeroBalances }
+  )
 }
 
 const mergeCustomAndNative = (balances: TokenBalance[]): TokenBalance[] => {
@@ -107,13 +107,14 @@ const mergeCustomAndNative = (balances: TokenBalance[]): TokenBalance[] => {
   return [...mergedBalances, ...missingBalances]
 }
 
-function updateTokens(address: string, zeroBalances: Set<string>, unknownBalances: TokenBalance[]) {
-  if (zeroBalances.size) {
-    storeApi.removeKnownTokens(address, zeroBalances)
+function updateStoredTokens(address: string, zeroBalances: TokenBalance[], tokenBalances: TokenBalance[]) {
+  const zeroBalanceSet = new Set(zeroBalances.map(toTokenId))
+  if (zeroBalanceSet.size) {
+    storeApi.removeKnownTokens(address, zeroBalanceSet)
   }
 
-  if (unknownBalances.length) {
-    storeApi.addKnownTokens(address, unknownBalances)
+  if (tokenBalances.length) {
+    storeApi.addKnownTokens(address, tokenBalances)
   }
 }
 
@@ -131,8 +132,8 @@ export function handleBalanceUpdate(
 
   if (changedBalances.length) {
     storeApi.setBalances(address, changedBalances)
-    const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances)
-    updateTokens(address, zeroBalances, unknownBalances)
+    const { toAdd, toRemove } = splitTokenBalances(changedBalances)
+    updateStoredTokens(address, toRemove, toAdd)
 
     storeApi.setAccountTokensUpdated(address)
   }
