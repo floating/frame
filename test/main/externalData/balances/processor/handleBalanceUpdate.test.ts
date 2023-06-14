@@ -1,21 +1,22 @@
 import { jest } from '@jest/globals'
 import { randomBytes, randomInt } from 'crypto'
 
-import { handleBalanceUpdate } from '../../../../main/externalData/balances/processor'
-import { storeApi } from '../../../../main/externalData/storeApi'
-import { NATIVE_CURRENCY } from '../../../../resources/constants'
+import { handleBalanceUpdate } from '../../../../../main/externalData/balances/processor'
+import { storeApi } from '../../../../../main/externalData/storeApi'
+import { NATIVE_CURRENCY } from '../../../../../resources/constants'
 
 const randomStr = () => randomBytes(32).toString('hex')
 
-jest.mock('../../../../main/externalData/surface', () => ({}))
-const { getTokenBalances, getCustomTokens, getNativeCurrency } = jest.mocked(storeApi)
+jest.mock('../../../../../main/externalData/surface', () => ({}))
+const { getTokenBalances, getCustomTokens, getNativeCurrency, addKnownTokens, getKnownTokens } =
+  jest.mocked(storeApi)
 
-jest.mock('../../../../main/externalData/storeApi', () => ({
+jest.mock('../../../../../main/externalData/storeApi', () => ({
   storeApi: {
     getTokenBalances: jest.fn(() => []),
     getCustomTokens: jest.fn(() => []),
     getNativeCurrency: jest.fn(),
-    getKnownTokens: () => [],
+    getKnownTokens: jest.fn(() => []),
     addPopulatedChains: jest.fn(),
     setBalances: jest.fn(),
     addKnownTokens: jest.fn(),
@@ -58,14 +59,23 @@ const Token = (address: string, chainId: number, symbol = randomStr(), name = ra
     }
   } as const)
 
-describe('snapshot updates', () => {
-  it('should always mark any present chains as populated in the state with the correct expiry time', () => {
+describe('updating balance expiry times', () => {
+  it('should set the correct expiry time for snapshot balance updates', () => {
     const address = randomStr()
     const chains = [1, 2, 3]
     handleBalanceUpdate(address, [], chains, 'snapshot')
     expect(storeApi.addPopulatedChains).toHaveBeenCalledWith(address, chains, 1000 * 60 * 5)
   })
 
+  it('should set the correct expiry time for scan balance updates', () => {
+    const address = randomStr()
+    const chains = [1, 2, 3]
+    handleBalanceUpdate(address, [], chains, 'scan')
+    expect(storeApi.addPopulatedChains).toHaveBeenCalledWith(address, chains, 1000 * 60)
+  })
+})
+
+describe('updating balances', () => {
   it('should update the state with the new balances', () => {
     const address = randomStr()
     const balances = [Balance(), Balance()]
@@ -128,7 +138,7 @@ describe('snapshot updates', () => {
     expect(storeApi.setBalances).toHaveBeenCalledWith(address, [expectedBalance])
   })
 
-  it('should include all custom tokens in the balances', () => {
+  it('should include all custom tokens', () => {
     const address = randomStr()
     const balances = [Balance(), Balance()]
 
@@ -232,15 +242,26 @@ describe('snapshot updates', () => {
   })
 })
 
-// describe('scanner updates', () => {
-//   it('should update the state with the new balances', () => {})
-//   it('should mark any present chains as populated in the state with the correct expiry time', () => {})
-//   it('should use custom token data where available', () => {})
-//   it('should use native asset data where available', () => {})
-//   it('should include all custom tokens in the balances', () => {})
-// })
+describe('updating tokens', () => {
+  it('should add previously unknown tokens to the known tokens', () => {
+    const address = randomStr()
+    const balance = Balance()
 
-// describe('custom token updates', () => {
-//   it('should ignore updates for chains using the accounts service', () => {})
-//   it('should ', () => {})
-// })
+    handleBalanceUpdate(address, [balance], [balance.chainId], 'snapshot')
+    expect(storeApi.addKnownTokens).toHaveBeenCalledWith(address, [balance])
+  })
+  it('should not add previously known tokens to the known tokens', () => {
+    const address = randomStr()
+    const balance = Balance()
+    getKnownTokens.mockReturnValueOnce([balance])
+    handleBalanceUpdate(address, [balance], [balance.chainId], 'snapshot')
+    expect(storeApi.addKnownTokens).not.toHaveBeenCalled()
+  })
+
+  it('should not add native assets to the known tokens', () => {
+    const address = randomStr()
+    const balance = Balance(1, NATIVE_CURRENCY)
+    handleBalanceUpdate(address, [balance], [balance.chainId], 'snapshot')
+    expect(storeApi.addKnownTokens).not.toHaveBeenCalled()
+  })
+})
