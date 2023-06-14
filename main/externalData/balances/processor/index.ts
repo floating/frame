@@ -3,9 +3,10 @@ import log from 'electron-log'
 import { isEqual } from 'lodash'
 import surface from '../../surface'
 import { storeApi } from '../../storeApi'
-import { toTokenId } from '../../../../resources/domain/balance'
+import { isNativeCurrency, toTokenId } from '../../../../resources/domain/balance'
 
 import type { Token, TokenBalance } from '../../../store/state'
+import { NATIVE_CURRENCY } from '../../../../resources/constants'
 
 const toExpiryWindow = {
   snapshot: 1000 * 60 * 5,
@@ -37,7 +38,8 @@ const getChangedBalances = (address: string, tokenBalances: TokenBalance[]): Tok
   }, [] as TokenBalance[])
 }
 
-const getTokenChanges = (address: string, tokenBalances: TokenBalance[]) => {
+const getTokenChanges = (address: string, balances: TokenBalance[]) => {
+  const tokenBalances = balances.filter((b) => !isNativeCurrency(b.address))
   const knownTokens = new Set(storeApi.getKnownTokens(address).map(toTokenId))
 
   const isKnown = (balance: TokenBalance) => knownTokens.has(toTokenId(balance))
@@ -56,7 +58,7 @@ const getTokenChanges = (address: string, tokenBalances: TokenBalance[]) => {
   return { unknownBalances, zeroBalances }
 }
 
-const mergeCustomTokens = (balances: TokenBalance[]): TokenBalance[] => {
+const mergeCustomAndNative = (balances: TokenBalance[]): TokenBalance[] => {
   // Retrieve custom tokens from the store
   const custom = storeApi.getCustomTokens()
 
@@ -76,6 +78,14 @@ const mergeCustomTokens = (balances: TokenBalance[]): TokenBalance[] => {
 
       // Remove the merged custom token
       delete customData[tokenId]
+    }
+
+    if (isNativeCurrency(balance.address)) {
+      const nativeCurrency = storeApi.getNativeCurrency(balance.chainId)
+      if (nativeCurrency) {
+        const { symbol, decimals, name, media } = nativeCurrency
+        balance = { ...balance, symbol, decimals, name, address: NATIVE_CURRENCY, media }
+      }
     }
 
     return balance
@@ -115,9 +125,9 @@ export function handleBalanceUpdate(
 ) {
   log.debug('Handling balance update', { address, chains })
 
-  const withCustom = mergeCustomTokens(balances)
+  const withLocalData = mergeCustomAndNative(balances)
 
-  const changedBalances = getChangedBalances(address, withCustom)
+  const changedBalances = getChangedBalances(address, withLocalData)
 
   if (changedBalances.length) {
     storeApi.setBalances(address, changedBalances)

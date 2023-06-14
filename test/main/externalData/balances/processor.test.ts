@@ -3,16 +3,18 @@ import { randomBytes, randomInt } from 'crypto'
 
 import { handleBalanceUpdate } from '../../../../main/externalData/balances/processor'
 import { storeApi } from '../../../../main/externalData/storeApi'
+import { NATIVE_CURRENCY } from '../../../../resources/constants'
 
 const randomStr = () => randomBytes(32).toString('hex')
 
 jest.mock('../../../../main/externalData/surface', () => ({}))
-const { getTokenBalances, getCustomTokens } = jest.mocked(storeApi)
+const { getTokenBalances, getCustomTokens, getNativeCurrency } = jest.mocked(storeApi)
 
 jest.mock('../../../../main/externalData/storeApi', () => ({
   storeApi: {
     getTokenBalances: jest.fn(() => []),
     getCustomTokens: jest.fn(() => []),
+    getNativeCurrency: jest.fn(),
     getKnownTokens: () => [],
     addPopulatedChains: jest.fn(),
     setBalances: jest.fn(),
@@ -26,23 +28,35 @@ const Balance = (
   chainId = 1,
   address = randomStr(),
   balanceString = '0x' + randomInt(20000000).toString(16)
-) => ({
-  symbol: randomStr(),
-  name: randomStr(),
-  decimals: randomInt(18),
-  address,
-  chainId,
-  balance: balanceString,
-  displayBalance: ''
-})
+) =>
+  ({
+    symbol: randomStr(),
+    name: randomStr(),
+    decimals: randomInt(18),
+    address,
+    chainId,
+    balance: balanceString,
+    displayBalance: '',
+    media: {
+      source: '',
+      cdn: {},
+      format: ''
+    }
+  } as const)
 
-const Token = (address: string, chainId: number, symbol = randomStr(), name = randomStr()) => ({
-  symbol,
-  name,
-  decimals: randomInt(18),
-  address,
-  chainId
-})
+const Token = (address: string, chainId: number, symbol = randomStr(), name = randomStr()) =>
+  ({
+    symbol,
+    name,
+    decimals: randomInt(18),
+    address,
+    chainId,
+    media: {
+      source: '',
+      cdn: {},
+      format: ''
+    }
+  } as const)
 
 describe('snapshot updates', () => {
   it('should always mark any present chains as populated in the state with the correct expiry time', () => {
@@ -78,6 +92,40 @@ describe('snapshot updates', () => {
       },
       balances[1]
     ])
+  })
+
+  it('should use the native token data where available', () => {
+    const address = randomStr()
+    const balances = [Balance(1, NATIVE_CURRENCY)]
+
+    const nativeCurrency = {
+      symbol: 'ETH',
+      name: 'Ethereum',
+      chainId: 1,
+      address: NATIVE_CURRENCY,
+      decimals: 18,
+      icon: 'https://cdn.mycryptoapi.com/images/ETH_icon.png',
+      usd: {
+        price: 1000,
+        change24hr: 0
+      },
+      media: {
+        source: '',
+        cdn: {},
+        format: ''
+      },
+      balance: '0x00',
+      displayBalance: '0'
+    } as const
+
+    // getCustomTokens.mockImplementationOnce(() => [])
+    getNativeCurrency.mockReturnValueOnce(nativeCurrency)
+
+    handleBalanceUpdate(address, balances, [1], 'snapshot')
+    const { symbol, decimals, name, media } = nativeCurrency
+    const expectedBalance = { ...balances[0], symbol, decimals, name, address: NATIVE_CURRENCY, media }
+
+    expect(storeApi.setBalances).toHaveBeenCalledWith(address, [expectedBalance])
   })
 
   it('should include all custom tokens in the balances', () => {

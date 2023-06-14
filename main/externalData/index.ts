@@ -22,13 +22,14 @@ export interface DataScanner {
   close: () => void
 }
 
+const UPDATE_NETWORKS_DEBOUNCE = 5000 // 5 seconds
+
 //TODO: cleanup state now that we are using new observer pattern...
 const externalData = function () {
   const scanner = BalanceScanner()
   scanner.start()
 
-  //TODO: move this into the observer creation fn..
-  const updateNetworks = () => {
+  const updateNetworks = debounce(() => {
     const chains = storeApi.getConnectedNetworkIds()
     const activeAccount = storeApi.getActiveAddress()
     const usingSurface = surface.networks.get(activeAccount)
@@ -41,7 +42,7 @@ const externalData = function () {
     }
 
     rates.updateSubscription(chains)
-  }
+  }, UPDATE_NETWORKS_DEBOUNCE)
 
   const updateAccount = (account: string) => {
     if (account) {
