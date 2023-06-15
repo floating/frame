@@ -15,10 +15,11 @@ import {
 
 const shouldShow = (ethereumNetworks, hiddenTokens, populatedChains, returnHidden) => (rawBalance) => {
   const { chainId, address } = rawBalance
+  const networkIsEnabled = ethereumNetworks[chainId]?.on
   const isHidden = hiddenTokens.includes(`${chainId}:${address}`)
-  const expires = populatedChains[chainId]?.expires > Date.now()
+  const isExpired = populatedChains[chainId]?.expires > Date.now()
 
-  return ethereumNetworks[chainId] && expires && returnHidden === isHidden
+  return networkIsEnabled && isExpired && returnHidden === isHidden
 }
 
 const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
