@@ -1,19 +1,9 @@
+import store from '../store'
 import { NATIVE_CURRENCY } from '../../resources/constants'
 import { UsdRate } from '../provider/assets'
-import store from '../store'
 
-import type {
-  Chain,
-  Balance,
-  Token,
-  Rate,
-  NativeCurrency,
-  Inventory,
-  InventoryAsset,
-  TokenBalance
-} from '../store/state'
+import type { Chain, Token, Rate, Inventory, InventoryAsset, TokenBalance } from '../store/state'
 
-// Store API object
 export const storeApi = {
   // Accounts
   getActiveAddress: () => (store('selected.current') || '') as Address,
