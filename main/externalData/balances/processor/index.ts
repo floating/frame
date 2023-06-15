@@ -3,9 +3,10 @@ import log from 'electron-log'
 import { isEqual } from 'lodash'
 import surface from '../../surface'
 import { storeApi } from '../../storeApi'
-import { toTokenId } from '../../../../resources/domain/balance'
+import { isNativeCurrency, toTokenId } from '../../../../resources/domain/balance'
 
 import type { Token, TokenBalance } from '../../../store/state'
+import { NATIVE_CURRENCY } from '../../../../resources/constants'
 
 const toExpiryWindow = {
   snapshot: 1000 * 60 * 5,
@@ -37,26 +38,27 @@ const getChangedBalances = (address: string, tokenBalances: TokenBalance[]): Tok
   }, [] as TokenBalance[])
 }
 
-const getTokenChanges = (address: string, tokenBalances: TokenBalance[]) => {
-  const knownTokens = new Set(storeApi.getKnownTokens(address).map(toTokenId))
+//Splits token balances into non-zero and zero balance tokens
+const splitTokenBalances = (balances: TokenBalance[]) => {
+  return balances.reduce(
+    (acc, balance) => {
+      // ignore native currencies
+      if (isNativeCurrency(balance.address)) return acc
 
-  const isKnown = (balance: TokenBalance) => knownTokens.has(toTokenId(balance))
+      const { toAdd: nonZeroBalanceTokens, toRemove: zeroBalanceTokens } = acc
 
-  // add any non-zero balances to the list of known tokens
-  const unknownBalances = tokenBalances.filter((b) => parseInt(b.balance) > 0 && !isKnown(b))
-
-  const zeroBalances = tokenBalances.reduce((zeroBalSet, balance) => {
-    const tokenId = toTokenId(balance)
-    if (parseInt(balance.balance) === 0 && knownTokens.has(tokenId)) {
-      zeroBalSet.add(tokenId)
+      return parseInt(balance.balance)
+        ? { toAdd: [...nonZeroBalanceTokens, balance], toRemove: zeroBalanceTokens }
+        : { toAdd: nonZeroBalanceTokens, toRemove: [...zeroBalanceTokens, balance] }
+    },
+    {
+      toAdd: [] as TokenBalance[],
+      toRemove: [] as TokenBalance[]
     }
-    return zeroBalSet
-  }, new Set<string>())
-
-  return { unknownBalances, zeroBalances }
+  )
 }
 
-const mergeCustomTokens = (balances: TokenBalance[]): TokenBalance[] => {
+const mergeCustomAndNative = (balances: TokenBalance[]): TokenBalance[] => {
   // Retrieve custom tokens from the store
   const custom = storeApi.getCustomTokens()
 
@@ -78,6 +80,14 @@ const mergeCustomTokens = (balances: TokenBalance[]): TokenBalance[] => {
       delete customData[tokenId]
     }
 
+    if (isNativeCurrency(balance.address)) {
+      const nativeCurrency = storeApi.getNativeCurrency(balance.chainId)
+      if (nativeCurrency) {
+        const { symbol, decimals, name, media } = nativeCurrency
+        balance = { ...balance, symbol, decimals, name, address: NATIVE_CURRENCY, media }
+      }
+    }
+
     return balance
   })
 
@@ -97,13 +107,14 @@ const mergeCustomTokens = (balances: TokenBalance[]): TokenBalance[] => {
   return [...mergedBalances, ...missingBalances]
 }
 
-function updateTokens(address: string, zeroBalances: Set<string>, unknownBalances: TokenBalance[]) {
-  if (zeroBalances.size) {
-    storeApi.removeKnownTokens(address, zeroBalances)
+function updateStoredTokens(address: string, zeroBalances: TokenBalance[], tokenBalances: TokenBalance[]) {
+  const zeroBalanceSet = new Set(zeroBalances.map(toTokenId))
+  if (zeroBalanceSet.size) {
+    storeApi.removeKnownTokens(address, zeroBalanceSet)
   }
 
-  if (unknownBalances.length) {
-    storeApi.addKnownTokens(address, unknownBalances)
+  if (tokenBalances.length) {
+    storeApi.addKnownTokens(address, tokenBalances)
   }
 }
 
@@ -115,14 +126,14 @@ export function handleBalanceUpdate(
 ) {
   log.debug('Handling balance update', { address, chains })
 
-  const withCustom = mergeCustomTokens(balances)
+  const withLocalData = mergeCustomAndNative(balances)
 
-  const changedBalances = getChangedBalances(address, withCustom)
+  const changedBalances = getChangedBalances(address, withLocalData)
 
   if (changedBalances.length) {
     storeApi.setBalances(address, changedBalances)
-    const { zeroBalances, unknownBalances } = getTokenChanges(address, changedBalances)
-    updateTokens(address, zeroBalances, unknownBalances)
+    const { toAdd, toRemove } = splitTokenBalances(changedBalances)
+    updateStoredTokens(address, toRemove, toAdd)
 
     storeApi.setAccountTokensUpdated(address)
   }

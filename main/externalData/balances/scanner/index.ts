@@ -157,6 +157,7 @@ function BalanceScanner() {
   }
 
   function updateBalances(address: Address, chains: number[]) {
+    log.debug('updateBalances', { address, chains })
     const customTokens = storeApi.getCustomTokens()
     const knownTokens = storeApi
       .getKnownTokens(address)
@@ -182,13 +183,10 @@ function BalanceScanner() {
   }
 
   function handleChainBalanceUpdate(balances: CurrencyBalance[], address: Address) {
-    const currentChainBalances = storeApi.getCurrencyBalances(address)
-
-    // update balances that have changed
     for (const balance of balances) {
-      const currentBalance = currentChainBalances.find((b) => b.chainId === balance.chainId)
-      if (currentBalance) {
-        const { symbol, decimals, name, media } = storeApi.getNativeCurrency(balance.chainId)
+      const nativeCurrency = storeApi.getNativeCurrency(balance.chainId)
+      if (nativeCurrency) {
+        const { symbol, decimals, name, media } = nativeCurrency
         storeApi.setBalance(address, {
           ...balance,
           symbol,
@@ -256,7 +254,7 @@ function BalanceScanner() {
   }
 
   function setNetworks(address: string, chains: number[]) {
-    if (chains.some((chainId) => !enabledNetworks.has(chainId)) || chains.length !== enabledNetworks.size) {
+    if (chains.length !== enabledNetworks.size || chains.some((chainId) => !enabledNetworks.has(chainId))) {
       enabledNetworks = new Set(chains)
       runWhenReady(() => updateBalances(address, chains))
     }

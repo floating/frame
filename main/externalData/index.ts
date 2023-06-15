@@ -27,7 +27,6 @@ const externalData = function () {
   const scanner = BalanceScanner()
   scanner.start()
 
-  //TODO: move this into the observer creation fn..
   const updateNetworks = () => {
     const chains = storeApi.getConnectedNetworkIds()
     const activeAccount = storeApi.getActiveAddress()
@@ -130,7 +129,6 @@ const externalData = function () {
     }
   })
 
-  //TODO: do we need to remove these???
   const observers = [
     activeAccountObserver,
     // accountsObserver,
