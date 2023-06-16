@@ -18,7 +18,7 @@ const BalancesExpanded = ({
 }) => {
   const [balanceFilter, setBalanceFilter] = useState('')
 
-  const hiddenTokens = useStore('main.hiddenTokens') || []
+  const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
 
   const renderAccountFilter = () => {
     return (
@@ -45,11 +45,15 @@ const BalancesExpanded = ({
     )
   }
 
-  const { balances: allBalances, totalValue, totalDisplayValue } = getBalances(balanceFilter, hiddenTokens)
+  const {
+    balances: allBalances,
+    totalValue,
+    totalDisplayValue
+  } = getBalances(balanceFilter, tokenPreferences)
 
   const { balances: hiddenBalances, totalDisplayValue: hiddenTotalDisplayValue } = getBalances(
     balanceFilter,
-    hiddenTokens,
+    tokenPreferences,
     true
   )
 

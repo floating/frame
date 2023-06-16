@@ -22,18 +22,8 @@ const InventoryCollectionSchema = z.object({
   items: z.array(InventoryAssetSchema)
 })
 
-export const CollectionPreferencesSchema = z.object({
-  hidden: z.boolean()
-  // Can add other preferences here... e.g.
-  // favourited: z.boolean().optional()
-})
-
-export const CollectionPreferencesDictionarySchema = z.record(CollectionPreferencesSchema)
-
 const InventorySchema = z.record(InventoryCollectionSchema)
 
 export type InventoryAsset = z.infer<typeof InventoryAssetSchema>
 export type InventoryCollection = z.infer<typeof InventoryCollectionSchema>
 export type Inventory = z.infer<typeof InventorySchema>
-export type CollectionPreferences = z.infer<typeof CollectionPreferencesSchema>
-export type CollectionPreferencesDictionary = z.infer<typeof CollectionPreferencesDictionarySchema>

@@ -982,34 +982,15 @@ module.exports = {
       return main
     })
   },
-  tokenVisiblity(u, chain, address, hidden) {
-    const tokenId = `${chain}:${address}`
-    u('main.hiddenTokens', (hiddenTokens) => {
-      const index = hiddenTokens.indexOf(tokenId)
-      // If it should be showing but is in the hidden array, remove it
-      if (index !== -1 && !hidden) {
-        hiddenTokens.splice(index, 1)
-        // If it should be hidden but isn't in the hidden array, add it
-      } else if (index === -1 && hidden) {
-        hiddenTokens.push(tokenId)
-      }
-      return hiddenTokens
-    })
-  },
 
-  updateCollectionPreferences(u, chainId, collectionAddress, preferenceUpdates) {
-    u('main.collectionPreferences', (collectionPreferences) => {
+  updateAssetPreferences(u, preferenceType, chainId, collectionAddress, preferenceChanges) {
+    u('main.assetPreferences', preferenceType, (preferences) => {
       const collectionId = `${chainId}:${collectionAddress}`
-      collectionPreferences[collectionId] = {
-        ...collectionPreferences[collectionId],
-        ...preferenceUpdates
+      preferences[collectionId] = {
+        ...preferences[collectionId],
+        ...preferenceChanges
       }
-      return collectionPreferences
+      return preferences
     })
   }
-
-  // toggleUSDValue: (u) => {
-  //   u('main.showUSDValue', show => !show)
-  // }
-  // __overwrite: (path, value) => u(path, () => value)
 }

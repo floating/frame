@@ -21,12 +21,13 @@ const HiddenOverlay = styled.div`
 const BalancesList = ({ balances }) => {
   const [open, setOpen] = useState(-1)
   const [confirming, setConfirming] = useState(false)
-  const hiddenTokens = useStore('main.hiddenTokens') || []
+  const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
   return (
     <Cluster>
       {balances.map(({ chainId, symbol, address, ...balance }, i) => {
         const tokenId = `${chainId}:${address}`
-        const hidden = hiddenTokens.includes(tokenId)
+        const preferences = tokenPreferences[tokenId]
+        const hidden = preferences ? preferences.hidden : balance.hideByDefault || false
         return (
           <React.Fragment key={tokenId}>
             <ClusterRow>
@@ -68,7 +69,9 @@ const BalancesList = ({ balances }) => {
                     onClick={() => {
                       setConfirming(false)
                       setOpen(-1)
-                      link.send('tray:action', 'tokenVisiblity', chainId, address, !hidden)
+                      link.send('tray:action', 'updateAssetPreferences', 'tokens', chainId, address, {
+                        hidden: !hidden
+                      })
                     }}
                   >
                     <div className='signerBalanceDrawerItem'>{svg.check(16)}</div>

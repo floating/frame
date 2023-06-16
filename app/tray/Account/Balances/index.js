@@ -13,10 +13,11 @@ import {
   isNativeCurrency
 } from '../../../../resources/domain/balance'
 
-const shouldShow = (ethereumNetworks, hiddenTokens, populatedChains, returnHidden) => (rawBalance) => {
+const shouldShow = (ethereumNetworks, tokenPreferences, populatedChains, returnHidden) => (rawBalance) => {
   const { chainId, address } = rawBalance
   const networkIsEnabled = ethereumNetworks[chainId]?.on
-  const isHidden = hiddenTokens.includes(`${chainId}:${address}`)
+  const preferences = tokenPreferences[`${chainId}:${address}`]
+  const isHidden = preferences ? preferences.hidden : rawBalance.hideByDefault || false
   const isExpired = populatedChains[chainId]?.expires > Date.now()
 
   return networkIsEnabled && isExpired && returnHidden === isHidden
@@ -69,11 +70,11 @@ class Balances extends React.Component {
     return { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains }
   }
 
-  getBalances(filter, hiddenTokens = [], returnHidden = false) {
+  getBalances(filter, tokenPreferences, returnHidden = false) {
     const { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains } = this.getStoreValues()
 
     const filteredBalances = rawBalances.filter(
-      shouldShow(ethereumNetworks, hiddenTokens, populatedChains, returnHidden)
+      shouldShow(ethereumNetworks, tokenPreferences, populatedChains, returnHidden)
     )
 
     const balances = filteredBalances

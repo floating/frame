@@ -10,7 +10,7 @@ import CollectionList from '../CollectionList'
 
 const InventoryExpanded = ({ expandedData, moduleId, account }) => {
   const [collectionFilter, setCollectionFilter] = useState('')
-  const collectionPreferences = useStore('main.collectionPreferences') || {}
+  const collectionPreferences = useStore('main.assetPreferences.collections') || {}
 
   const renderAccountFilter = () => {
     return (
@@ -56,7 +56,8 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
       .filter((collection = {}) => {
         if (!collection.meta) return false
         const collectionId = `${collection.meta.chainId}:${collection.contract}`
-        const isHidden = collectionPreferences[collectionId]?.hidden || collection.meta.hideByDefault || false
+        const preferences = collectionPreferences[collectionId]
+        const isHidden = preferences ? preferences.hidden : collection.meta.hideByDefault || false
         if (isHidden) hiddenCount++
         return expandedData.hidden ? isHidden : !isHidden
       })
