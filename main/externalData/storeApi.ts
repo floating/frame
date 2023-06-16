@@ -89,5 +89,11 @@ export const storeApi = {
     store.addPopulatedChains(address.toLowerCase(), chains, expiryWindow),
 
   //Misc
-  getTrayOpened: () => store('tray.open')
+  getTrayOpened: () => store('tray.open'),
+
+  //Hidden assets
+  hideToken: (chainId: number, contractAddress: string) =>
+    store.tokenVisiblity(chainId, contractAddress, true),
+  hideCollection: (chainId: number, contractAddress: string) =>
+    store.collectionVisiblity(chainId, contractAddress, true)
 }

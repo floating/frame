@@ -8,6 +8,8 @@ import { isNativeCurrency, toTokenId } from '../../../../resources/domain/balanc
 import type { Token, TokenBalance } from '../../../store/state'
 import { NATIVE_CURRENCY } from '../../../../resources/constants'
 
+type UpdatedBalance = TokenBalance & { hideByDefault?: boolean }
+
 const toExpiryWindow = {
   snapshot: 1000 * 60 * 5,
   scan: 1000 * 60
@@ -58,7 +60,7 @@ const splitTokenBalances = (balances: TokenBalance[]) => {
   )
 }
 
-const mergeCustomAndNative = (balances: TokenBalance[]): TokenBalance[] => {
+const mergeCustomAndNative = (balances: TokenBalance[]) => {
   // Retrieve custom tokens from the store
   const custom = storeApi.getCustomTokens()
 
@@ -107,6 +109,18 @@ const mergeCustomAndNative = (balances: TokenBalance[]): TokenBalance[] => {
   return [...mergedBalances, ...missingBalances]
 }
 
+const hideUnknownTokens = (balances: UpdatedBalance[]) => {
+  const knownTokens = storeApi.getKnownTokens()
+  const knownTokenIds = new Set(knownTokens.map(toTokenId))
+
+  const toHide = balances.filter((balance) => {
+    const tokenId = toTokenId(balance)
+    return !knownTokenIds.has(tokenId) && balance.hideByDefault
+  })
+
+  toHide.forEach((balance) => storeApi.hideToken(balance.chainId, balance.address))
+}
+
 function updateStoredTokens(address: string, zeroBalances: TokenBalance[], tokenBalances: TokenBalance[]) {
   const zeroBalanceSet = new Set(zeroBalances.map(toTokenId))
   if (zeroBalanceSet.size) {
@@ -120,12 +134,12 @@ function updateStoredTokens(address: string, zeroBalances: TokenBalance[], token
 
 export function handleBalanceUpdate(
   address: string,
-  balances: TokenBalance[],
+  balances: UpdatedBalance[],
   chains: number[],
   mode: keyof typeof toExpiryWindow
 ) {
   log.debug('Handling balance update', { address, chains })
-
+  hideUnknownTokens(balances)
   const withLocalData = mergeCustomAndNative(balances)
 
   const changedBalances = getChangedBalances(address, withLocalData)

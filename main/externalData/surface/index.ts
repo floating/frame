@@ -30,6 +30,7 @@ type BalanceItem = {
   chainId: number
   decimals: number
   amount: string
+  hideByDefault: boolean
 }
 
 interface CollectionItem {
@@ -64,7 +65,8 @@ const toTokenBalance = (b: BalanceItem) => ({
   balance: b.amount,
   decimals: b.decimals || 18,
   displayBalance: formatUnits(b.amount, b.decimals),
-  media: b.media
+  media: b.media,
+  hideByDefault: b.hideByDefault
 })
 
 const toInventoryAsset = (item: CollectionItem): InventoryAsset => ({
@@ -184,7 +186,7 @@ const Surface = () => {
         log.debug(`Created subscription to items`, { account, items })
       },
       onData: (data) => {
-        log.debug('Received update for items', { account, items: data })
+        log.info('Received update for items', { account })
 
         if (!data.length) return
         const assets = data.map(toInventoryAsset)
