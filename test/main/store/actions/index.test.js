@@ -27,7 +27,8 @@ import {
   updateTypedDataRequest as updateTypedDataAction,
   removeNativeCurrencyRate as removeNativeCurrencyRateAction,
   removeRate as removeRateAction,
-  setInventoryAssets as setInventoryAssetsAction
+  setInventoryAssets as setInventoryAssetsAction,
+  updateCollectionPreferences as updateCollectionPreferencesAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -1564,5 +1565,59 @@ describe('#setInventoryAssets', () => {
     setInventoryAssets(account, collection, [existingItem, acquiredItem])
 
     expect(inventory[account][collection]).toStrictEqual([existingItem, acquiredItem])
+  })
+})
+
+describe('#updateCollectionPreferences', () => {
+  let collectionPreferences
+
+  const collectionChainId = 1
+  const collectionAddress = '0xabcd'
+  const collectionId = `${collectionChainId}:${collectionAddress}`
+
+  const updaterFn = (node, update) => {
+    expect(node).toBe('main.collectionPreferences')
+    collectionPreferences = update(collectionPreferences)
+  }
+
+  const updateCollectionPreferences = (chainId, address, preferences) =>
+    updateCollectionPreferencesAction(updaterFn, chainId, address, preferences)
+
+  beforeEach(() => {
+    collectionPreferences = {}
+  })
+
+  it('should add new preferences when the collection has no previous preferences', () => {
+    const preferences = {
+      hidden: false
+    }
+
+    updateCollectionPreferences(collectionChainId, collectionAddress, preferences)
+
+    expect(collectionPreferences[collectionId]).toStrictEqual(preferences)
+  })
+
+  it('should correctly update existing preferences when new ones are provided', () => {
+    collectionPreferences[collectionId] = { hidden: true }
+
+    const preferences = {
+      hidden: false
+    }
+
+    updateCollectionPreferences(collectionChainId, collectionAddress, preferences)
+
+    expect(collectionPreferences[collectionId]).toStrictEqual(preferences)
+  })
+
+  it('should maintain unmodified preferences when new preferences are provided', () => {
+    collectionPreferences[collectionId] = { favourite: true }
+
+    const preferences = {
+      hidden: false
+    }
+
+    updateCollectionPreferences(collectionChainId, collectionAddress, preferences)
+
+    expect(collectionPreferences[collectionId]).toStrictEqual({ ...preferences, favourite: true })
   })
 })
