@@ -77,14 +77,14 @@ class Inventory extends React.Component {
 
   displayCollections() {
     const inventory = this.store('main.inventory', this.props.account)
-    const hiddenCollections = this.store('main.hiddenCollections')
+    const collectionPreferences = this.store('main.collectionPreferences') || {}
     const collections = Object.keys(inventory || {})
     return collections
       .filter((k) => {
         const c = inventory[k]
         if (!c || !c.meta) return false
         const collectionId = `${c.meta.chainId}:${k}`
-        const isHidden = hiddenCollections.includes(collectionId)
+        const isHidden = collectionPreferences[collectionId]?.hidden || c.meta.hideByDefault || false
         return !isHidden
       })
       .sort((a, b) => {

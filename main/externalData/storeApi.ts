@@ -2,7 +2,8 @@ import store from '../store'
 import { NATIVE_CURRENCY } from '../../resources/constants'
 import { UsdRate } from '../provider/assets'
 
-import type { Chain, Token, Rate, Inventory, InventoryAsset, TokenBalance } from '../store/state'
+import type { Chain, Token, Rate, Inventory, InventoryAsset, TokenBalance, WithTokenId } from '../store/state'
+import { CollectionPreferencesDictionary } from '../store/state/types/inventory'
 
 export const storeApi = {
   // Accounts
@@ -95,5 +96,7 @@ export const storeApi = {
   hideToken: (chainId: number, contractAddress: string) =>
     store.tokenVisiblity(chainId, contractAddress, true),
   hideCollection: (chainId: number, contractAddress: string) =>
-    store.collectionVisiblity(chainId, contractAddress, true)
+    store.updateCollectionPreferences(chainId, contractAddress, { hidden: true }),
+  getCollectionPreferences: () =>
+    (store('main.collectionPreferences') || {}) as CollectionPreferencesDictionary
 }

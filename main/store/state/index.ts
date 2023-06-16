@@ -155,7 +155,7 @@ const mainState = {
   permissions: main('permissions', {}),
   balances: {},
   hiddenTokens: main('hiddenTokens', []),
-  hiddenCollections: main('hiddenCollections', []),
+  collectionPreferences: main('collectionPreferences', {}),
   tokens: main('tokens', { custom: [], known: {} }),
   rates: {}, // main('rates', {}),
   inventory: {}, // main('rates', {}),

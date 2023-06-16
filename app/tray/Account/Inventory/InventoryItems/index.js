@@ -38,8 +38,8 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
   const { meta } = inventory[k]
 
   const collectionId = `${meta.chainId}:${k}`
-  const hiddenCollections = useStore('main.hiddenCollections') || []
-  const isHidden = hiddenCollections.includes(collectionId)
+  const collectionPreferences = useStore('main.collectionPreferences') || {}
+  const isHidden = collectionPreferences[collectionId]?.hidden || meta.hideByDefault || false
 
   useEffect(() => {
     if (k) {
@@ -163,7 +163,9 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
                     <ClusterValue
                       width={'42px'}
                       onClick={() => {
-                        link.send('tray:action', 'collectionVisiblity', meta.chainId, k, !isHidden)
+                        link.send('tray:action', 'updateCollectionPreferences', meta.chainId, k, {
+                          hidden: !isHidden
+                        })
                         setConfirmHide(false)
                         if (!isHidden) link.send('nav:back', 'panel')
                       }}

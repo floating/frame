@@ -16,6 +16,7 @@ type ItemCollection = {
   name: string
   description: string
   media: Media
+  hideByDefault: boolean
 }
 
 type CollectionMetdata = ItemCollection & {
@@ -49,7 +50,8 @@ const toMeta = (collection: CollectionMetdata) => ({
   media: collection.media,
   chainId: collection.chainId,
   external_url: '',
-  tokens: collection.ownedItems
+  tokens: collection.ownedItems,
+  hideByDefault: collection.hideByDefault
 })
 
 const toInventoryCollection = (collection: CollectionMetdata) => ({

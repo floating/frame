@@ -996,20 +996,18 @@ module.exports = {
       return hiddenTokens
     })
   },
-  collectionVisiblity(u, chain, address, hidden) {
-    const collectionId = `${chain}:${address}`
-    u('main.hiddenCollections', (hiddenCollections) => {
-      const index = hiddenCollections.indexOf(collectionId)
-      // If it should be showing but is in the hidden array, remove it
-      if (index !== -1 && !hidden) {
-        hiddenCollections.splice(index, 1)
-        // If it should be hidden but isn't in the hidden array, add it
-      } else if (index === -1 && hidden) {
-        hiddenCollections.push(collectionId)
+
+  updateCollectionPreferences(u, chainId, collectionAddress, preferenceUpdates) {
+    u('main.collectionPreferences', (collectionPreferences) => {
+      const collectionId = `${chainId}:${collectionAddress}`
+      collectionPreferences[collectionId] = {
+        ...collectionPreferences[collectionId],
+        ...preferenceUpdates
       }
-      return hiddenCollections
+      return collectionPreferences
     })
   }
+
   // toggleUSDValue: (u) => {
   //   u('main.showUSDValue', show => !show)
   // }
