@@ -29,7 +29,7 @@ const previewTitle = (name = '') => {
   }
 }
 
-const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, account }) => {
+const InventoryCollection = ({ expandedData = {}, inventory, visibilityDictionary, account }) => {
   const [hoverAsset, setHoverAsset] = useState(false)
   const { currentCollection } = expandedData
   const k = expandedData.currentCollection
@@ -38,9 +38,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, onAssetClick, accou
   const { meta } = inventory[k]
 
   const collectionId = `${meta.chainId}:${k}`
-  const collectionPreferences = useStore('main.assetPreferences.collections') || {}
-  const preferences = collectionPreferences[collectionId]
-  const isHidden = preferences ? preferences.hidden : meta.hideByDefault || false
+  const isHidden = visibilityDictionary[collectionId]
 
   useEffect(() => {
     if (k) {
