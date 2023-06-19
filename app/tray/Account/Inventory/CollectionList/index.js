@@ -57,6 +57,8 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
 
   const media = collection?.meta?.media
 
+  console.log('media', media)
+
   return (
     <ClusterRow key={collectionId}>
       <ClusterValue

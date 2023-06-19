@@ -109,18 +109,6 @@ const mergeCustomAndNative = (balances: TokenBalance[]) => {
   return [...mergedBalances, ...missingBalances]
 }
 
-const hideUnknownTokens = (balances: UpdatedBalance[]) => {
-  const knownTokens = storeApi.getKnownTokens()
-  const knownTokenIds = new Set(knownTokens.map(toTokenId))
-
-  const toHide = balances.filter((balance) => {
-    const tokenId = toTokenId(balance)
-    return !knownTokenIds.has(tokenId) && balance.hideByDefault
-  })
-
-  toHide.forEach((balance) => storeApi.hideToken(balance.chainId, balance.address))
-}
-
 function updateStoredTokens(address: string, zeroBalances: TokenBalance[], tokenBalances: TokenBalance[]) {
   const zeroBalanceSet = new Set(zeroBalances.map(toTokenId))
   if (zeroBalanceSet.size) {
@@ -139,7 +127,6 @@ export function handleBalanceUpdate(
   mode: keyof typeof toExpiryWindow
 ) {
   log.debug('Handling balance update', { address, chains })
-  hideUnknownTokens(balances)
   const withLocalData = mergeCustomAndNative(balances)
 
   const changedBalances = getChangedBalances(address, withLocalData)

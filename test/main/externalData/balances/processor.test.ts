@@ -21,8 +21,7 @@ jest.mock('../../../../main/externalData/storeApi', () => ({
     addKnownTokens: jest.fn(),
     accountTokensUpdated: jest.fn(),
     setAccountTokensUpdated: jest.fn(),
-    removeKnownTokens: jest.fn(),
-    hideToken: jest.fn()
+    removeKnownTokens: jest.fn()
   }
 }))
 
@@ -240,41 +239,6 @@ describe('#handleBalanceUpdate', () => {
       handleBalanceUpdate(address, [newBalance], [], 'snapshot')
 
       expect(storeApi.setBalances).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('hiding balances', () => {
-    it('should hide unknown balances with the `hideByDefault` flag', () => {
-      const balance = {
-        ...Balance(),
-        hideByDefault: true
-      }
-
-      const address = randomStr()
-
-      handleBalanceUpdate(address, [balance], [balance.chainId], 'snapshot')
-      expect(storeApi.hideToken).toHaveBeenCalledWith(balance.chainId, balance.address)
-    })
-
-    it('should not hide known balances with the `hideByDefault` flag', () => {
-      const balance = {
-        ...Balance(),
-        hideByDefault: true
-      }
-      getKnownTokens.mockReturnValueOnce([balance])
-      const address = randomStr()
-
-      handleBalanceUpdate(address, [balance], [balance.chainId], 'snapshot')
-      expect(storeApi.hideToken).not.toHaveBeenCalled()
-    })
-
-    it('should not hide balances without the `hideByDefault` flag', () => {
-      const balance = Balance()
-
-      const address = randomStr()
-
-      handleBalanceUpdate(address, [balance], [balance.chainId], 'snapshot')
-      expect(storeApi.hideToken).not.toHaveBeenCalled()
     })
   })
 

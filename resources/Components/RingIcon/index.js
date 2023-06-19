@@ -5,7 +5,7 @@ import svg from '../../svg'
 import DisplayMedia from '../DisplayMedia'
 
 const mediaExists = (media) => {
-  return media?.source && media?.type
+  return media?.source && media?.format
 }
 
 const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, frozen, media }) => {

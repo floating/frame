@@ -99,10 +99,5 @@ export const storeApi = {
   //Misc
   getTrayOpened: () => store('tray.open'),
 
-  //Hidden assets
-  hideToken: (chainId: number, contractAddress: string) =>
-    store.updateCollectionPreferences('tokens', chainId, contractAddress, { hidden: true }),
-  hideCollection: (chainId: number, contractAddress: string) =>
-    store.updateCollectionPreferences('collections', chainId, contractAddress, { hidden: true }),
-  getCollectionPreferences: () => (store('main.collectionPreferences') || {}) as PreferencesDictionary
+  updateAssetPreferences: () => (store('main.collectionPreferences') || {}) as PreferencesDictionary
 }
