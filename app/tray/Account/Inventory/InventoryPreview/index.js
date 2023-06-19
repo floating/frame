@@ -63,8 +63,8 @@ class Inventory extends React.Component {
   }
 
   isFilterMatch(collection) {
-    const { filter = '' } = this.props
-    const c = this.store('main.inventory', this.props.account, collection)
+    const { filter = '', inventory } = this.props
+    const c = inventory[collection]
     if (!c) return false
     const collectionName = c.meta && c.meta.name
     const collectionItems = c.items || {}
@@ -76,7 +76,7 @@ class Inventory extends React.Component {
   }
 
   displayCollections() {
-    const inventory = this.store('main.inventory', this.props.account)
+    const { inventory } = this.props
     const hiddenCollections = this.store('main.hiddenCollections')
     const collections = Object.keys(inventory || {})
     return collections
@@ -99,7 +99,7 @@ class Inventory extends React.Component {
   }
 
   render() {
-    const inventory = this.store('main.inventory', this.props.account)
+    const { inventory } = this.props
     const collections = Object.keys(inventory || {})
     const displayCollections = this.displayCollections()
     const moreCollections = collections.length - displayCollections.length
