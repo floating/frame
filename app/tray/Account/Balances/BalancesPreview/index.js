@@ -10,6 +10,27 @@ import HighValueWarning from '../Warning'
 
 import BalancesList from '../BalancesList'
 
+const ShowMoreButton = ({ moduleId, account, allBalances, balances }) => {
+  const showMore = () => {
+    const crumb = {
+      view: 'expandedModule',
+      data: {
+        id: moduleId,
+        account: account
+      }
+    }
+    link.send('nav:forward', 'panel', crumb)
+  }
+
+  return (
+    <div className='signerBalanceButtons'>
+      <div className='signerBalanceButton signerBalanceShowAll' onClick={showMore}>
+        {allBalances.length - balances.length > 0 ? `+${allBalances.length - balances.length} More` : 'More'}
+      </div>
+    </div>
+  )
+}
+
 const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, filter, isHotSigner }) => {
   const [moduleRef] = useAccountModule(moduleId)
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
@@ -18,46 +39,23 @@ const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, fil
 
   const balances = allBalances.slice(0, 4)
 
+  const footerButton = (
+    <ShowMoreButton moduleId={moduleId} account={account} allBalances={allBalances} balances={balances} />
+  )
+
   return (
     <div ref={moduleRef} className='balancesBlock'>
       <div className={'moduleHeader'}>
         <span>{svg.tokens(13)}</span>
         <span>{'Balances'}</span>
       </div>
-      <BalancesList balances={balances} />
+      <BalancesList
+        balances={balances}
+        footerButton={footerButton}
+        displayValue={totalDisplayValue}
+        allChainsUpdated={allChainsUpdated}
+      />
       {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
-      <div className='signerBalanceTotal'>
-        <div className='signerBalanceButtons'>
-          <div
-            className='signerBalanceButton signerBalanceShowAll'
-            onClick={() => {
-              const crumb = {
-                view: 'expandedModule',
-                data: {
-                  id: moduleId,
-                  account: account
-                }
-              }
-              link.send('nav:forward', 'panel', crumb)
-            }}
-          >
-            {allBalances.length - balances.length > 0
-              ? `+${allBalances.length - balances.length} More`
-              : 'More'}
-          </div>
-        </div>
-        {balances.length && allChainsUpdated ? (
-          <div className='signerBalanceTotalText'>
-            <div className='signerBalanceTotalLabel'>{'Total'}</div>
-            <div className='signerBalanceTotalValue'>
-              {svg.usd(11)}
-              {totalDisplayValue}
-            </div>
-          </div>
-        ) : (
-          <div className='signerBalanceLoading'>{svg.sine()}</div>
-        )}
-      </div>
     </div>
   )
 }

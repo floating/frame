@@ -52,13 +52,13 @@ const DisplayBox = styled.div`
   }
 `
 
-const DisplayMedia = ({ media, thumb, frozen, audio, full, lazy }) => {
+const DisplayMedia = ({ media, alt, thumb, frozen, audio, full, lazy }) => {
   if (!media) return null
   if (media.format === 'image') {
     if (thumb || frozen) {
       if (frozen) {
         if (media.cdn?.frozen) {
-          return <img src={pylonURL(media.cdn.frozen)} loading={lazy ? 'lazy' : 'eager'} />
+          return <img src={pylonURL(media.cdn.frozen)} alt={alt} loading={lazy ? 'lazy' : 'eager'} />
         } else {
           return svg.missing(12)
         }

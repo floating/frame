@@ -10,7 +10,7 @@ const mediaExists = (media) => {
 
 const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, frozen, media }) => {
   if (mediaExists(media)) {
-    return <DisplayMedia media={media} thumb={true} frozen={frozen} />
+    return <DisplayMedia media={media} thumb={true} frozen={frozen} alt={alt} />
   }
 
   if (img) {

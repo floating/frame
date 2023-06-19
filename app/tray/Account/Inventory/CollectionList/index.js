@@ -120,8 +120,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
   )
 }
 
-const CollectionList = ({ moduleId, account, collections: collectionContracts = [] }) => {
-  const inventory = useStore('main.inventory', account)
+const CollectionList = ({ moduleId, account, collections: collectionContracts = [], inventory }) => {
   return collectionContracts.map((contractAddress) => {
     const collection = inventory[contractAddress]
     return (
