@@ -8,7 +8,7 @@ import { matchFilter } from '../../../../../resources/utils'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 import CollectionList from '../CollectionList'
 
-const InventoryExpanded = ({ expandedData, moduleId, account }) => {
+const InventoryExpanded = ({ expandedData, moduleId, account, inventory }) => {
   const [collectionFilter, setCollectionFilter] = useState('')
   const hiddenCollections = useStore('main.hiddenCollections') || []
 
@@ -70,7 +70,6 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
       .filter((c) => isFilterMatch(c))
   }
 
-  const inventory = useStore('main.inventory', account)
   const collections = Object.entries(inventory || {}).map(([contract, collection]) => ({
     ...collection,
     contract
@@ -89,6 +88,7 @@ const InventoryExpanded = ({ expandedData, moduleId, account }) => {
               moduleId={moduleId}
               account={account}
               collections={filteredCollections.map((c) => c.contract)}
+              inventory={inventory}
             />
           ) : inventory ? (
             <ClusterRow>
