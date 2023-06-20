@@ -44,4 +44,4 @@ jobs:
   trigger_build:
     needs: sync
     if: needs.check-out-of-sync.outputs.local_version != needs.check-out-of-sync.outputs.latest_version
-    uses: frame-labs/frame-canary/.github/workflows/canary-prebuild@canary
+    uses: frame-labs/frame-canary/.github/workflows/canary-prebuild.yml@canary
