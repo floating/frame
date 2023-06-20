@@ -8,7 +8,7 @@ import { NATIVE_CURRENCY } from '../../../../resources/constants'
 const randomStr = () => randomBytes(32).toString('hex')
 
 jest.mock('../../../../main/externalData/surface', () => ({}))
-const { getTokenBalances, getCustomTokens, getNativeCurrency, removeKnownTokens } = jest.mocked(storeApi)
+const { getTokenBalances, getCustomTokens, getNativeCurrency, getKnownTokens } = jest.mocked(storeApi)
 
 jest.mock('../../../../main/externalData/storeApi', () => ({
   storeApi: {

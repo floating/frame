@@ -16,7 +16,8 @@ const InventoryCollectionSchema = z.object({
     media: MediaSchema,
     chainId: z.number(),
     tokens: z.array(z.string()),
-    external_url: z.string().optional()
+    external_url: z.string().optional(),
+    hideByDefault: z.boolean()
   }),
   items: z.array(InventoryAssetSchema)
 })

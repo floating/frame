@@ -27,7 +27,8 @@ import {
   updateTypedDataRequest as updateTypedDataAction,
   removeNativeCurrencyRate as removeNativeCurrencyRateAction,
   removeRate as removeRateAction,
-  setInventoryAssets as setInventoryAssetsAction
+  setInventoryAssets as setInventoryAssetsAction,
+  updateAssetPreferences as updateAssetPreferencesAction
 } from '../../../../main/store/actions'
 import { toTokenId } from '../../../../resources/domain/balance'
 
@@ -1564,5 +1565,68 @@ describe('#setInventoryAssets', () => {
     setInventoryAssets(account, collection, [existingItem, acquiredItem])
 
     expect(inventory[account][collection]).toStrictEqual([existingItem, acquiredItem])
+  })
+})
+
+describe('#updateAssetPreferences', () => {
+  let assetPreferences
+
+  const collectionChainId = 1
+  const collectionAddress = '0xabcd'
+  const collectionId = `${collectionChainId}:${collectionAddress}`
+
+  beforeEach(() => {
+    assetPreferences = {
+      collections: {},
+      tokens: {}
+    }
+  })
+
+  const preferenceTypes = ['collections', 'tokens']
+  preferenceTypes.forEach((preferenceType) => {
+    const updaterFn = (node, assetType, update) => {
+      expect(node).toBe('main.assetPreferences')
+      assetPreferences[assetType] = update(assetPreferences[assetType])
+    }
+
+    const updatePreferences = (chainId, address, preferences) =>
+      updateAssetPreferencesAction(updaterFn, preferenceType, chainId, address, preferences)
+
+    it(`should add new ${preferenceType} preferences when the entry has no previous preferences`, () => {
+      const preferences = {
+        hidden: false
+      }
+
+      updatePreferences(collectionChainId, collectionAddress, preferences)
+
+      expect(assetPreferences[preferenceType][collectionId]).toStrictEqual(preferences)
+    })
+
+    it(`should correctly update existing ${preferenceType} preferences when new ones are provided`, () => {
+      assetPreferences[preferenceType][collectionId] = { hidden: true }
+
+      const preferences = {
+        hidden: false
+      }
+
+      updatePreferences(collectionChainId, collectionAddress, preferences)
+
+      expect(assetPreferences[preferenceType][collectionId]).toStrictEqual(preferences)
+    })
+
+    it(`should maintain unmodified ${preferenceType} preferences when new preferences are provided`, () => {
+      assetPreferences[preferenceType][collectionId] = { favourite: true }
+
+      const preferences = {
+        hidden: false
+      }
+
+      updatePreferences(collectionChainId, collectionAddress, preferences)
+
+      expect(assetPreferences[preferenceType][collectionId]).toStrictEqual({
+        ...preferences,
+        favourite: true
+      })
+    })
   })
 })
