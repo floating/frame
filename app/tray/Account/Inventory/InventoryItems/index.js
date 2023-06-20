@@ -38,7 +38,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, visibilityDictionar
   const { meta } = inventory[k]
 
   const collectionId = `${meta.chainId}:${k}`
-  const isHidden = visibilityDictionary[collectionId]
+  const isHidden = !visibilityDictionary[collectionId]
 
   useEffect(() => {
     if (k) {
