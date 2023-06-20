@@ -29,6 +29,7 @@ export type { Shortcut, ShortcutKey, ModifierKey } from './types/shortcuts'
 export type { ColorwayPalette } from './types/colors'
 export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
 export type { Media } from './types/media'
+export type { Preferences, PreferencesDictionary } from './types/preferences'
 
 const StateSchema = z.object({
   main: MainSchema.passthrough(), // TODO: remove passthrough once all pieces of state have been defined
@@ -154,8 +155,10 @@ const mainState = {
   addresses: main('addresses', {}), // Should be removed after 0.5 release
   permissions: main('permissions', {}),
   balances: {},
-  hiddenTokens: main('hiddenTokens', []),
-  hiddenCollections: main('hiddenCollections', []),
+  assetPreferences: main('assetPreferences', {
+    tokens: {},
+    collections: {}
+  }),
   tokens: main('tokens', { custom: [], known: {} }),
   rates: {}, // main('rates', {}),
   inventory: {}, // main('rates', {}),

@@ -40,13 +40,16 @@ const BalanceListFooter = ({ displayValue, footerButton, allChainsUpdated }) => 
 const BalancesList = ({ balances, displayValue, footerButton, allChainsUpdated }) => {
   const [open, setOpen] = useState(-1)
   const [confirming, setConfirming] = useState(false)
-  const hiddenTokens = useStore('main.hiddenTokens') || []
+  const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
   return (
     <ClusterBox>
       <Cluster>
         {balances.map(({ chainId, symbol, address, ...balance }, i) => {
           const tokenId = `${chainId}:${address}`
-          const hidden = hiddenTokens.includes(tokenId)
+
+          const preferences = tokenPreferences[tokenId]
+          const hidden = preferences ? preferences.hidden : balance.hideByDefault || false
+
           return (
             <React.Fragment key={tokenId}>
               <ClusterRow>

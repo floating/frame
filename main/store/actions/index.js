@@ -982,36 +982,15 @@ module.exports = {
       return main
     })
   },
-  tokenVisiblity(u, chain, address, hidden) {
-    const tokenId = `${chain}:${address}`
-    u('main.hiddenTokens', (hiddenTokens) => {
-      const index = hiddenTokens.indexOf(tokenId)
-      // If it should be showing but is in the hidden array, remove it
-      if (index !== -1 && !hidden) {
-        hiddenTokens.splice(index, 1)
-        // If it should be hidden but isn't in the hidden array, add it
-      } else if (index === -1 && hidden) {
-        hiddenTokens.push(tokenId)
+
+  updateAssetPreferences(u, preferenceType, chainId, collectionAddress, preferenceChanges) {
+    u('main.assetPreferences', preferenceType, (preferences) => {
+      const collectionId = `${chainId}:${collectionAddress}`
+      preferences[collectionId] = {
+        ...preferences[collectionId],
+        ...preferenceChanges
       }
-      return hiddenTokens
-    })
-  },
-  collectionVisiblity(u, chain, address, hidden) {
-    const collectionId = `${chain}:${address}`
-    u('main.hiddenCollections', (hiddenCollections) => {
-      const index = hiddenCollections.indexOf(collectionId)
-      // If it should be showing but is in the hidden array, remove it
-      if (index !== -1 && !hidden) {
-        hiddenCollections.splice(index, 1)
-        // If it should be hidden but isn't in the hidden array, add it
-      } else if (index === -1 && hidden) {
-        hiddenCollections.push(collectionId)
-      }
-      return hiddenCollections
+      return preferences
     })
   }
-  // toggleUSDValue: (u) => {
-  //   u('main.showUSDValue', show => !show)
-  // }
-  // __overwrite: (path, value) => u(path, () => value)
 }

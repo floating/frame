@@ -2,8 +2,16 @@ import store from '../store'
 import { NATIVE_CURRENCY } from '../../resources/constants'
 import { UsdRate } from '../provider/assets'
 
-import type { Chain, Token, Rate, Inventory, InventoryAsset, TokenBalance } from '../store/state'
-
+import type {
+  Chain,
+  Token,
+  Rate,
+  Inventory,
+  InventoryAsset,
+  TokenBalance,
+  WithTokenId,
+  PreferencesDictionary
+} from '../store/state'
 export const storeApi = {
   // Accounts
   getActiveAddress: () => (store('selected.current') || '') as Address,
@@ -89,5 +97,7 @@ export const storeApi = {
     store.addPopulatedChains(address.toLowerCase(), chains, expiryWindow),
 
   //Misc
-  getTrayOpened: () => store('tray.open')
+  getTrayOpened: () => store('tray.open'),
+
+  updateAssetPreferences: () => (store('main.collectionPreferences') || {}) as PreferencesDictionary
 }

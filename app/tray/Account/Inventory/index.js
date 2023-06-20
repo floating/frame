@@ -5,7 +5,7 @@ import InventoryPreview from './InventoryPreview'
 import InventoryExpanded from './InventoryExpanded'
 import InventoryItems from './InventoryItems'
 
-const filterOutDisabledChains = (inventory, ethereumNetworks) => {
+const filterInventory = (inventory, ethereumNetworks) => {
   return Object.fromEntries(
     Object.entries(inventory).filter(
       ([
@@ -20,16 +20,29 @@ const filterOutDisabledChains = (inventory, ethereumNetworks) => {
   )
 }
 
+const createVisibilityDictionary = (inventory, collectionPreferences) => {
+  const visibilityDictionary = {}
+  Object.entries(inventory).forEach(([_cAddress, { meta }]) => {
+    const collectionId = `${meta.chainId}:${_cAddress}`
+    const preferences = collectionPreferences[collectionId]
+    const isHidden = preferences ? preferences.hidden : meta.hideByDefault || false
+    visibilityDictionary[collectionId] = !isHidden
+  })
+  return visibilityDictionary
+}
+
 class Inventory extends React.Component {
   render() {
     const onAssetClick = (url) => () => {
       this.store.notify('openExternal', { url })
     }
 
-    const inventory = this.store('main.inventory', this.props.account)
+    const inventory = this.store('main.inventory', this.props.account) || {}
     const ethereumNetworks = this.store('main.networks.ethereum')
+    const collectionPreferences = this.store('main.assetPreferences.collections') || {}
 
-    const enabledChainsInventory = filterOutDisabledChains(inventory, ethereumNetworks)
+    const visibilityDictionary = createVisibilityDictionary(inventory, collectionPreferences)
+    const enabledChainsInventory = filterInventory(inventory, ethereumNetworks)
     const expandedData = this.props.expandedData || {}
 
     return this.props.expanded ? (
@@ -39,14 +52,25 @@ class Inventory extends React.Component {
           onAssetClick={onAssetClick}
           expandedData={expandedData}
           inventory={enabledChainsInventory}
+          visibilityDictionary={visibilityDictionary}
           account={this.props.account}
           key={'expandedCollection'}
         />
       ) : (
-        <InventoryExpanded {...this.props} inventory={enabledChainsInventory} key={'expandedList'} />
+        <InventoryExpanded
+          {...this.props}
+          visibilityDictionary={visibilityDictionary}
+          inventory={enabledChainsInventory}
+          key={'expandedList'}
+        />
       )
     ) : (
-      <InventoryPreview {...this.props} inventory={enabledChainsInventory} key={'previewList'} />
+      <InventoryPreview
+        {...this.props}
+        inventory={enabledChainsInventory}
+        key={'previewList'}
+        visibilityDictionary={visibilityDictionary}
+      />
     )
   }
 }

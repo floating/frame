@@ -33,9 +33,9 @@ const ShowMoreButton = ({ moduleId, account, allBalances, balances }) => {
 
 const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, filter, isHotSigner }) => {
   const [moduleRef] = useAccountModule(moduleId)
-  const hiddenTokens = useStore('main.hiddenTokens') || []
+  const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
 
-  const { balances: allBalances, totalValue, totalDisplayValue } = getBalances(filter, hiddenTokens)
+  const { balances: allBalances, totalValue, totalDisplayValue } = getBalances(filter, tokenPreferences)
 
   const balances = allBalances.slice(0, 4)
 
