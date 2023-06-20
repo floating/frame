@@ -13,14 +13,22 @@ import {
   isNativeCurrency
 } from '../../../../resources/domain/balance'
 
-const shouldShow = (ethereumNetworks, tokenPreferences, populatedChains, returnHidden) => (rawBalance) => {
-  const { chainId, address } = rawBalance
+const expiredAndDisabledChains = (ethereumNetworks, populatedChains) => (rawBalance) => {
+  const { chainId } = rawBalance
   const networkIsEnabled = ethereumNetworks[chainId]?.on
-  const preferences = tokenPreferences[`${chainId}:${address}`]
-  const isHidden = preferences ? preferences.hidden : rawBalance.hideByDefault || false
+
   const isExpired = populatedChains[chainId]?.expires > Date.now()
 
-  return networkIsEnabled && isExpired && returnHidden === isHidden
+  return networkIsEnabled && isExpired
+}
+
+const isHidden = (rawBalance, tokenPreferences) => {
+  const { chainId, address } = rawBalance
+
+  const preferences = tokenPreferences[`${chainId}:${address}`]
+  const isHidden = preferences ? preferences.hidden : rawBalance.hideByDefault || false
+
+  return isHidden
 }
 
 const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
@@ -44,6 +52,32 @@ const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
   }
 
   return createBalance(balanceData, chain.isTestnet ? { price: 0 } : rate.usd)
+}
+
+const seperateHidden = (balances, tokenPreferences) => {
+  return balances.reduce(
+    (acc, balance) => {
+      const hidden = isHidden(balance, tokenPreferences)
+      if (hidden) {
+        acc.hiddenBalances.push(balance)
+      } else {
+        acc.visibleBalances.push(balance)
+      }
+      return acc
+    },
+    { hiddenBalances: [], visibleBalances: [] }
+  )
+}
+
+const insertValues = (balances) => {
+  const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
+  const totalDisplayValue = formatUsdRate(totalValue, 0)
+
+  return {
+    balances,
+    totalValue,
+    totalDisplayValue
+  }
 }
 
 class Balances extends React.Component {
@@ -70,12 +104,10 @@ class Balances extends React.Component {
     return { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains }
   }
 
-  getBalances(filter, tokenPreferences, returnHidden = false) {
+  getBalances(filter, tokenPreferences) {
     const { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains } = this.getStoreValues()
 
-    const filteredBalances = rawBalances.filter(
-      shouldShow(ethereumNetworks, tokenPreferences, populatedChains, returnHidden)
-    )
+    const filteredBalances = rawBalances.filter(expiredAndDisabledChains(ethereumNetworks, populatedChains))
 
     const balances = filteredBalances
       .map(toBalance(networksMeta, rates, ethereumNetworks))
@@ -85,10 +117,9 @@ class Balances extends React.Component {
       })
       .sort(byTotalValue)
 
-    const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
-    const totalDisplayValue = formatUsdRate(totalValue, 0)
+    const { hiddenBalances, visibleBalances } = seperateHidden(balances, tokenPreferences)
 
-    return { balances, totalValue, totalDisplayValue }
+    return { hidden: insertValues(hiddenBalances), visible: insertValues(visibleBalances) }
   }
 
   getAllChainsUpdated() {

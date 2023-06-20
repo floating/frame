@@ -10,7 +10,7 @@ import HighValueWarning from '../Warning'
 
 import BalancesList from '../BalancesList'
 
-const ShowMoreButton = ({ moduleId, account, allBalances, balances }) => {
+const ShowMoreButton = ({ moduleId, account, balanceCount, balances }) => {
   const showMore = () => {
     const crumb = {
       view: 'expandedModule',
@@ -25,7 +25,7 @@ const ShowMoreButton = ({ moduleId, account, allBalances, balances }) => {
   return (
     <div className='signerBalanceButtons'>
       <div className='signerBalanceButton signerBalanceShowAll' onClick={showMore}>
-        {allBalances.length - balances.length > 0 ? `+${allBalances.length - balances.length} More` : 'More'}
+        {balanceCount - balances.length > 0 ? `+${balanceCount - balances.length} More` : 'More'}
       </div>
     </div>
   )
@@ -35,12 +35,22 @@ const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, fil
   const [moduleRef] = useAccountModule(moduleId)
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
 
-  const { balances: allBalances, totalValue, totalDisplayValue } = getBalances(filter, tokenPreferences)
+  const {
+    visible: { balances, totalValue, totalDisplayValue },
+    hidden: { balances: hiddenBalances }
+  } = getBalances(filter, tokenPreferences)
 
-  const balances = allBalances.slice(0, 4)
+  const previewBalances = balances.slice(0, 4)
+
+  const balanceCount = balances.length + hiddenBalances.length
 
   const footerButton = (
-    <ShowMoreButton moduleId={moduleId} account={account} allBalances={allBalances} balances={balances} />
+    <ShowMoreButton
+      moduleId={moduleId}
+      account={account}
+      balanceCount={balanceCount}
+      balances={previewBalances}
+    />
   )
 
   return (
@@ -50,7 +60,7 @@ const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, fil
         <span>{'Balances'}</span>
       </div>
       <BalancesList
-        balances={balances}
+        balances={previewBalances}
         footerButton={footerButton}
         displayValue={totalDisplayValue}
         allChainsUpdated={allChainsUpdated}

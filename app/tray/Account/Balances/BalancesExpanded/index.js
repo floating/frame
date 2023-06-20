@@ -73,15 +73,9 @@ const BalancesExpanded = ({
   const [balanceFilter, setBalanceFilter] = useState('')
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
   const {
-    balances: allBalances,
-    totalValue,
-    totalDisplayValue
+    hidden: { balances: hiddenBalances, totalDisplayValue: hiddenTotalDisplayValue },
+    visible: { balances: allBalances, totalValue, totalDisplayValue }
   } = getBalances(balanceFilter, tokenPreferences)
-  const { balances: hiddenBalances, totalDisplayValue: hiddenTotalDisplayValue } = getBalances(
-    balanceFilter,
-    tokenPreferences,
-    true
-  )
 
   const footerButton = !expandedData.hidden && (
     <ShowHiddenButton account={account} moduleId={moduleId} hiddenBalances={hiddenBalances} />
