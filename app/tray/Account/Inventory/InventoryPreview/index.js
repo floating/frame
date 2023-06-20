@@ -83,7 +83,7 @@ class Inventory extends React.Component {
         const c = inventory[k]
         if (!c || !c.meta) return false
         const collectionId = `${c.meta.chainId}:${k}`
-        const isHidden = visibilityDictionary[collectionId]
+        const isHidden = !visibilityDictionary[collectionId]
         return !isHidden
       })
       .sort((a, b) => {
@@ -100,8 +100,8 @@ class Inventory extends React.Component {
   render() {
     const { inventory } = this.props
     const collections = Object.keys(inventory || {})
-    const displayCollections = this.displayCollections()
-    const moreCollections = collections.length - displayCollections.length
+    const numberOfVisibleCollections = Object.values(this.props.visibilityDictionary).filter(Boolean).length
+    const moreCollections = collections.length - numberOfVisibleCollections
     return (
       <div ref={this.moduleRef} className='balancesBlock' style={{}}>
         <div className='moduleHeader'>

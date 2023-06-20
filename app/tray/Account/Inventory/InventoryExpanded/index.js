@@ -55,7 +55,7 @@ const InventoryExpanded = ({ expandedData, moduleId, account, inventory, visibil
       .filter((collection = {}) => {
         if (!collection.meta) return false
         const collectionId = `${collection.meta.chainId}:${collection.contract}`
-        const isHidden = visibilityDictionary[collectionId]
+        const isHidden = !visibilityDictionary[collectionId]
         if (isHidden) hiddenCount++
         return expandedData.hidden ? isHidden : !isHidden
       })
