@@ -6,16 +6,42 @@ on:
     - cron: '*/5 0-3 * * *'
     - cron: '*/5 18-23 * * *'
     - cron: '*/30 4-17 * * *'
+  workflow_dispatch:
 
 jobs:
-  sync:
+  check-out-of-sync:
     if: github.repository == 'frame-labs/frame-canary'
     runs-on: ubuntu-latest
+    outputs:
+      local_version: ${{ steps.setlocal.outputs.version }}
+      latest_version: ${{ steps.setlatest.outputs.version }}
 
     steps:
       - uses: actions/checkout@v3
       - run: git remote add upstream https://github.com/floating/frame.git
       - run: git fetch upstream canary
+      - name: Set local version
+        id: setlocal
+        run: git rev-parse origin/canary | xargs -I {} echo "version={}" >> "$GITHUB_OUTPUT"
+      - name: Set latest version
+        id: setlatest
+        run: git rev-parse upstream/canary | xargs -I {} echo "version={}" >> "$GITHUB_OUTPUT"
+
+  sync:
+    needs: check-out-of-sync
+    if: needs.check-out-of-sync.outputs.local_version != needs.check-out-of-sync.outputs.latest_version
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "Version ${{ needs.check-out-of-sync.outputs.local_version }} is out of date, merging in upstream version ${{ needs.check-out-of-sync.outputs.latest_version }}"
+      - run: git remote add upstream https://github.com/floating/frame.git
+      - run: git fetch upstream canary
       - run: git checkout canary
       - run: git merge upstream/canary
       - run: git push origin canary
+
+  trigger_build:
+    needs: sync
+    if: needs.check-out-of-sync.outputs.local_version != needs.check-out-of-sync.outputs.latest_version
+    uses: frame-labs/frame-canary/.github/workflows/canary-prebuild@canary
