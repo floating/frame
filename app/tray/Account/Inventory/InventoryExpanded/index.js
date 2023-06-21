@@ -92,14 +92,17 @@ const InventoryExpanded = ({ expandedData, moduleId, account, inventory, hiddenC
           ) : inventory ? (
             <ClusterRow>
               <ClusterValue>
-                <div className='inventoryNotFound'>No Items Found</div>
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+                  <div className='inventoryNotFound'>No Items Found</div>
+                </div>
               </ClusterValue>
             </ClusterRow>
           ) : (
             <ClusterRow>
               <ClusterValue>
-                {/* <div className='signerBalanceLoading'>{svg.sine()}</div> */}
-                <div className='inventoryNotFound'>Loading Items</div>
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+                  <div className='inventoryNotFound'>Loading Items</div>
+                </div>
               </ClusterValue>
             </ClusterRow>
           )}
