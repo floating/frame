@@ -42,7 +42,7 @@ const BalancesList = ({ balances, displayValue, footerButton, allChainsUpdated }
   const [confirming, setConfirming] = useState(false)
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
   return (
-    <ClusterBox>
+    <>
       <Cluster>
         {balances.map(({ chainId, symbol, address, ...balance }, i) => {
           const tokenId = `${chainId}:${address}`
@@ -147,7 +147,7 @@ const BalancesList = ({ balances, displayValue, footerButton, allChainsUpdated }
         footerButton={footerButton}
         allChainsUpdated={allChainsUpdated}
       />
-    </ClusterBox>
+    </>
   )
 }
 
