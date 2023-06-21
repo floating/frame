@@ -65,7 +65,7 @@
     "@ethereumjs/util": "8.0.3",
     "@ethersproject/contracts": "5.7.0",
     "@ethersproject/providers": "5.7.2",
-    "@framelabs/pylon-api-client": "0.1.8",
+    "@framelabs/pylon-api-client": "0.1.9",
     "@framelabs/pylon-client": "0.0.10",
     "@githubprimer/octicons-react": "8.5.0",
     "@ledgerhq/hw-app-eth": "6.33.6",
