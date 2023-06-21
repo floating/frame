@@ -127,15 +127,18 @@ const Surface = () => {
             return
           }
 
-          chainIds.push(Number(chainId))
-          const { balances: chainBalances = {}, inventory: chainInventory = {} } = chain
-          Object.values(chainBalances).forEach((balance) => balances.push(toTokenBalance(balance)))
-
-          Object.entries(chainInventory).forEach(([collection, inventoryData]) => {
-            if (inventoryData) {
-              inventory[collection.toLowerCase()] = toInventoryCollection(inventoryData)
-            }
-          })
+          const { balances: chainBalances, inventory: chainInventory } = chain
+          if (chainBalances) {
+            chainIds.push(Number(chainId))
+            Object.values(chainBalances).forEach((balance) => balances.push(toTokenBalance(balance)))
+          }
+          if (chainInventory) {
+            Object.entries(chainInventory).forEach(([collection, inventoryData]) => {
+              if (inventoryData) {
+                inventory[collection.toLowerCase()] = toInventoryCollection(inventoryData)
+              }
+            })
+          }
         })
 
         handleBalanceUpdate(address, balances, chainIds, 'snapshot')
