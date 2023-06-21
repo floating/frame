@@ -20,15 +20,14 @@ const filterInventory = (inventory, ethereumNetworks) => {
   )
 }
 
-const createVisibilityDictionary = (inventory, collectionPreferences) => {
-  const visibilityDictionary = {}
-  Object.entries(inventory).forEach(([_cAddress, { meta }]) => {
-    const collectionId = `${meta.chainId}:${_cAddress}`
+const getHiddenCollections = (inventory, collectionPreferences) => {
+  return Object.entries(inventory).reduce((collections, [contractAddress, { meta }]) => {
+    const collectionId = `${meta.chainId}:${contractAddress}`
     const preferences = collectionPreferences[collectionId]
     const isHidden = preferences ? preferences.hidden : meta.hideByDefault || false
-    visibilityDictionary[collectionId] = !isHidden
-  })
-  return visibilityDictionary
+    if (isHidden) collections.add(collectionId)
+    return collections
+  }, new Set())
 }
 
 class Inventory extends React.Component {
@@ -41,7 +40,7 @@ class Inventory extends React.Component {
     const ethereumNetworks = this.store('main.networks.ethereum')
     const collectionPreferences = this.store('main.assetPreferences.collections') || {}
 
-    const visibilityDictionary = createVisibilityDictionary(inventory, collectionPreferences)
+    const hiddenCollections = getHiddenCollections(inventory, collectionPreferences)
     const enabledChainsInventory = filterInventory(inventory, ethereumNetworks)
     const expandedData = this.props.expandedData || {}
 
@@ -52,14 +51,14 @@ class Inventory extends React.Component {
           onAssetClick={onAssetClick}
           expandedData={expandedData}
           inventory={enabledChainsInventory}
-          visibilityDictionary={visibilityDictionary}
+          hiddenCollections={hiddenCollections}
           account={this.props.account}
           key={'expandedCollection'}
         />
       ) : (
         <InventoryExpanded
           {...this.props}
-          visibilityDictionary={visibilityDictionary}
+          hiddenCollections={hiddenCollections}
           inventory={enabledChainsInventory}
           key={'expandedList'}
         />
@@ -69,7 +68,7 @@ class Inventory extends React.Component {
         {...this.props}
         inventory={enabledChainsInventory}
         key={'previewList'}
-        visibilityDictionary={visibilityDictionary}
+        hiddenCollections={hiddenCollections}
       />
     )
   }

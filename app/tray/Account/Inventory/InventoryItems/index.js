@@ -29,7 +29,7 @@ const previewTitle = (name = '') => {
   }
 }
 
-const InventoryCollection = ({ expandedData = {}, inventory, visibilityDictionary, account }) => {
+const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, account }) => {
   const [hoverAsset, setHoverAsset] = useState(false)
   const { currentCollection } = expandedData
   const k = expandedData.currentCollection
@@ -38,7 +38,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, visibilityDictionar
   const { meta } = inventory[k]
 
   const collectionId = `${meta.chainId}:${k}`
-  const isHidden = !visibilityDictionary[collectionId]
+  const isHidden = hiddenCollections.has(collectionId)
 
   useEffect(() => {
     if (k) {

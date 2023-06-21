@@ -188,7 +188,7 @@ const Surface = () => {
         log.debug(`Created subscription to items`, { account, items })
       },
       onData: (data) => {
-        log.info('Received update for items', { account })
+        log.debug('Received update for items', { account })
 
         if (!data.length) return
         const assets = data.map(toInventoryAsset)
