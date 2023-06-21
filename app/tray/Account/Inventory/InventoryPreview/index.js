@@ -115,7 +115,9 @@ class Inventory extends React.Component {
           ) : inventory ? (
             <ClusterRow>
               <ClusterValue>
-                <div className='inventoryNotFound'>No Items Found</div>
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+                  <div className='inventoryNotFound'>No Items Found</div>
+                </div>
               </ClusterValue>
             </ClusterRow>
           ) : (

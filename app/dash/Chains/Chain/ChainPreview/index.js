@@ -19,13 +19,10 @@ const ChainPreview = (props) => {
       />
       {on && (
         <div className='chainModules'>
-          <ClusterBox>
-            <Cluster>
-              <Connection {...props} />
-              <Gas chainId={id} />
-            </Cluster>
-          </ClusterBox>
-          <div style={{ height: '14px' }} />
+          <Cluster>
+            <Connection {...props} />
+            <Gas chainId={id} />
+          </Cluster>
         </div>
       )}
     </div>
