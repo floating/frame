@@ -75,15 +75,16 @@ class Inventory extends React.Component {
     return matchFilter(filter, [collectionName, ...itemNames])
   }
 
-  displayCollections() {
-    const { inventory, visibilityDictionary } = this.props
+  filterCollections() {
+    const { inventory, hiddenCollections } = this.props
     const collections = Object.keys(inventory || {})
+
     return collections
       .filter((k) => {
         const c = inventory[k]
         if (!c || !c.meta) return false
         const collectionId = `${c.meta.chainId}:${k}`
-        const isHidden = !visibilityDictionary[collectionId]
+        const isHidden = hiddenCollections.has(collectionId)
         return !isHidden
       })
       .sort((a, b) => {
@@ -94,22 +95,13 @@ class Inventory extends React.Component {
         return 0
       })
       .filter((c) => this.isFilterMatch(c))
-      .slice(0, 5)
   }
 
   render() {
     const { inventory } = this.props
-    const collections = Object.keys(inventory || {})
-    const displayedCollections = this.displayCollections()
-
-    const numberOfVisibleCollections = Object.entries(this.props.visibilityDictionary).filter(
-      ([contractId, visible]) => {
-        const contractAddress = contractId.split(':')[1]
-        return visible && collections.includes(contractAddress)
-      }
-    ).length
-
-    const moreCollections = numberOfVisibleCollections - displayedCollections.length
+    const collections = this.filterCollections()
+    const displayedCollections = collections.slice(0, 5)
+    const moreCollections = collections.length - displayedCollections.length
 
     return (
       <div ref={this.moduleRef} className='balancesBlock' style={{}}>
