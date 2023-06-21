@@ -111,8 +111,6 @@ class Inventory extends React.Component {
 
     const moreCollections = numberOfVisibleCollections - displayedCollections.length
 
-    console.log('displayedCollections', displayedCollections)
-    console.log({ moreCollections, visibilityDictionary: this.props.visibilityDictionary })
     return (
       <div ref={this.moduleRef} className='balancesBlock' style={{}}>
         <div className='moduleHeader'>
