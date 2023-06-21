@@ -21,8 +21,8 @@ const filterInventory = (inventory, ethereumNetworks) => {
 }
 
 const getHiddenCollections = (inventory, collectionPreferences) => {
-  return Object.entries(inventory).reduce((collections, [_cAddress, { meta }]) => {
-    const collectionId = `${meta.chainId}:${_cAddress}`
+  return Object.entries(inventory).reduce((collections, [contractAddress, { meta }]) => {
+    const collectionId = `${meta.chainId}:${contractAddress}`
     const preferences = collectionPreferences[collectionId]
     const isHidden = preferences ? preferences.hidden : meta.hideByDefault || false
     if (isHidden) collections.add(collectionId)
