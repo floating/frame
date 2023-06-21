@@ -122,16 +122,16 @@ const Surface = () => {
         const inventory: Inventory = {}
 
         Object.entries(chains).forEach(([chainId, chain]) => {
-          if (!chain || !chain.balances || !chain.inventory) {
+          if (!chain) {
             log.verbose(`Missing data for chain ${chainId}`, { address })
             return
           }
 
           chainIds.push(Number(chainId))
+          const { balances: chainBalances = {}, inventory: chainInventory = {} } = chain
+          Object.values(chainBalances).forEach((balance) => balances.push(toTokenBalance(balance)))
 
-          Object.values(chain.balances).forEach((balance) => balances.push(toTokenBalance(balance)))
-
-          Object.entries(chain.inventory).forEach(([collection, inventoryData]) => {
+          Object.entries(chainInventory).forEach(([collection, inventoryData]) => {
             if (inventoryData) {
               inventory[collection.toLowerCase()] = toInventoryCollection(inventoryData)
             }
