@@ -100,8 +100,19 @@ class Inventory extends React.Component {
   render() {
     const { inventory } = this.props
     const collections = Object.keys(inventory || {})
-    const numberOfVisibleCollections = Object.values(this.props.visibilityDictionary).filter(Boolean).length
-    const moreCollections = collections.length - numberOfVisibleCollections
+    const displayedCollections = this.displayCollections()
+
+    const numberOfVisibleCollections = Object.entries(this.props.visibilityDictionary).filter(
+      ([contractId, visible]) => {
+        const contractAddress = contractId.split(':')[1]
+        return visible && collections.includes(contractAddress)
+      }
+    ).length
+
+    const moreCollections = numberOfVisibleCollections - displayedCollections.length
+
+    console.log('displayedCollections', displayedCollections)
+    console.log({ moreCollections, visibilityDictionary: this.props.visibilityDictionary })
     return (
       <div ref={this.moduleRef} className='balancesBlock' style={{}}>
         <div className='moduleHeader'>
@@ -110,7 +121,7 @@ class Inventory extends React.Component {
         </div>
         <Cluster>
           {collections.length ? (
-            <CollectionList {...this.props} collections={this.displayCollections()} />
+            <CollectionList {...this.props} collections={displayedCollections} />
           ) : inventory ? (
             <ClusterRow>
               <ClusterValue>
