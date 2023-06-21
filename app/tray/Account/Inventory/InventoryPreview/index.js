@@ -75,15 +75,16 @@ class Inventory extends React.Component {
     return matchFilter(filter, [collectionName, ...itemNames])
   }
 
-  displayCollections() {
-    const { inventory, visibilityDictionary } = this.props
+  filterCollections() {
+    const { inventory, hiddenCollections } = this.props
     const collections = Object.keys(inventory || {})
+
     return collections
       .filter((k) => {
         const c = inventory[k]
         if (!c || !c.meta) return false
         const collectionId = `${c.meta.chainId}:${k}`
-        const isHidden = !visibilityDictionary[collectionId]
+        const isHidden = hiddenCollections.has(collectionId)
         return !isHidden
       })
       .sort((a, b) => {
@@ -94,14 +95,14 @@ class Inventory extends React.Component {
         return 0
       })
       .filter((c) => this.isFilterMatch(c))
-      .slice(0, 5)
   }
 
   render() {
     const { inventory } = this.props
-    const collections = Object.keys(inventory || {})
-    const numberOfVisibleCollections = Object.values(this.props.visibilityDictionary).filter(Boolean).length
-    const moreCollections = collections.length - numberOfVisibleCollections
+    const collections = this.filterCollections()
+    const displayedCollections = collections.slice(0, 5)
+    const moreCollections = collections.length - displayedCollections.length
+
     return (
       <div ref={this.moduleRef} className='balancesBlock' style={{}}>
         <div className='moduleHeader'>
@@ -110,7 +111,7 @@ class Inventory extends React.Component {
         </div>
         <Cluster>
           {collections.length ? (
-            <CollectionList {...this.props} collections={this.displayCollections()} />
+            <CollectionList {...this.props} collections={displayedCollections} />
           ) : inventory ? (
             <ClusterRow>
               <ClusterValue>

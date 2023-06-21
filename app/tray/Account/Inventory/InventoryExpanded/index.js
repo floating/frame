@@ -8,7 +8,7 @@ import { matchFilter } from '../../../../../resources/utils'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 import CollectionList from '../CollectionList'
 
-const InventoryExpanded = ({ expandedData, moduleId, account, inventory, visibilityDictionary }) => {
+const InventoryExpanded = ({ expandedData, moduleId, account, inventory, hiddenCollections }) => {
   const [collectionFilter, setCollectionFilter] = useState('')
 
   const renderAccountFilter = () => {
@@ -55,7 +55,7 @@ const InventoryExpanded = ({ expandedData, moduleId, account, inventory, visibil
       .filter((collection = {}) => {
         if (!collection.meta) return false
         const collectionId = `${collection.meta.chainId}:${collection.contract}`
-        const isHidden = !visibilityDictionary[collectionId]
+        const isHidden = hiddenCollections.has(collectionId)
         if (isHidden) hiddenCount++
         return expandedData.hidden ? isHidden : !isHidden
       })
