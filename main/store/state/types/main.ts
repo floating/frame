@@ -43,7 +43,6 @@ export const MainSchema = z.object({
   origins: KnownOriginsSchema,
   knownExtensions: z.record(z.string(), z.boolean()),
   assetPreferences: PreferencesSchema,
-  hiddenCollections: z.array(z.string()),
   permissions: z.record(
     z.string().describe('Address'),
     z.record(z.string().describe('Origin Id'), PermissionSchema)
