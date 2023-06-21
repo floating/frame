@@ -79,7 +79,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
           link.send('nav:forward', 'panel', crumb)
         }}
       >
-        <div className={'signerBalance'} onMouseDown={() => this.setState({ selected: i })}>
+        <div className='signerBalance'>
           {scanning && <div className='signerBalanceLoading' style={{ animationDelay: 0.15 * i + 's' }} />}
           <CollectionInner>
             <CollectionIcon>
