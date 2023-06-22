@@ -20,6 +20,7 @@ function BalanceScanner() {
   let workerController: BalancesWorkerController | null
   let onResume: (() => void) | null
   let enabledNetworks = new Set<number>()
+  const isOnEnabledChain = (balance: TokenBalance) => enabledNetworks.has(balance.chainId)
   function attemptRestart() {
     log.warn(`balances controller stopped, restarting in ${RESTART_WAIT} seconds`)
     stop()
@@ -200,7 +201,8 @@ function BalanceScanner() {
   }
 
   function handleTokenBalanceUpdate(balances: TokenBalance[], address: Address) {
-    handleBalanceUpdate(address, balances, Array.from(enabledNetworks), 'scan')
+    const filtered = balances.filter(isOnEnabledChain)
+    handleBalanceUpdate(address, filtered, Array.from(enabledNetworks), 'scan')
   }
 
   function handleTokenBlacklistUpdate(tokensToRemove: Set<string>) {
