@@ -91,7 +91,9 @@ const BalancesList = ({ balances, displayValue, footerButton, allChainsUpdated }
                       onClick={() => {
                         setConfirming(false)
                         setOpen(-1)
-                        link.send('tray:action', 'tokenVisiblity', chainId, address, !hidden)
+                        link.send('tray:action', 'updateAssetPreferences', 'tokens', chainId, address, {
+                          hidden: !hidden
+                        })
                       }}
                     >
                       <div className='signerBalanceDrawerItem'>{svg.check(16)}</div>
