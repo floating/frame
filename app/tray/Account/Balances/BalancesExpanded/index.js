@@ -4,17 +4,31 @@ import svg from '../../../../../resources/svg'
 import HighValueWarning from '../Warning'
 import BalancesList from '../BalancesList'
 
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
+
 import useStore from '../../../../../resources/Hooks/useStore'
 
 const AddTokenButton = () => (
-  <div
-    className='signerBalanceButton signerBalanceAddToken'
-    onMouseDown={() => {
-      link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
-    }}
-  >
-    <span>Add Token</span>
-  </div>
+  <Cluster>
+    <ClusterRow>
+      <ClusterValue
+        onClick={() => {
+          link.send('tray:action', 'navDash', { view: 'tokens', data: { notify: 'addToken' } })
+        }}
+      >
+        <div
+          style={{
+            padding: '12px',
+            textTransform: 'uppercase',
+            fontSize: '12px',
+            fontWeight: 'bold'
+          }}
+        >
+          {'Add Token'}
+        </div>
+      </ClusterValue>
+    </ClusterRow>
+  </Cluster>
 )
 
 const ShowHiddenButton = ({ account, moduleId, hiddenBalances }) => {
@@ -90,17 +104,21 @@ const BalancesExpanded = ({
   return (
     <div className='accountViewScroll'>
       <AccountFilter balanceFilter={balanceFilter} setBalanceFilter={setBalanceFilter} />
+      <ClusterBox>
+        <BalancesList
+          balances={expandedData.hidden ? hiddenBalances : allBalances}
+          displayValue={expandedData.hidden ? hiddenTotalDisplayValue : totalDisplayValue}
+          allChainsUpdated={allChainsUpdated}
+          footerButton={footerButton}
+        />
+      </ClusterBox>
 
-      <BalancesList
-        balances={expandedData.hidden ? hiddenBalances : allBalances}
-        displayValue={expandedData.hidden ? hiddenTotalDisplayValue : totalDisplayValue}
-        allChainsUpdated={allChainsUpdated}
-        footerButton={footerButton}
-      />
-      <div className='signerBalanceFooter'>
-        {!expandedData.hidden && <AddTokenButton />}
-        {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
-      </div>
+      {!expandedData.hidden && (
+        <div>
+          {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
+          <AddTokenButton />
+        </div>
+      )}
     </div>
   )
 }
