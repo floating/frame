@@ -9,6 +9,7 @@ on:
     inputs:
       ref:
         type: string
+        default: canary
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
