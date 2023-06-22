@@ -18,11 +18,11 @@ const HiddenOverlay = styled.div`
   z-index: 10000;
 `
 
-const BalanceListFooter = ({ displayValue, footerButton, shouldShowTotal }) => {
+const BalanceListFooter = ({ displayValue, footerButton, shouldShowTotalValue }) => {
   return (
     <div className='signerBalanceTotal'>
       {footerButton || <></>}
-      {shouldShowTotal ? (
+      {shouldShowTotalValue ? (
         <div className='signerBalanceTotalText'>
           <div className='signerBalanceTotalLabel'>{'Total'}</div>
           <div className='signerBalanceTotalValue'>
@@ -37,7 +37,7 @@ const BalanceListFooter = ({ displayValue, footerButton, shouldShowTotal }) => {
   )
 }
 
-const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotal }) => {
+const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalValue }) => {
   const [open, setOpen] = useState(-1)
   const [confirming, setConfirming] = useState(false)
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
@@ -145,7 +145,7 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotal })
       <BalanceListFooter
         displayValue={displayValue}
         footerButton={footerButton}
-        shouldShowTotal={shouldShowTotal}
+        shouldShowTotalValue={shouldShowTotalValue}
       />
     </>
   )
