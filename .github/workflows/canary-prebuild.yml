@@ -6,6 +6,10 @@ on:
       - 'canary'
   workflow_dispatch:
   workflow_call:
+    inputs:
+      ref:
+        type: string
+        default: canary
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -17,6 +21,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - name: read version from package.json
         id: package-version
         uses: martinbeentjes/npm-get-version-action@master
@@ -60,6 +66,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: 18.12.1
