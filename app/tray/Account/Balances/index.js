@@ -48,8 +48,8 @@ const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
 
 class Balances extends React.Component {
   componentDidMount() {
-    this.shouldShowTotal()
-    this.intervalId = setInterval(() => this.shouldShowTotal(), 60_000)
+    this.shouldShowTotalValue()
+    this.intervalId = setInterval(() => this.shouldShowTotalValue(), 60_000)
   }
 
   componentWillUnmount() {
@@ -91,7 +91,7 @@ class Balances extends React.Component {
     return { balances, totalValue, totalDisplayValue }
   }
 
-  shouldShowTotal() {
+  shouldShowTotalValue() {
     const {
       balances: { populatedChains = {} }
     } = this.store('main.accounts', this.props.account)
@@ -115,7 +115,7 @@ class Balances extends React.Component {
     return (
       <Component
         {...this.props}
-        shouldShowTotal={this.shouldShowTotal()}
+        shouldShowTotalValue={this.shouldShowTotalValue()}
         getBalances={this.getBalances.bind(this)}
         isHotSigner={this.isHotSigner()}
       />

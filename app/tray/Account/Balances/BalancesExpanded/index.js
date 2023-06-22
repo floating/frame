@@ -76,7 +76,14 @@ const AccountFilter = ({ balanceFilter, setBalanceFilter }) => {
   )
 }
 
-const BalancesExpanded = ({ getBalances, shouldShowTotal, isHotSigner, expandedData, moduleId, account }) => {
+const BalancesExpanded = ({
+  getBalances,
+  shouldShowTotalValue,
+  isHotSigner,
+  expandedData,
+  moduleId,
+  account
+}) => {
   const [balanceFilter, setBalanceFilter] = useState('')
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
   const {
@@ -108,7 +115,9 @@ const BalancesExpanded = ({ getBalances, shouldShowTotal, isHotSigner, expandedD
 
       {!expandedData.hidden && (
         <div>
-          {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={shouldShowTotal} />}
+          {totalValue.toNumber() > 10000 && isHotSigner && (
+            <HighValueWarning updated={shouldShowTotalValue} />
+          )}
           <AddTokenButton />
         </div>
       )}
