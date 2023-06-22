@@ -48,8 +48,8 @@ const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
 
 class Balances extends React.Component {
   componentDidMount() {
-    this.getAllChainsUpdated()
-    this.intervalId = setInterval(() => this.getAllChainsUpdated(), 60_000)
+    this.shouldShowTotal()
+    this.intervalId = setInterval(() => this.shouldShowTotal(), 60_000)
   }
 
   componentWillUnmount() {
@@ -91,21 +91,18 @@ class Balances extends React.Component {
     return { balances, totalValue, totalDisplayValue }
   }
 
-  getAllChainsUpdated() {
+  shouldShowTotal() {
     const {
       balances: { populatedChains = {} }
     } = this.store('main.accounts', this.props.account)
 
-    const connectedChains = Object.values(this.store('main.networks.ethereum') || {}).reduce((acc, n) => {
-      if ((n.connection.primary || {}).connected || (n.connection.secondary || {}).connected) {
-        acc.push(n.id)
-      }
-      return acc
-    }, [])
+    const enabledChains = Object.values(this.store('main.networks.ethereum') || {})
+      .filter((n) => n.on)
+      .map((n) => n.id)
 
-    return connectedChains.every((chainId) => {
-      return populatedChains[chainId] && populatedChains[chainId].expires > Date.now()
-    })
+    const isPopulated = (chainId) => populatedChains[chainId] && populatedChains[chainId].expires > Date.now()
+
+    return enabledChains.every(isPopulated)
   }
 
   isHotSigner() {
@@ -118,7 +115,7 @@ class Balances extends React.Component {
     return (
       <Component
         {...this.props}
-        allChainsUpdated={this.getAllChainsUpdated()}
+        shouldShowTotal={this.shouldShowTotal()}
         getBalances={this.getBalances.bind(this)}
         isHotSigner={this.isHotSigner()}
       />
