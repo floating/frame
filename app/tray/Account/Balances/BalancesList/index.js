@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import link from '../../../../../resources/link'
 import svg from '../../../../../resources/svg'
 
-import { Cluster, ClusterRow, ClusterValue, ClusterBox } from '../../../../../resources/Components/Cluster'
+import { Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
 
 import useStore from '../../../../../resources/Hooks/useStore'
 
