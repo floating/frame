@@ -122,20 +122,23 @@ const Surface = () => {
         const inventory: Inventory = {}
 
         Object.entries(chains).forEach(([chainId, chain]) => {
-          if (!chain || !chain.balances || !chain.inventory) {
+          if (!chain) {
             log.verbose(`Missing data for chain ${chainId}`, { address })
             return
           }
 
-          chainIds.push(Number(chainId))
-
-          Object.values(chain.balances).forEach((balance) => balances.push(toTokenBalance(balance)))
-
-          Object.entries(chain.inventory).forEach(([collection, inventoryData]) => {
-            if (inventoryData) {
-              inventory[collection.toLowerCase()] = toInventoryCollection(inventoryData)
-            }
-          })
+          const { balances: chainBalances, inventory: chainInventory } = chain
+          if (chainBalances) {
+            chainIds.push(Number(chainId))
+            Object.values(chainBalances).forEach((balance) => balances.push(toTokenBalance(balance)))
+          }
+          if (chainInventory) {
+            Object.entries(chainInventory).forEach(([collection, inventoryData]) => {
+              if (inventoryData) {
+                inventory[collection.toLowerCase()] = toInventoryCollection(inventoryData)
+              }
+            })
+          }
         })
 
         handleBalanceUpdate(address, balances, chainIds, 'snapshot')
