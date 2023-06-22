@@ -150,5 +150,5 @@ export async function openBlockExplorer(openExplorer: OpenExplorer) {
 
   const explorerUrl = explorer && urlFormats[type] ? await urlFormats[type]() : explorer
 
-  shell.openExternal(explorerUrl)
+  shell.openExternal(explorerUrl || explorer)
 }
