@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const PreferencesSchema = z.object({
+const PreferencesSchema = z.object({
   hidden: z.boolean()
   // Can add other preferences here... e.g.
   // favourited: z.boolean().optional()
