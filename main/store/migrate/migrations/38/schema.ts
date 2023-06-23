@@ -1,47 +1,47 @@
 import { z } from 'zod'
 
-import { v37StateSchema as LegacyStateSchema } from '../37/schema'
-
-const LegacyMainSchema = LegacyStateSchema.shape.main
-
-// update connection schema to remove "poa" preset
-const v38PresetValues = z.enum(['local', 'custom', 'pylon'])
-
-const LegacyChainSchema = LegacyMainSchema.shape.networks.shape.ethereum.valueSchema
-const LegacyConnectionSchema = LegacyChainSchema.shape.connection.shape.primary
-
-const v38ConnectionSchema = LegacyConnectionSchema.merge(
-  z.object({
-    current: v38PresetValues
+const v38MuteSchema = z
+  .object({
+    migrateToPylon: z.boolean().default(false)
   })
-)
+  .passthrough()
+  .default({})
 
-const v38ChainSchema = LegacyChainSchema.merge(
-  z.object({
+const v38ConnectionSchema = z
+  .object({
+    current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']),
+    custom: z.string().default('')
+  })
+  .passthrough()
+
+export const v38ChainSchema = z
+  .object({
+    id: z.coerce.number(),
     connection: z.object({
       primary: v38ConnectionSchema,
       secondary: v38ConnectionSchema
     })
   })
-)
+  .passthrough()
 
-const v38MainSchema = z.object({
-  ...LegacyMainSchema.shape,
-  networks: z.object({
-    ethereum: z.record(z.coerce.number(), v38ChainSchema)
+const EthereumChainsSchema = z.record(z.coerce.number(), v38ChainSchema)
+
+export const v38ChainsSchema = z.object({
+  ethereum: EthereumChainsSchema
+})
+
+export const v38MainSchema = z
+  .object({
+    networks: v38ChainsSchema,
+    mute: v38MuteSchema
   })
-})
+  .passthrough()
 
-const v38StateSchema = z.object({
-  ...LegacyStateSchema.shape,
-  main: v38MainSchema
-})
+export const v38StateSchema = z
+  .object({
+    main: v38MainSchema
+  })
+  .passthrough()
 
-// export types needed for migration
-export const LegacySchema = LegacyStateSchema
-
-export type LegacyConnection = z.infer<typeof LegacyConnectionSchema>
-
-export type v38Preset = z.infer<typeof v38PresetValues>
 export type v38Connection = z.infer<typeof v38ConnectionSchema>
-export type v38State = z.infer<typeof v38StateSchema>
+export type v38Chain = z.infer<typeof v38ChainSchema>
