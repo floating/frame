@@ -2,10 +2,9 @@ import store from '../../store'
 
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
-import type { NativeCurrency, Rate } from '../../store/state'
+import type { NativeCurrency } from '../../store/state'
 import type { TokenBalance } from '../../store/state/types/token'
-
-export type UsdRate = { usd: Rate }
+import { UsdRate } from '../../store/state/types/rate'
 
 interface AssetsChangedHandler {
   assetsChanged: (address: Address, assets: RPC.GetAssets.Assets) => void

@@ -14,7 +14,8 @@ import { PrivacySchema } from './privacy'
 import { ShortcutsSchema } from './shortcuts'
 import { TokenBalanceSchema, TokenSchema } from './token'
 import { SignerSchema } from './signer'
-import { PreferencesDictionarySchema, PreferencesSchema } from './preferences'
+import { PreferencesSchema } from './preferences'
+import { UsdRateSchema } from './rate'
 
 const UpdaterPreferencesSchema = z.object({
   dontRemind: z.array(z.string())
@@ -63,6 +64,7 @@ export const MainSchema = z.object({
   shortcuts: ShortcutsSchema,
   updater: UpdaterPreferencesSchema,
   frames: z.record(z.string(), FrameSchema),
+  rates: z.record(UsdRateSchema),
   ...MainPreferences
 })
 

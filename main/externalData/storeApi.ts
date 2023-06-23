@@ -1,6 +1,5 @@
 import store from '../store'
 import { NATIVE_CURRENCY } from '../../resources/constants'
-import { UsdRate } from '../provider/assets'
 
 import type {
   Chain,
@@ -9,9 +8,10 @@ import type {
   Inventory,
   InventoryAsset,
   TokenBalance,
-  WithTokenId,
-  PreferencesDictionary
+  PreferencesDictionary,
+  UsdRate
 } from '../store/state'
+
 export const storeApi = {
   // Accounts
   getActiveAddress: () => (store('selected.current') || '') as Address,
@@ -93,6 +93,7 @@ export const storeApi = {
 
   // Rates
   setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
+  getTokenRates: () => store('main.rates') as Record<Address, UsdRate>,
   removeTokenRate: (address: Address) => store.removeRate(address),
   setNativeCurrencyRate: (chainId: number, rate: Rate) =>
     store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),

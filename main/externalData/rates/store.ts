@@ -1,10 +1,9 @@
 import log from 'electron-log'
 import { AssetId, AssetType } from '@framelabs/pylon-client/dist/assetId'
 
-import type { UsdRate } from '../../provider/assets'
 import { storeApi } from '../storeApi'
 import { toTokenId } from '../../../resources/domain/balance'
-import { WithTokenId } from '../../store/state'
+import { UsdRate, WithTokenId } from '../../store/state'
 
 type RateUpdate = {
   id: AssetId

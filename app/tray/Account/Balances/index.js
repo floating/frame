@@ -90,19 +90,40 @@ class Balances extends React.Component {
 
     return { balances, totalValue, totalDisplayValue }
   }
-
-  shouldShowTotalValue() {
-    const {
-      balances: { populatedChains = {} }
-    } = this.store('main.accounts', this.props.account)
-
+  getEnabledChains() {
     const enabledChains = Object.values(this.store('main.networks.ethereum') || {})
       .filter((n) => n.on)
       .map((n) => n.id)
 
-    const isPopulated = (chainId) => populatedChains[chainId] && populatedChains[chainId].expires > Date.now()
+    return enabledChains
+  }
 
-    return enabledChains.every(isPopulated)
+  tokenRatesSet(chains) {
+    const balances = this.store('main.balances', this.props.account) || []
+    const rates = this.store('main.rates')
+
+    const isMissingRate = (balance) =>
+      chains.includes(balance.chainId) && !isNativeCurrency(balance.address) && !rates[toTokenId(balance)]
+
+    const balancesMissingRates = balances.filter(isMissingRate)
+
+    return !balancesMissingRates.length
+  }
+
+  balancesSet(chains) {
+    const {
+      balances: { populatedChains = {} }
+    } = this.store('main.accounts', this.props.account)
+
+    const balancesPopulated = (chainId) =>
+      populatedChains[chainId] && populatedChains[chainId].expires > Date.now()
+
+    return chains.every(balancesPopulated)
+  }
+
+  shouldShowTotalValue() {
+    const enabledChains = this.getEnabledChains()
+    return this.balancesSet(enabledChains) && this.tokenRatesSet(enabledChains)
   }
 
   isHotSigner() {
