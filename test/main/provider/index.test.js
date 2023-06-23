@@ -437,7 +437,8 @@ describe('#send', () => {
                 source: 'https://badgerdao.io/icon.jpg',
                 format: 'image',
                 cdn: {}
-              }
+              },
+              hideByDefault: false
             },
             payload: request
           })

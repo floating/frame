@@ -20,7 +20,7 @@ const getChangedBalances = (address: string, tokenBalances: TokenBalance[]): Tok
   const customTokens = new Set(storeApi.getCustomTokens().map(toTokenId))
 
   return tokenBalances.reduce((balances, newBalance) => {
-    const { address: newAddress, chainId: newChainId, balance: newBalanceValue } = newBalance
+    const { address: newAddress, chainId: newChainId, balance: newBalanceValue, hideByDefault } = newBalance
 
     const currentBalance = currentTokenBalances.find(
       ({ address, chainId }) => address === newAddress && chainId === newChainId

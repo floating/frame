@@ -74,7 +74,8 @@ describe('custom tokens', () => {
         source,
         format: 'image',
         cdn: {}
-      }
+      },
+      hideByDefault: false
     })
   })
 
@@ -96,7 +97,8 @@ describe('custom tokens', () => {
         source: '',
         format: 'image',
         cdn: {}
-      }
+      },
+      hideByDefault: false
     })
   })
 
@@ -121,7 +123,8 @@ describe('custom tokens', () => {
         source: '',
         format: 'image',
         cdn: {}
-      }
+      },
+      hideByDefault: false
     })
   })
 
@@ -143,7 +146,8 @@ describe('custom tokens', () => {
         source: '',
         format: 'image',
         cdn: {}
-      }
+      },
+      hideByDefault: false
     })
   })
 
@@ -188,7 +192,8 @@ describe('custom tokens', () => {
           source: '',
           format: 'image',
           cdn: {}
-        }
+        },
+        hideByDefault: false
       }
     ])
   })
@@ -233,7 +238,8 @@ describe('known tokens', () => {
           source,
           format: 'image',
           cdn: {}
-        }
+        },
+        hideByDefault: false
       }
     ])
   })
@@ -259,7 +265,8 @@ describe('known tokens', () => {
           source: '',
           format: 'image',
           cdn: {}
-        }
+        },
+        hideByDefault: false
       }
     ])
   })
@@ -312,7 +319,8 @@ describe('known tokens', () => {
           source: '',
           format: 'image',
           cdn: {}
-        }
+        },
+        hideByDefault: false
       }
     ])
   })
@@ -337,7 +345,8 @@ describe('known tokens', () => {
         source: '',
         format: 'image',
         cdn: {}
-      }
+      },
+      hideByDefault: false
     })
   })
 
@@ -363,7 +372,8 @@ describe('known tokens', () => {
         source: '',
         format: 'image',
         cdn: {}
-      }
+      },
+      hideByDefault: false
     })
   })
 })
