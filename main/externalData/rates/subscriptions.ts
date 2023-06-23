@@ -2,11 +2,34 @@ import log from 'electron-log'
 import Pylon, { AssetType } from '@framelabs/pylon-client'
 
 import { handleUpdates } from './store'
+import { storeApi } from '../storeApi'
+import { Token } from '../../store/state'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
-import type { Token } from '../../store/state'
-import { storeApi } from '../storeApi'
+
+function toTokenSubscriptions(
+  { tokenSubscriptions, tokenIds }: { tokenSubscriptions: AssetId[]; tokenIds: Set<string> },
+  address: Address
+) {
+  const addToken = (token: Token) => {
+    const { chainId, address } = token
+    const tokenId = toTokenId({ chainId, address })
+
+    if (!tokenIds.has(tokenId)) {
+      tokenIds.add(tokenId)
+      tokenSubscriptions.push({
+        type: AssetType.Token,
+        chainId,
+        address
+      })
+    }
+  }
+
+  storeApi.getTokenBalances(address).forEach(addToken)
+
+  return { tokenSubscriptions, tokenIds }
+}
 
 export default function rates(pylon: Pylon) {
   function updateSubscription() {
@@ -18,20 +41,9 @@ export default function rates(pylon: Pylon) {
       chainId
     }))
 
-    const displayedTokens = addresses.reduce((allTokens, address) => {
-      const tokens = storeApi.getTokenBalances(address)
-      return [...allTokens, ...tokens]
-    }, [] as Token[])
-
-    const tokens = new Set(displayedTokens.map(toTokenId))
-
-    const tokenSubscriptions = Array.from(tokens).map((token) => {
-      const [chainId, address] = token.split(':')
-      return {
-        type: AssetType.Token,
-        chainId: Number(chainId),
-        address: address
-      }
+    const { tokenSubscriptions } = addresses.reduce(toTokenSubscriptions, {
+      tokenSubscriptions: [] as AssetId[],
+      tokenIds: new Set<string>()
     })
 
     subscribeToRates([...nativeSubscriptions, ...tokenSubscriptions])
