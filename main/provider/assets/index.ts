@@ -2,7 +2,7 @@ import store from '../../store'
 
 import { NATIVE_CURRENCY } from '../../../resources/constants'
 
-import type { NativeCurrency, Rate } from '../../store/state'
+import type { NativeCurrency, Rate, Preferences } from '../../store/state'
 import type { TokenBalance } from '../../store/state/types/token'
 
 export type UsdRate = { usd: Rate }
@@ -28,7 +28,8 @@ const storeApi = {
   },
   getLastUpdated: (account: Address): number => {
     return store('main.accounts', account, 'balances.lastUpdated')
-  }
+  },
+  getAssetPreferences: (): Preferences => store('main.assetPreferences')
 }
 
 function createObserver(handler: AssetsChangedHandler) {
@@ -70,7 +71,12 @@ function fetchAssets(accountId: string) {
     erc20: [] as RPC.GetAssets.Erc20[]
   }
 
+  const assetPreferences = storeApi.getAssetPreferences()
+
   return balances.reduce((assets, balance) => {
+    const prefs = assetPreferences.tokens[balance.chainId + ':' + balance.address]
+    if (prefs ? prefs.hidden : balance.hideByDefault) return assets
+
     if (balance.address === NATIVE_CURRENCY) {
       const currency = storeApi.getNativeCurrency(balance.chainId)
 
@@ -80,7 +86,6 @@ function fetchAssets(accountId: string) {
       })
     } else {
       const usdRate = storeApi.getUsdRate(balance.address)
-
       assets.erc20.push({
         ...balance,
         tokenInfo: {

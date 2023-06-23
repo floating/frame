@@ -187,14 +187,15 @@ function BalanceScanner() {
     for (const balance of balances) {
       const nativeCurrency = storeApi.getNativeCurrency(balance.chainId)
       if (nativeCurrency) {
-        const { symbol, decimals, name, media } = nativeCurrency
+        const { symbol, decimals, name, media, hideByDefault } = nativeCurrency
         storeApi.setBalance(address, {
           ...balance,
           symbol,
           decimals,
           name,
           address: NATIVE_CURRENCY,
-          media
+          media,
+          hideByDefault
         })
       }
     }

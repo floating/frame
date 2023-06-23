@@ -41,7 +41,8 @@ export const v40TokenBalanceSchema = z.object({
   decimals: z.number(),
   media: v40MediaSchema,
   balance: HexStringSchema,
-  displayBalance: z.string()
+  displayBalance: z.string(),
+  hideByDefault: z.boolean().optional()
 })
 
 export const v40TokenSchema = z.object({

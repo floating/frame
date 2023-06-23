@@ -667,6 +667,7 @@ describe('#send', () => {
     beforeEach(() => {
       store.set('main.accounts', address, { balances: { lastUpdated: new Date() } })
       store.set('main.balances', address, balances)
+      store.set('main.assetPreferences', { tokens: {}, collections: {} })
     })
 
     it('returns an error if no account is selected', (done) => {
