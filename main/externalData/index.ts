@@ -39,7 +39,7 @@ const externalData = function () {
       scanner.setNetworks(activeAccount, chainsToScan)
     }
 
-    rates.updateSubscription([...usingSurface, ...chainsToScan])
+    rates.updateSubscription()
   }
 
   const updateAccount = (account: string) => {
@@ -77,7 +77,7 @@ const externalData = function () {
       scanner.addTokens(activeAccount, tokensToScan)
     }
 
-    rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
+    rates.updateSubscription()
   })
 
   const activeAccountObserver = createActiveAccountObserver({
@@ -99,7 +99,7 @@ const externalData = function () {
       handleTokensUpdate(address, tokens)
     },
     knownTokensChanged() {
-      rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
+      rates.updateSubscription()
     }
   })
 

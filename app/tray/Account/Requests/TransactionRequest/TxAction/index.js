@@ -44,7 +44,7 @@ class TxSending extends React.Component {
         const ensName = recipientEns
 
         const isTestnet = this.store('main.networks', this.props.chain.type, this.props.chain.id, 'isTestnet')
-        const rate = this.store('main.rates', toTokenId(contract))
+        const rate = this.store('main.rates', toTokenId({ address: contract, chainId }))
 
         return (
           <ClusterBox title={`Sending ${symbol}`} subtitle={name} animationSlot={this.props.i}>

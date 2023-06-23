@@ -9,20 +9,23 @@ import type { Token } from '../../store/state'
 import { storeApi } from '../storeApi'
 
 export default function rates(pylon: Pylon) {
-  function updateSubscription(chains: number[]) {
-    const subscribedCurrencies = chains.map((chainId) => ({ type: AssetType.NativeCurrency, chainId }))
-
+  function updateSubscription() {
+    const networks = storeApi.getNetworks()
     const addresses = storeApi.getAddresses()
 
-    const displayedTokens = addresses.reduce((allTokens, address) => {
-      const tokens = storeApi.getTokenBalances(address).filter((token) => chains.includes(token.chainId))
+    const nativeSubscriptions = networks.map(({ id: chainId }) => ({
+      type: AssetType.NativeCurrency,
+      chainId
+    }))
 
+    const displayedTokens = addresses.reduce((allTokens, address) => {
+      const tokens = storeApi.getTokenBalances(address)
       return [...allTokens, ...tokens]
     }, [] as Token[])
 
     const tokens = new Set(displayedTokens.map(toTokenId))
 
-    const subscribedTokens = Array.from(tokens).map((token) => {
+    const tokenSubscriptions = Array.from(tokens).map((token) => {
       const [chainId, address] = token.split(':')
       return {
         type: AssetType.Token,
@@ -31,7 +34,7 @@ export default function rates(pylon: Pylon) {
       }
     })
 
-    subscribeToRates([...subscribedCurrencies, ...subscribedTokens])
+    subscribeToRates([...nativeSubscriptions, ...tokenSubscriptions])
   }
 
   function start() {

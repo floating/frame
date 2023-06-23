@@ -24,6 +24,9 @@ export const storeApi = {
 
   // Networks
   getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Chain,
+  getNetworks: () => {
+    return Object.values(store('main.networks.ethereum') || {}) as Chain[]
+  },
   getNativeCurrency: (id: number) =>
     (store('main.networksMeta.ethereum', id, 'nativeCurrency') || {}) as TokenBalance,
   getConnectedNetworks: () => {
@@ -40,6 +43,10 @@ export const storeApi = {
       }
       return acc
     }, [] as number[])
+  },
+  getEnabledNetworkIds: () => {
+    const networks = Object.values(store('main.networks.ethereum') || {}) as Chain[]
+    return networks.filter((n) => n.on).map((n) => n.id)
   },
 
   // Tokens
