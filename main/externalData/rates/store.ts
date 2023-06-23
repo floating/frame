@@ -3,6 +3,8 @@ import { AssetId, AssetType } from '@framelabs/pylon-client/dist/assetId'
 
 import type { UsdRate } from '../../provider/assets'
 import { storeApi } from '../storeApi'
+import { toTokenId } from '../../../resources/domain/balance'
+import { WithTokenId } from '../../store/state'
 
 type RateUpdate = {
   id: AssetId
@@ -27,9 +29,9 @@ const separateUpdates = (updates: RateUpdate[]) =>
 
 const gatherTokenRates = (updates: RateUpdate[]) =>
   updates.reduce((rates, update) => {
-    const address = update.id.address as string
+    const tokenId = toTokenId(update.id as WithTokenId)
 
-    rates[address] = {
+    rates[tokenId] = {
       usd: {
         price: update.data.usd,
         change24hr: update.data.usd_24h_change

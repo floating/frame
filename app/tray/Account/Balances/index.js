@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import BalancesPreview from './BalancesPreview'
 import BalancesExpanded from './BalancesExpanded'
 
-import { formatUsdRate } from '../../../../resources/domain/balance'
+import { formatUsdRate, toTokenId } from '../../../../resources/domain/balance'
 import { matchFilter } from '../../../../resources/utils'
 import {
   createBalance,
@@ -27,7 +27,7 @@ const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
   const isNative = isNativeCurrency(rawBalance.address)
   const nativeCurrencyInfo = networksMeta[rawBalance.chainId]?.nativeCurrency || {}
   const chain = ethereumNetworks[rawBalance.chainId]
-  const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
+  const rate = isNative ? nativeCurrencyInfo : rates[toTokenId(rawBalance)] || {}
 
   const logoURI =
     (isNative && nativeCurrencyInfo.icon) || rawBalance.media?.cdn?.thumb || rawBalance.media?.source
