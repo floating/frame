@@ -1,17 +1,8 @@
 import store from '../store'
 import { NATIVE_CURRENCY } from '../../resources/constants'
-import { UsdRate } from '../provider/assets'
 
-import type {
-  Chain,
-  Token,
-  Rate,
-  Inventory,
-  InventoryAsset,
-  TokenBalance,
-  WithTokenId,
-  PreferencesDictionary
-} from '../store/state'
+import type { Chain, Token, Rate, Inventory, InventoryAsset, TokenBalance } from '../store/state'
+
 export const storeApi = {
   // Accounts
   getActiveAddress: () => (store('selected.current') || '') as Address,
@@ -92,7 +83,8 @@ export const storeApi = {
   },
 
   // Rates
-  setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
+  setTokenRates: (rates: Record<Address, Record<string, Rate>>) => store.setRates(rates),
+  getTokenRates: () => store('main.rates') as Record<Address, Record<string, Rate>>,
   removeTokenRate: (address: Address) => store.removeRate(address),
   setNativeCurrencyRate: (chainId: number, rate: Rate) =>
     store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),
@@ -103,7 +95,5 @@ export const storeApi = {
     store.addPopulatedChains(address.toLowerCase(), chains, expiryWindow),
 
   //Misc
-  getTrayOpened: () => store('tray.open'),
-
-  updateAssetPreferences: () => (store('main.collectionPreferences') || {}) as PreferencesDictionary
+  getTrayOpened: () => store('tray.open')
 }

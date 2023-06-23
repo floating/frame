@@ -29,7 +29,7 @@ export type { Shortcut, ShortcutKey, ModifierKey } from './types/shortcuts'
 export type { ColorwayPalette } from './types/colors'
 export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
 export type { Media } from './types/media'
-export type { Preferences, PreferencesDictionary } from './types/preferences'
+export type { AssetPreferences } from './types/preferences'
 
 const StateSchema = z.object({
   main: MainSchema.passthrough(), // TODO: remove passthrough once all pieces of state have been defined
