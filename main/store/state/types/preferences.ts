@@ -1,18 +1,14 @@
 import { z } from 'zod'
 
-export const PreferencesEntrySchema = z.object({
+const PreferencesSchema = z.object({
   hidden: z.boolean()
   // Can add other preferences here... e.g.
   // favourited: z.boolean().optional()
 })
 
-export const PreferencesDictionarySchema = z.record(PreferencesEntrySchema)
-
-export const PreferencesSchema = z.object({
-  collections: PreferencesDictionarySchema,
-  tokens: PreferencesDictionarySchema
+export const AssetPreferencesSchema = z.object({
+  collections: z.record(PreferencesSchema),
+  tokens: z.record(PreferencesSchema)
 })
 
-export type Preferences = z.infer<typeof PreferencesSchema>
-export type PreferencesEntry = z.infer<typeof PreferencesEntrySchema>
-export type PreferencesDictionary = z.infer<typeof PreferencesDictionarySchema>
+export type AssetPreferences = z.infer<typeof AssetPreferencesSchema>

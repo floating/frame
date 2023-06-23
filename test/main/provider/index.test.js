@@ -1864,7 +1864,7 @@ describe('state change events', () => {
     store.set('main.accounts', address, 'balances.lastUpdated', new Date())
     store.set('main.permissions', address, { 'test.frame': { origin: 'test.frame', provider: true } })
     store.set('main.networksMeta.ethereum.1.nativeCurrency', ethPriceData)
-    store.set('main.rates', tokenBalance.address, tokenPriceData)
+    store.set('main.rates', `${tokenBalance.chainId}:${tokenBalance.address}`, tokenPriceData)
     store.set('main.balances', address, [ethBalance, tokenBalance])
     store.set('selected.current', address)
 

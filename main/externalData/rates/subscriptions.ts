@@ -6,7 +6,10 @@ import { storeApi } from '../storeApi'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
-import type { Chain, Token } from '../../store/state'
+import type { Chain, Rate, Token, WithTokenId } from '../../store/state'
+
+const NO_RATE_DATA = {}
+const RATES_LOADED_TIMEOUT = 2000 // 2 seconds
 
 const tokenSubscriptionSet = {
   tokenSubscriptions: [] as AssetId[],
@@ -41,6 +44,19 @@ const toNativeSubscription = ({ id: chainId }: Chain) => ({
   chainId
 })
 
+const populateWithEmptyState = (assets: AssetId[]) => () => {
+  const persistedRates = storeApi.getTokenRates()
+  const defaultedRates = assets.reduce((rates, asset) => {
+    const tokenId = toTokenId(asset as WithTokenId)
+    if (!persistedRates[tokenId]) {
+      rates[tokenId] = NO_RATE_DATA
+    }
+    return rates
+  }, {} as Record<string, Record<string, Rate>>)
+
+  storeApi.setTokenRates(defaultedRates)
+}
+
 export default function rates(pylon: Pylon) {
   function updateSubscription() {
     const networks = storeApi.getNetworks()
@@ -50,6 +66,10 @@ export default function rates(pylon: Pylon) {
     const { tokenSubscriptions } = addresses.reduce(toTokenSubscriptions, tokenSubscriptionSet)
 
     subscribeToRates([...nativeSubscriptions, ...tokenSubscriptions])
+
+    // if rates are not loaded after 2 seconds, populate with a blank
+    // rate to indicate that we tried to load the rate data
+    setTimeout(populateWithEmptyState(tokenSubscriptions), RATES_LOADED_TIMEOUT)
   }
 
   function start() {

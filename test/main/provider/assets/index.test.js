@@ -38,7 +38,7 @@ describe('#loadAssets', () => {
       address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
     }
 
-    store.set('main.rates', balance.address, priceData)
+    store.set('main.rates', `${balance.chainId}:${balance.address}`, priceData)
     store.set('main.balances', account, [balance])
 
     expect(loadAssets(account)).toEqual({
@@ -103,7 +103,7 @@ describe('#createObserver', () => {
       address: '0x383518188c0c6d7730d91b2c03a03c837814a899'
     }
 
-    store.set('main.rates', balance.address, priceData)
+    store.set('main.rates', `${balance.chainId}:${balance.address}`, priceData)
     store.set('main.balances', account, [balance])
 
     fireObserver()
