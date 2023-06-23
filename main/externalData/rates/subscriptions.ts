@@ -8,8 +8,13 @@ import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
 
+const tokenSubscriptionSet = {
+  tokenSubscriptions: [] as AssetId[],
+  tokenIds: new Set<string>()
+}
+
 function toTokenSubscriptions(
-  { tokenSubscriptions, tokenIds }: { tokenSubscriptions: AssetId[]; tokenIds: Set<string> },
+  { tokenSubscriptions, tokenIds }: typeof tokenSubscriptionSet,
   address: Address
 ) {
   const addToken = (token: Token) => {
@@ -41,10 +46,7 @@ export default function rates(pylon: Pylon) {
       chainId
     }))
 
-    const { tokenSubscriptions } = addresses.reduce(toTokenSubscriptions, {
-      tokenSubscriptions: [] as AssetId[],
-      tokenIds: new Set<string>()
-    })
+    const { tokenSubscriptions } = addresses.reduce(toTokenSubscriptions, tokenSubscriptionSet)
 
     subscribeToRates([...nativeSubscriptions, ...tokenSubscriptions])
   }
