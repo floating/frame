@@ -14,15 +14,13 @@ export default function rates(pylon: Pylon) {
 
     const addresses = storeApi.getAddresses()
 
-    const knownTokens = addresses.reduce((allTokens, address) => {
-      const tokens = storeApi.getKnownTokens(address).filter((token) => chains.includes(token.chainId))
+    const displayedTokens = addresses.reduce((allTokens, address) => {
+      const tokens = storeApi.getTokenBalances(address).filter((token) => chains.includes(token.chainId))
 
       return [...allTokens, ...tokens]
     }, [] as Token[])
 
-    const customTokens = storeApi.getCustomTokens().filter((token) => chains.includes(token.chainId))
-
-    const tokens = new Set([...knownTokens, ...customTokens].map(toTokenId))
+    const tokens = new Set(displayedTokens.map(toTokenId))
 
     const subscribedTokens = Array.from(tokens).map((token) => {
       const [chainId, address] = token.split(':')

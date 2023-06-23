@@ -2,6 +2,7 @@ import { AssetType } from '@framelabs/pylon-client/dist/assetId'
 
 import store from '../../../../main/store'
 import { handleUpdates } from '../../../../main/externalData/rates/store'
+import { toTokenId } from '../../../../resources/domain/balance'
 
 jest.mock('../../../../main/store', () => ({
   setNativeCurrencyData: jest.fn(),
@@ -60,7 +61,7 @@ it('handles token updates', () => {
   handleUpdates([update])
 
   expect(store.setRates).toHaveBeenCalledWith({
-    [update.id.address]: Rate(update.data.usd, update.data.usd_24h_change)
+    [toTokenId(update.id)]: Rate(update.data.usd, update.data.usd_24h_change)
   })
 })
 
@@ -77,7 +78,7 @@ it('handles a message with both native currency and token updates', () => {
   )
 
   expect(store.setRates).toHaveBeenCalledWith({
-    [tokenUpdate.id.address]: Rate(tokenUpdate.data.usd, tokenUpdate.data.usd_24h_change)
+    [toTokenId(tokenUpdate.id)]: Rate(tokenUpdate.data.usd, tokenUpdate.data.usd_24h_change)
   })
 })
 

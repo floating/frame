@@ -84,8 +84,7 @@ export const storeApi = {
     store.setInventoryAssets(address.toLowerCase(), collectionAddress, assets)
   },
 
-  // Rrates
-  setRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
+  // Rates
   setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
   removeTokenRate: (address: Address) => store.removeRate(address),
   setNativeCurrencyRate: (chainId: number, rate: Rate) =>
