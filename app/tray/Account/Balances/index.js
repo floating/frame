@@ -106,7 +106,7 @@ class Balances extends React.Component {
     const isMissingRate = (balance) =>
       chains.includes(balance.chainId) && !isNativeCurrency(balance.address) && !rates[toTokenId(balance)]
 
-    return balances.some(isMissingRate)
+    return !balances.some(isMissingRate)
   }
 
   balancesSet(chains) {
