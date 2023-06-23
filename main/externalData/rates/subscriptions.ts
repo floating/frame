@@ -6,7 +6,7 @@ import { storeApi } from '../storeApi'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
-import type { Chain, Token, UsdRate, WithTokenId } from '../../store/state'
+import type { Chain, Rate, Token, WithTokenId } from '../../store/state'
 
 const EMPTY_RATE_STATE = {}
 const POPULATE_EMPTY_STATE_TIMEOUT = 2000 // 2 seconds
@@ -52,7 +52,7 @@ const populateWithEmptyState = (assets: AssetId[]) => () => {
       rates[tokenId] = EMPTY_RATE_STATE
     }
     return rates
-  }, {} as Record<string, UsdRate>)
+  }, {} as Record<string, Record<string, Rate>>)
 
   storeApi.setTokenRates(defaultedRates)
 }

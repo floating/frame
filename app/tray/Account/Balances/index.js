@@ -90,6 +90,7 @@ class Balances extends React.Component {
 
     return { balances, totalValue, totalDisplayValue }
   }
+
   getEnabledChains() {
     const enabledChains = Object.values(this.store('main.networks.ethereum') || {})
       .filter((n) => n.on)
@@ -105,9 +106,7 @@ class Balances extends React.Component {
     const isMissingRate = (balance) =>
       chains.includes(balance.chainId) && !isNativeCurrency(balance.address) && !rates[toTokenId(balance)]
 
-    const balancesMissingRates = balances.filter(isMissingRate)
-
-    return !balancesMissingRates.length
+    return balances.some(isMissingRate)
   }
 
   balancesSet(chains) {
