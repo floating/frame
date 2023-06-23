@@ -3,20 +3,20 @@ import Pylon, { AssetType } from '@framelabs/pylon-client'
 
 import { handleUpdates } from './store'
 import { storeApi } from '../storeApi'
-import { Token } from '../../store/state'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
+import type { Chain, Token } from '../../store/state'
 
 const tokenSubscriptionSet = {
   tokenSubscriptions: [] as AssetId[],
   tokenIds: new Set<string>()
 }
 
-function toTokenSubscriptions(
+const toTokenSubscriptions = (
   { tokenSubscriptions, tokenIds }: typeof tokenSubscriptionSet,
   address: Address
-) {
+) => {
   const addToken = (token: Token) => {
     const { chainId, address } = token
     const tokenId = toTokenId({ chainId, address })
@@ -36,16 +36,17 @@ function toTokenSubscriptions(
   return { tokenSubscriptions, tokenIds }
 }
 
+const toNativeSubscription = ({ id: chainId }: Chain) => ({
+  type: AssetType.NativeCurrency,
+  chainId
+})
+
 export default function rates(pylon: Pylon) {
   function updateSubscription() {
     const networks = storeApi.getNetworks()
     const addresses = storeApi.getAddresses()
 
-    const nativeSubscriptions = networks.map(({ id: chainId }) => ({
-      type: AssetType.NativeCurrency,
-      chainId
-    }))
-
+    const nativeSubscriptions = networks.map(toNativeSubscription)
     const { tokenSubscriptions } = addresses.reduce(toTokenSubscriptions, tokenSubscriptionSet)
 
     subscribeToRates([...nativeSubscriptions, ...tokenSubscriptions])
