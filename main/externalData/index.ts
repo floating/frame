@@ -28,10 +28,10 @@ const externalData = function () {
   scanner.start()
 
   const updateNetworks = () => {
-    const chains = storeApi.getConnectedNetworkIds()
     const activeAccount = storeApi.getActiveAddress()
     const usingSurface = surface.networks.get(activeAccount)
-    const chainsToScan = chains.filter((chainId) => !usingSurface.includes(chainId))
+    const connectedChains = storeApi.getConnectedNetworkIds()
+    const chainsToScan = connectedChains.filter((chainId) => !usingSurface.includes(chainId))
 
     log.debug('updateNetworks', { usingSurface, activeAccount, chainsToScan })
 
@@ -39,7 +39,7 @@ const externalData = function () {
       scanner.setNetworks(activeAccount, chainsToScan)
     }
 
-    rates.updateSubscription(chains)
+    rates.updateSubscription()
   }
 
   const updateAccount = (account: string) => {
@@ -77,7 +77,7 @@ const externalData = function () {
       scanner.addTokens(activeAccount, tokensToScan)
     }
 
-    rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
+    rates.updateSubscription()
   })
 
   const activeAccountObserver = createActiveAccountObserver({
@@ -99,7 +99,7 @@ const externalData = function () {
       handleTokensUpdate(address, tokens)
     },
     knownTokensChanged() {
-      rates.updateSubscription(storeApi.getConnectedNetworks().map((network) => network.id))
+      rates.updateSubscription()
     }
   })
 

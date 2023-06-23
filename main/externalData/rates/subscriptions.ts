@@ -2,38 +2,54 @@ import log from 'electron-log'
 import Pylon, { AssetType } from '@framelabs/pylon-client'
 
 import { handleUpdates } from './store'
+import { storeApi } from '../storeApi'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
-import type { Token } from '../../store/state'
-import { storeApi } from '../storeApi'
+import type { Chain, Token } from '../../store/state'
+
+const tokenSubscriptionSet = {
+  tokenSubscriptions: [] as AssetId[],
+  tokenIds: new Set<string>()
+}
+
+const toTokenSubscriptions = (
+  { tokenSubscriptions, tokenIds }: typeof tokenSubscriptionSet,
+  address: Address
+) => {
+  const addToken = (token: Token) => {
+    const { chainId, address } = token
+    const tokenId = toTokenId({ chainId, address })
+
+    if (!tokenIds.has(tokenId)) {
+      tokenIds.add(tokenId)
+      tokenSubscriptions.push({
+        type: AssetType.Token,
+        chainId,
+        address
+      })
+    }
+  }
+
+  storeApi.getTokenBalances(address).forEach(addToken)
+
+  return { tokenSubscriptions, tokenIds }
+}
+
+const toNativeSubscription = ({ id: chainId }: Chain) => ({
+  type: AssetType.NativeCurrency,
+  chainId
+})
 
 export default function rates(pylon: Pylon) {
-  function updateSubscription(chains: number[]) {
-    const subscribedCurrencies = chains.map((chainId) => ({ type: AssetType.NativeCurrency, chainId }))
-
+  function updateSubscription() {
+    const networks = storeApi.getNetworks()
     const addresses = storeApi.getAddresses()
 
-    const knownTokens = addresses.reduce((allTokens, address) => {
-      const tokens = storeApi.getKnownTokens(address).filter((token) => chains.includes(token.chainId))
+    const nativeSubscriptions = networks.map(toNativeSubscription)
+    const { tokenSubscriptions } = addresses.reduce(toTokenSubscriptions, tokenSubscriptionSet)
 
-      return [...allTokens, ...tokens]
-    }, [] as Token[])
-
-    const customTokens = storeApi.getCustomTokens().filter((token) => chains.includes(token.chainId))
-
-    const tokens = new Set([...knownTokens, ...customTokens].map(toTokenId))
-
-    const subscribedTokens = Array.from(tokens).map((token) => {
-      const [chainId, address] = token.split(':')
-      return {
-        type: AssetType.Token,
-        chainId: Number(chainId),
-        address: address
-      }
-    })
-
-    subscribeToRates([...subscribedCurrencies, ...subscribedTokens])
+    subscribeToRates([...nativeSubscriptions, ...tokenSubscriptions])
   }
 
   function start() {
