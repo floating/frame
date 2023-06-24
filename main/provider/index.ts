@@ -909,7 +909,8 @@ export class Provider extends EventEmitter {
             source: tokenData.image,
             format: 'image',
             cdn: {}
-          }
+          },
+          hideByDefault: false
         }
 
         const handlerId = this.addRequestHandler(res)

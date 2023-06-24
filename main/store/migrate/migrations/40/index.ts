@@ -41,7 +41,8 @@ export const v40TokenBalanceSchema = z.object({
   decimals: z.number(),
   media: v40MediaSchema,
   balance: HexStringSchema,
-  displayBalance: z.string()
+  displayBalance: z.string(),
+  hideByDefault: z.boolean()
 })
 
 export const v40TokenSchema = z.object({
@@ -50,7 +51,8 @@ export const v40TokenSchema = z.object({
   chainId: ChainIdSchema,
   address: z.string(),
   decimals: z.number(),
-  media: v40MediaSchema
+  media: v40MediaSchema,
+  hideByDefault: z.boolean()
 })
 
 const defaultTokensState = {
@@ -101,7 +103,8 @@ const migrateToken = <T extends WithLogoURI>({ logoURI, ...token }: T) => ({
     source: logoURI || '',
     format: 'image' as const,
     cdn: {}
-  }
+  },
+  hideByDefault: false
 })
 
 const migrateKnownTokens = (knownTokens: Record<string, unknown[]>): Record<string, v40TokenBalance[]> =>
