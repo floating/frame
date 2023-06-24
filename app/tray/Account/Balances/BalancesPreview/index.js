@@ -31,7 +31,7 @@ const ShowMoreButton = ({ moduleId, account, allBalances, balances }) => {
   )
 }
 
-const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, filter, isHotSigner }) => {
+const BalancesPreview = ({ shouldShowTotalValue, moduleId, getBalances, account, filter, isHotSigner }) => {
   const [moduleRef] = useAccountModule(moduleId)
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
 
@@ -53,9 +53,9 @@ const BalancesPreview = ({ allChainsUpdated, moduleId, getBalances, account, fil
         balances={balances}
         footerButton={footerButton}
         displayValue={totalDisplayValue}
-        allChainsUpdated={allChainsUpdated}
+        shouldShowTotalValue={shouldShowTotalValue}
       />
-      {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
+      {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={shouldShowTotalValue} />}
     </div>
   )
 }

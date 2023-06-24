@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import BalancesPreview from './BalancesPreview'
 import BalancesExpanded from './BalancesExpanded'
 
-import { formatUsdRate } from '../../../../resources/domain/balance'
+import { formatUsdRate, toTokenId } from '../../../../resources/domain/balance'
 import { matchFilter } from '../../../../resources/utils'
 import {
   createBalance,
@@ -27,7 +27,7 @@ const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
   const isNative = isNativeCurrency(rawBalance.address)
   const nativeCurrencyInfo = networksMeta[rawBalance.chainId]?.nativeCurrency || {}
   const chain = ethereumNetworks[rawBalance.chainId]
-  const rate = isNative ? nativeCurrencyInfo : rates[rawBalance.address || rawBalance.symbol] || {}
+  const rate = isNative ? nativeCurrencyInfo : rates[toTokenId(rawBalance)] || {}
 
   const logoURI =
     (isNative && nativeCurrencyInfo.icon) || rawBalance.media?.cdn?.thumb || rawBalance.media?.source
@@ -47,15 +47,6 @@ const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
 }
 
 class Balances extends React.Component {
-  componentDidMount() {
-    this.getAllChainsUpdated()
-    this.intervalId = setInterval(() => this.getAllChainsUpdated(), 60_000)
-  }
-
-  componentWillUnmount() {
-    if (this.intervalId) clearInterval(this.intervalId)
-  }
-
   getStoreValues() {
     const { address } = this.store('main.accounts', this.props.account)
     const rawBalances = this.store('main.balances', address) || []
@@ -91,21 +82,37 @@ class Balances extends React.Component {
     return { balances, totalValue, totalDisplayValue }
   }
 
-  getAllChainsUpdated() {
+  getEnabledChains() {
+    const enabledChains = Object.values(this.store('main.networks.ethereum') || {})
+      .filter((n) => n.on)
+      .map((n) => n.id)
+
+    return enabledChains
+  }
+
+  tokenRatesSet(chains) {
+    const balances = this.store('main.balances', this.props.account) || []
+    const rates = this.store('main.rates')
+
+    const isMissingRate = (balance) =>
+      chains.includes(balance.chainId) && !isNativeCurrency(balance.address) && !rates[toTokenId(balance)]
+
+    return !balances.some(isMissingRate)
+  }
+
+  balancesSet(chains) {
     const {
       balances: { populatedChains = {} }
     } = this.store('main.accounts', this.props.account)
 
-    const connectedChains = Object.values(this.store('main.networks.ethereum') || {}).reduce((acc, n) => {
-      if ((n.connection.primary || {}).connected || (n.connection.secondary || {}).connected) {
-        acc.push(n.id)
-      }
-      return acc
-    }, [])
+    const balancesPopulated = (chainId) => populatedChains[chainId]?.expires > Date.now()
 
-    return connectedChains.every((chainId) => {
-      return populatedChains[chainId] && populatedChains[chainId].expires > Date.now()
-    })
+    return chains.every(balancesPopulated)
+  }
+
+  shouldShowTotalValue() {
+    const enabledChains = this.getEnabledChains()
+    return this.balancesSet(enabledChains) && this.tokenRatesSet(enabledChains)
   }
 
   isHotSigner() {
@@ -118,7 +125,7 @@ class Balances extends React.Component {
     return (
       <Component
         {...this.props}
-        allChainsUpdated={this.getAllChainsUpdated()}
+        shouldShowTotalValue={this.shouldShowTotalValue()}
         getBalances={this.getBalances.bind(this)}
         isHotSigner={this.isHotSigner()}
       />

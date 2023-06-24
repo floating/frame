@@ -1,17 +1,8 @@
 import store from '../store'
 import { NATIVE_CURRENCY } from '../../resources/constants'
-import { UsdRate } from '../provider/assets'
 
-import type {
-  Chain,
-  Token,
-  Rate,
-  Inventory,
-  InventoryAsset,
-  TokenBalance,
-  WithTokenId,
-  PreferencesDictionary
-} from '../store/state'
+import type { Chain, Token, Rate, Inventory, InventoryAsset, TokenBalance } from '../store/state'
+
 export const storeApi = {
   // Accounts
   getActiveAddress: () => (store('selected.current') || '') as Address,
@@ -24,6 +15,9 @@ export const storeApi = {
 
   // Networks
   getNetwork: (id: number) => (store('main.networks.ethereum', id) || {}) as Chain,
+  getNetworks: () => {
+    return Object.values(store('main.networks.ethereum') || {}) as Chain[]
+  },
   getNativeCurrency: (id: number) =>
     (store('main.networksMeta.ethereum', id, 'nativeCurrency') || {}) as TokenBalance,
   getConnectedNetworks: () => {
@@ -40,6 +34,10 @@ export const storeApi = {
       }
       return acc
     }, [] as number[])
+  },
+  getEnabledNetworkIds: () => {
+    const networks = Object.values(store('main.networks.ethereum') || {}) as Chain[]
+    return networks.filter((n) => n.on).map((n) => n.id)
   },
 
   // Tokens
@@ -84,9 +82,9 @@ export const storeApi = {
     store.setInventoryAssets(address.toLowerCase(), collectionAddress, assets)
   },
 
-  // Rrates
-  setRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
-  setTokenRates: (rates: Record<Address, UsdRate>) => store.setRates(rates),
+  // Rates
+  setTokenRates: (rates: Record<Address, Record<string, Rate>>) => store.setRates(rates),
+  getTokenRates: () => store('main.rates') as Record<Address, Record<string, Rate>>,
   removeTokenRate: (address: Address) => store.removeRate(address),
   setNativeCurrencyRate: (chainId: number, rate: Rate) =>
     store.setNativeCurrencyData('ethereum', chainId, { usd: rate }),
@@ -97,7 +95,5 @@ export const storeApi = {
     store.addPopulatedChains(address.toLowerCase(), chains, expiryWindow),
 
   //Misc
-  getTrayOpened: () => store('tray.open'),
-
-  updateAssetPreferences: () => (store('main.collectionPreferences') || {}) as PreferencesDictionary
+  getTrayOpened: () => store('tray.open')
 }

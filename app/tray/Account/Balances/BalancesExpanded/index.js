@@ -78,7 +78,7 @@ const AccountFilter = ({ balanceFilter, setBalanceFilter }) => {
 
 const BalancesExpanded = ({
   getBalances,
-  allChainsUpdated,
+  shouldShowTotalValue,
   isHotSigner,
   expandedData,
   moduleId,
@@ -115,7 +115,9 @@ const BalancesExpanded = ({
 
       {!expandedData.hidden && (
         <div>
-          {totalValue.toNumber() > 10000 && isHotSigner && <HighValueWarning updated={allChainsUpdated} />}
+          {totalValue.toNumber() > 10000 && isHotSigner && (
+            <HighValueWarning updated={shouldShowTotalValue} />
+          )}
           <AddTokenButton />
         </div>
       )}
