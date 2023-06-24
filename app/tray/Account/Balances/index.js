@@ -47,15 +47,6 @@ const toBalance = (networksMeta, rates, ethereumNetworks) => (rawBalance) => {
 }
 
 class Balances extends React.Component {
-  componentDidMount() {
-    this.shouldShowTotalValue()
-    this.intervalId = setInterval(() => this.shouldShowTotalValue(), 60_000)
-  }
-
-  componentWillUnmount() {
-    if (this.intervalId) clearInterval(this.intervalId)
-  }
-
   getStoreValues() {
     const { address } = this.store('main.accounts', this.props.account)
     const rawBalances = this.store('main.balances', address) || []
