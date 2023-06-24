@@ -114,8 +114,7 @@ class Balances extends React.Component {
       balances: { populatedChains = {} }
     } = this.store('main.accounts', this.props.account)
 
-    const balancesPopulated = (chainId) =>
-      populatedChains[chainId] && populatedChains[chainId].expires > Date.now()
+    const balancesPopulated = (chainId) => populatedChains[chainId]?.expires > Date.now()
 
     return chains.every(balancesPopulated)
   }
