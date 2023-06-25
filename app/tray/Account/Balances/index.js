@@ -7,11 +7,7 @@ import BalancesExpanded from './BalancesExpanded'
 
 import { formatUsdRate, toTokenId } from '../../../../resources/domain/balance'
 import { matchFilter } from '../../../../resources/utils'
-import {
-  createBalance,
-  sortByTotalValue as byTotalValue,
-  isNativeCurrency
-} from '../../../../resources/domain/balance'
+import { createBalance, sortByTotalValue, isNativeCurrency } from '../../../../resources/domain/balance'
 
 const shouldShow = (ethereumNetworks, tokenPreferences, populatedChains, returnHidden) => (rawBalance) => {
   const { chainId, address } = rawBalance
@@ -74,7 +70,15 @@ class Balances extends React.Component {
         const chain = ethereumNetworks[rawBalance.chainId]
         return matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
       })
-      .sort(byTotalValue)
+      .sort((a, b) => {
+        const aId = a.symbol?.toLowerCase() + ':' + a.address?.toLowerCase()
+        const bId = b.symbol?.toLowerCase() + ':' + b.address?.toLowerCase()
+        return aId < bId ? -1 : aId > bId ? 1 : 0
+      })
+      .sort((a, b) => {
+        return a.chainId - b.chainId
+      })
+      .sort(sortByTotalValue)
 
     const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
     const totalDisplayValue = formatUsdRate(totalValue, 0)
