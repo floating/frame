@@ -1,5 +1,4 @@
 import migration from '../../../../../main/store/migrate/migrations/40'
-import { toTokenId } from '../../../../../resources/domain/balance'
 import { createState } from '../setup'
 
 let state
