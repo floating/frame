@@ -2,7 +2,6 @@ import log from 'electron-log'
 import { z } from 'zod'
 
 import { AddressSchema, ChainIdSchema, HexStringSchema } from '../../../state/types/utils'
-import { toTokenId } from '../../../../../resources/domain/balance'
 
 const v39TokenSchema = z.object({
   name: z.string().default(''),
@@ -56,12 +55,6 @@ export const v40TokenSchema = z.object({
   hideByDefault: z.boolean()
 })
 
-export const v40PreferencesSchema = z.object({
-  hidden: z.boolean()
-  // Can add other preferences here... e.g.
-  // favourited: z.boolean().optional()
-})
-
 const defaultTokensState = {
   known: {},
   custom: []
@@ -83,16 +76,12 @@ const v39StateSchema = z
   })
   .passthrough()
 
-export const v40StateSchema = z.object({
+const v40StateSchema = z.object({
   main: z
     .object({
       tokens: z.object({
         known: z.record(z.array(v40TokenBalanceSchema)),
         custom: z.array(v40TokenSchema)
-      }),
-      assetPreferences: z.object({
-        collections: z.record(v40PreferencesSchema),
-        tokens: z.record(v40PreferencesSchema)
       })
     })
     .passthrough()
@@ -102,22 +91,10 @@ type v39Token = z.infer<typeof v39TokenSchema>
 type v40Token = z.infer<typeof v40TokenSchema>
 type v39TokenBalance = z.infer<typeof v39TokenBalanceSchema>
 type v40TokenBalance = z.infer<typeof v40TokenBalanceSchema>
-type v40Preferences = z.infer<typeof v40PreferencesSchema>
 type v40State = z.infer<typeof v40StateSchema>
 
 interface WithLogoURI {
   logoURI?: string
-}
-
-const migrateTokenPreferences = (customTokens: v40Token[]) => {
-  const tokenPreferences: Record<string, v40Preferences> = {}
-  for (const token of customTokens) {
-    tokenPreferences[toTokenId(token)] = {
-      hidden: false
-    }
-  }
-
-  return tokenPreferences
 }
 
 const migrateToken = <T extends WithLogoURI>({ logoURI, ...token }: T) => ({
@@ -154,18 +131,13 @@ const migrate = (initial: unknown) => {
     const v39State = v39StateSchema.parse(initial)
     const { known: knownTokens, custom: customTokens } = v39State.main.tokens
 
-    const migratedCustomTokens = migrateCustomTokens(customTokens)
     const v40State: v40State = {
       ...v39State,
       main: {
         ...v39State.main,
         tokens: {
           known: migrateKnownTokens(knownTokens),
-          custom: migratedCustomTokens
-        },
-        assetPreferences: {
-          collections: {},
-          tokens: migrateTokenPreferences(migratedCustomTokens)
+          custom: migrateCustomTokens(customTokens)
         }
       }
     }
