@@ -60,13 +60,16 @@ const splitTokenBalances = (balances: TokenBalance[]) => {
   )
 }
 
-const mergeCustomAndNative = (balances: TokenBalance[]) => {
+const mergeCustomAndNative = (balances: TokenBalance[], chains: number[]) => {
   // Retrieve custom tokens from the store
   const custom = storeApi.getCustomTokens()
 
   // Convert custom tokens array to an object for easier manipulation
   const customData = custom.reduce((data, token) => {
-    data[toTokenId(token)] = token
+    if (chains.includes(token.chainId)) {
+      data[toTokenId(token)] = token
+    }
+
     return data
   }, {} as Record<string, Token>)
 
@@ -75,8 +78,8 @@ const mergeCustomAndNative = (balances: TokenBalance[]) => {
     const tokenId = toTokenId(balance)
 
     if (tokenId in customData) {
-      const { name, symbol, decimals } = customData[tokenId]
-      balance = { ...balance, name, symbol, decimals }
+      const { name, symbol, decimals, hideByDefault } = customData[tokenId]
+      balance = { ...balance, name, symbol, decimals, hideByDefault }
 
       // Remove the merged custom token
       delete customData[tokenId]
@@ -127,7 +130,7 @@ export function handleBalanceUpdate(
   mode: keyof typeof toExpiryWindow
 ) {
   log.debug('Handling balance update', { address, chains })
-  const withLocalData = mergeCustomAndNative(balances)
+  const withLocalData = mergeCustomAndNative(balances, chains)
 
   const changedBalances = getChangedBalances(address, withLocalData)
 
