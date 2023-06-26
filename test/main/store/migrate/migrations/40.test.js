@@ -1,4 +1,5 @@
 import migration from '../../../../../main/store/migrate/migrations/40'
+import { toTokenId } from '../../../../../resources/domain/balance'
 import { createState } from '../setup'
 
 let state
@@ -374,6 +375,41 @@ describe('known tokens', () => {
         cdn: {}
       },
       hideByDefault: false
+    })
+  })
+})
+
+describe('asset preferences', () => {
+  it('should create an empty record for inventory preferences', () => {
+    const migratedState = migration.migrate(state)
+    expect(migratedState.main.assetPreferences.collections).toStrictEqual({})
+  })
+
+  it('should create an empty object for token preferences if no custom tokens are present', () => {
+    const migratedState = migration.migrate(state)
+    expect(migratedState.main.assetPreferences.tokens).toStrictEqual({})
+  })
+  it('should set visibility of each custom token to "not hidden" by default', () => {
+    const customToken = {
+      name: 'Custom Token',
+      symbol: 'CT',
+      chainId: 1,
+      address: '0x1234',
+      decimals: 18,
+      media: {
+        source: '',
+        format: 'image',
+        cdn: {}
+      },
+      hideByDefault: false
+    }
+
+    state.main.tokens.custom = [customToken]
+
+    const migratedState = migration.migrate(state)
+
+    expect(migratedState.main.assetPreferences.tokens[toTokenId(customToken)]).toStrictEqual({
+      hidden: false
     })
   })
 })

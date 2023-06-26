@@ -108,7 +108,7 @@ const BalancesExpanded = ({
         <BalancesList
           balances={expandedData.hidden ? hiddenBalances : allBalances}
           displayValue={expandedData.hidden ? hiddenTotalDisplayValue : totalDisplayValue}
-          allChainsUpdated={allChainsUpdated}
+          shouldShowTotalValue={shouldShowTotalValue}
           footerButton={footerButton}
         />
       </ClusterBox>

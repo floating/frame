@@ -1,10 +1,7 @@
 import { z } from 'zod'
+import { v40PreferencesSchema } from '../../migrate/migrations/40'
 
-const PreferencesSchema = z.object({
-  hidden: z.boolean()
-  // Can add other preferences here... e.g.
-  // favourited: z.boolean().optional()
-})
+const PreferencesSchema = v40PreferencesSchema
 
 export const AssetPreferencesSchema = z.object({
   collections: z.record(PreferencesSchema),
