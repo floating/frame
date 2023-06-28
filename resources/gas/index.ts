@@ -16,6 +16,16 @@ export function getMaxTotalFee(tx = { chainId: '' }) {
     return 10_000_000 * 1e18
   }
 
+  // for BSC, the max fee should be 30 BNB
+  if ([56, 97].includes(chainId)) {
+    return 30 * 1e18
+  }
+
+  // for RSK, the max fee should be 0.5 rBTC
+  if ([30, 31].includes(chainId)) {
+    return 5 * 1e17
+  }
+
   // for all other chains, default to 500 of the chain's currency
   return 500 * 1e18
 }
