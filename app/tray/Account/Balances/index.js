@@ -82,16 +82,7 @@ class Balances extends React.Component {
 
     const totalDisplayValue = formatUsdRate(totalValue, 0)
 
-    const balances = filteredBalances
-      .sort((a, b) => {
-        const aId = `${a.symbol}:${a.address}`
-        const bId = `${b.symbol}:${b.address}`
-        return aId < bId ? -1 : aId > bId ? 1 : 0
-      })
-      .sort((a, b) => {
-        return a.chainId - b.chainId
-      })
-      .sort(sortByTotalValue)
+    const balances = filteredBalances.sort(sortByTotalValue)
 
     return { balances, totalValue, totalDisplayValue }
   }
