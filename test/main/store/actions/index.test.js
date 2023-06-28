@@ -291,12 +291,12 @@ describe('#setBalances', () => {
 
     expect(balances).toEqual([
       {
-        ...testTokens.badger,
-        balance: addHexPrefix(new BigNumber(30.5).toString(16))
-      },
-      {
         ...testTokens.zrx,
         balance: addHexPrefix(new BigNumber(7983.2332).toString(16))
+      },
+      {
+        ...testTokens.badger,
+        balance: addHexPrefix(new BigNumber(30.5).toString(16))
       }
     ])
   })

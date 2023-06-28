@@ -58,7 +58,9 @@ const DisplayMedia = ({ media, alt, thumb, frozen, audio, full, lazy }) => {
     if (thumb || frozen) {
       if (frozen) {
         if (media.cdn?.frozen) {
-          return <img src={pylonURL(media.cdn.frozen)} alt={alt} loading={lazy ? 'lazy' : 'eager'} />
+          return (
+            <img key={alt} src={pylonURL(media.cdn.frozen)} alt={alt} loading={lazy ? 'lazy' : 'eager'} />
+          )
         } else {
           return svg.missing(12)
         }
@@ -66,6 +68,7 @@ const DisplayMedia = ({ media, alt, thumb, frozen, audio, full, lazy }) => {
         if (media.cdn?.thumb) {
           return (
             <img
+              key={alt}
               src={pylonURL(media.cdn.thumb || media.cdn.main || media.source)}
               loading={lazy ? 'lazy' : 'eager'}
             />

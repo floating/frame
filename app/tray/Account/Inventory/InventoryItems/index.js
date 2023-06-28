@@ -85,7 +85,13 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
         <div className='inventoryCollectionItem'>
           {media ? (
             <div className='inventoryCollectionItemImage'>
-              <DisplayMedia media={media} frozen={true} lazy={true} alt={(name || '').toUpperCase()} />
+              <DisplayMedia
+                media={media}
+                frozen={true}
+                thumb={true}
+                lazy={true}
+                alt={(name || '').toUpperCase()}
+              />
             </div>
           ) : (
             <PulsateCircle index={i} />

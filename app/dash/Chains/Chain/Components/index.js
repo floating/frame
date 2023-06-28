@@ -20,11 +20,21 @@ export const SubmitChainButton = ({ text, enabled, textColor, onClick }) => {
 
 export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, showExpand, showToggle }) => {
   const isMainnet = id === 1
+  const media = {
+    format: 'image',
+    source: icon,
+    cdn: {}
+  }
+  const isEth = [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(id)
   return (
     <div className='signerTop'>
       <div className='signerDetails'>
         <div className='signerIcon'>
-          <RingIcon color={`var(--${primaryColor})`} img={icon} svgName={svgName} />
+          {isEth ? (
+            <RingIcon color={`var(--${primaryColor})`} svgName={'ETH'} />
+          ) : (
+            <RingIcon color={`var(--${primaryColor})`} media={media} svgName={svgName} />
+          )}
         </div>
         {/* <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div> */}
         <div role='chainName' className='signerName'>

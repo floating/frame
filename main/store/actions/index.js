@@ -36,6 +36,19 @@ function includesToken(tokens, token) {
   return tokens.some((t) => t.address.toLowerCase() === existingAddress && t.chainId === token.chainId)
 }
 
+const defaultBalanceSort = (balances) => {
+  balances
+    .sort((a, b) => {
+      const aId = `${a.symbol}:${a.address}`
+      const bId = `${b.symbol}:${b.address}`
+      return aId < bId ? -1 : aId > bId ? 1 : 0
+    })
+    .sort((a, b) => {
+      return a.chainId - b.chainId
+    })
+  return balances
+}
+
 module.exports = {
   ...panelActions,
   // setSync: (u, key, payload) => u(key, () => payload),
@@ -615,8 +628,7 @@ module.exports = {
       const existingBalances = balances.filter(
         (b) => b.address !== balance.address || b.chainId !== balance.chainId
       )
-
-      return [...existingBalances, balance]
+      return defaultBalanceSort([...existingBalances, balance])
     })
   },
   // Tokens
@@ -629,7 +641,7 @@ module.exports = {
       // TODO: possibly add an option to filter out zero balances
       //const withoutZeroBalances = Object.entries(updatedBalances)
       //.filter(([address, balanceObj]) => !(new BigNumber(balanceObj.balance)).isZero())
-      return [...existingBalances, ...newBalances]
+      return defaultBalanceSort([...existingBalances, ...newBalances])
     })
   },
   removeBalance: (u, chainId, address) => {

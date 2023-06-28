@@ -59,29 +59,30 @@ class Balances extends React.Component {
 
   getBalances(filter, tokenPreferences, returnHidden = false) {
     const { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains } = this.getStoreValues()
+    const shouldShowBalance = shouldShow(ethereumNetworks, tokenPreferences, populatedChains, returnHidden)
+    const createBalance = toBalance(networksMeta, rates, ethereumNetworks)
 
-    const filteredBalances = rawBalances.filter(
-      shouldShow(ethereumNetworks, tokenPreferences, populatedChains, returnHidden)
+    const { filteredBalances, totalValue } = rawBalances.reduce(
+      ({ filteredBalances, totalValue }, rawBalance) => {
+        const chain = ethereumNetworks[rawBalance.chainId]
+
+        if (
+          shouldShowBalance(rawBalance) &&
+          matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
+        ) {
+          const balance = createBalance(rawBalance)
+          filteredBalances.push(balance)
+          totalValue = totalValue.plus(BigNumber(balance.totalValue))
+        }
+
+        return { filteredBalances, totalValue }
+      },
+      { filteredBalances: [], totalValue: BigNumber(0) }
     )
 
-    const balances = filteredBalances
-      .map(toBalance(networksMeta, rates, ethereumNetworks))
-      .filter((rawBalance) => {
-        const chain = ethereumNetworks[rawBalance.chainId]
-        return matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
-      })
-      .sort((a, b) => {
-        const aId = a.symbol?.toLowerCase() + ':' + a.address?.toLowerCase()
-        const bId = b.symbol?.toLowerCase() + ':' + b.address?.toLowerCase()
-        return aId < bId ? -1 : aId > bId ? 1 : 0
-      })
-      .sort((a, b) => {
-        return a.chainId - b.chainId
-      })
-      .sort(sortByTotalValue)
-
-    const totalValue = balances.reduce((a, b) => a.plus(b.totalValue), BigNumber(0))
     const totalDisplayValue = formatUsdRate(totalValue, 0)
+
+    const balances = filteredBalances.sort(sortByTotalValue)
 
     return { balances, totalValue, totalDisplayValue }
   }

@@ -93,8 +93,6 @@ class Requests extends React.Component {
     return (
       <ClusterBox key={origin}>
         <div className='requestGroup'>
-          {/* <img src={proxyFavicon} width='24px' height='24px' />
-          <RingIcon img={favicon} alt={'?'} small noRing /> */}
           <div className='requestGroupMain'>
             <div style={{ marginRight: '8px' }}>{svg.window(12)}</div>
             <div className='requestGroupName'>{groupName}</div>
