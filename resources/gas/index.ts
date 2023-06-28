@@ -8,14 +8,24 @@ export function getMaxTotalFee(tx = { chainId: '' }) {
 
   // for Fantom, the max fee should be 14000 FTM
   if ([250, 4002].includes(chainId)) {
-    return 14000 * 1e18
+    return 14_000 * 1e18
   }
 
-  // for PulseChain, the max fee should be 100000000000 PLS
+  // for PulseChain, the max fee should be 10M PLS
   if ([369, 940, 941, 942, 943].includes(chainId)) {
-    return 100000000000 * 1e18
+    return 10_000_000 * 1e18
   }
 
-  // for all other chains, default to 50 of the chain's currency
-  return 50 * 1e18
+  // for BSC, the max fee should be 30 BNB
+  if ([56, 97].includes(chainId)) {
+    return 30 * 1e18
+  }
+
+  // for RSK, the max fee should be 0.5 rBTC
+  if ([30, 31].includes(chainId)) {
+    return 5 * 1e17
+  }
+
+  // for all other chains, default to 500 of the chain's currency
+  return 500 * 1e18
 }

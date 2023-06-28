@@ -18,19 +18,19 @@ describe('#getMaxTotalFee', () => {
     expect(getMaxTotalFee(tx)).toBe(14000e18)
   })
 
-  it('sets the max fee as 100000000000 PLS on PulseChain', () => {
+  it('sets the max fee as 10000000 PLS on PulseChain', () => {
     const tx = {
       chainId: addHexPrefix((369).toString(16))
     }
 
-    expect(getMaxTotalFee(tx)).toBe(1e29)
+    expect(getMaxTotalFee(tx)).toBe(1e25)
   })
 
-  it('sets the max fee as 50 on other chains', () => {
+  it('sets the max fee as 500 on other chains', () => {
     const tx = {
       chainId: addHexPrefix((255).toString(16))
     }
 
-    expect(getMaxTotalFee(tx)).toBe(5e19)
+    expect(getMaxTotalFee(tx)).toBe(5e20)
   })
 })
