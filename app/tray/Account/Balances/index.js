@@ -64,14 +64,15 @@ class Balances extends React.Component {
 
     const { filteredBalances, totalValue } = rawBalances.reduce(
       ({ filteredBalances, totalValue }, rawBalance) => {
-        if (shouldShowBalance(rawBalance)) {
-          const balance = createBalance(rawBalance)
-          const chain = ethereumNetworks[rawBalance.chainId]
+        const chain = ethereumNetworks[rawBalance.chainId]
 
-          if (matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])) {
-            filteredBalances.push(balance)
-            totalValue = totalValue.plus(BigNumber(balance.totalValue))
-          }
+        if (
+          shouldShowBalance(rawBalance) &&
+          matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
+        ) {
+          const balance = createBalance(rawBalance)
+          filteredBalances.push(balance)
+          totalValue = totalValue.plus(BigNumber(balance.totalValue))
         }
 
         return { filteredBalances, totalValue }
