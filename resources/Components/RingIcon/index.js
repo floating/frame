@@ -8,13 +8,9 @@ const mediaExists = (media) => {
   return media?.source && media?.format
 }
 
-const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, frozen, media }) => {
+const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, frozen, media, thumb }) => {
   if (mediaExists(media)) {
-    return <DisplayMedia media={media} thumb={true} frozen={frozen} alt={alt} />
-  }
-
-  if (img) {
-    return <img src={img} alt={alt} />
+    return <DisplayMedia media={media} thumb={thumb} frozen={frozen} alt={alt} />
   }
 
   if (svgName) {
@@ -28,7 +24,7 @@ const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, frozen, media 
   return svg.missing(small ? 8 : 12)
 }
 
-const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft, frozen, media }) => {
+const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft, frozen, media, thumb }) => {
   let ringIconClass = 'ringIcon'
   if (small) ringIconClass += ' ringIconSmall'
   if (block) ringIconClass += ' ringIconBlock'
@@ -50,6 +46,7 @@ const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft
           small={small}
           nft={nft}
           frozen={frozen}
+          thumb={thumb}
           media={media}
         />
       </div>

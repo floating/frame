@@ -47,6 +47,8 @@ const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
         <div className='signerBalanceIcon'>
           <RingIcon
             img={!isEth && !isTestnet && imageURL}
+            thumb={true}
+            frozen={true}
             media={!isEth && media}
             svgName={isEth && 'eth'}
             alt={symbol.toUpperCase()}

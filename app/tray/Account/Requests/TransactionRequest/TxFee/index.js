@@ -7,6 +7,7 @@ import { GasFeesSource, usesBaseFee } from '../../../../../../resources/domain/t
 import { displayValueData } from '../../../../../../resources/utils/displayValue'
 import { hexToInt } from '../../../../../../resources/utils'
 import link from '../../../../../../resources/link'
+import svg from '../../../../../../resources/svg'
 import {
   ClusterBox,
   Cluster,
@@ -126,28 +127,29 @@ class TxFee extends React.Component {
     })
 
     return (
-      <ClusterBox title='fee' animationSlot={this.props.i}>
+      <ClusterBox animationSlot={this.props.i}>
+        <div className='_txLabel'>
+          <div>{`Fee`}</div>
+        </div>
         <Cluster>
           <ClusterRow>
-            <ClusterColumn>
-              <ClusterValue
-                onClick={() => {
-                  link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
-                }}
-              >
-                <GasDisplay maxFeePerGas={displayValueData(maxFeePerGas)} />
-              </ClusterValue>
-            </ClusterColumn>
-            <ClusterColumn grow={2}>
-              <ClusterValue>
-                <div className='txSendingValue'>
-                  <DisplayCoinBalance amount={maxFee} symbol={nativeCurrency.symbol} />
-                </div>
-              </ClusterValue>
-              <ClusterValue>
-                <USDEstimateDisplay minFee={minFee} maxFee={maxFee} nativeCurrency={nativeCurrency} />
-              </ClusterValue>
-            </ClusterColumn>
+            <ClusterValue
+              onClick={() => {
+                link.send('nav:update', 'panel', { data: { step: 'adjustFee' } })
+              }}
+            >
+              <GasDisplay maxFeePerGas={displayValueData(maxFeePerGas)} />
+            </ClusterValue>
+            <ClusterValue>
+              <div className='txSendingValue'>
+                <DisplayCoinBalance amount={maxFee} symbol={nativeCurrency.symbol} />
+              </div>
+            </ClusterValue>
+          </ClusterRow>
+          <ClusterRow>
+            <ClusterValue>
+              <USDEstimateDisplay minFee={minFee} maxFee={maxFee} nativeCurrency={nativeCurrency} />
+            </ClusterValue>
           </ClusterRow>
           {req.feesUpdatedByUser ? (
             <ClusterRow>
