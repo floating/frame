@@ -83,10 +83,6 @@ class Balances extends React.Component {
     const totalDisplayValue = formatUsdRate(totalValue, 0)
 
     const balances = filteredBalances
-      .filter((rawBalance) => {
-        const chain = ethereumNetworks[rawBalance.chainId]
-        return matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
-      })
       .sort((a, b) => {
         const aId = `${a.symbol}:${a.address}`
         const bId = `${b.symbol}:${b.address}`
