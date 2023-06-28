@@ -25,7 +25,6 @@ class CustomTokens extends React.Component {
                   return a.chainId <= b.chainId
                 })
                 .map((token, i) => {
-                  console.log('token.logoURI', token)
                   return (
                     <div
                       key={i}
@@ -37,14 +36,6 @@ class CustomTokens extends React.Component {
                     >
                       <div className='customTokensListItemTitle'>
                         <div className='customTokensListItemName'>
-                          {/* <img
-                            src={
-                              token.logoURI &&
-                              `https://proxy.pylon.link?type=icon&target=${encodeURIComponent(token.logoURI)}`
-                            }
-                            value={token.symbol.toUpperCase()}
-                            
-                          /> */}
                           <RingIcon media={token.media} alt={token.symbol.toUpperCase()}></RingIcon>
                           <div className='customTokensListItemText'>
                             <div className='customTokensListItemSymbol'>{token.symbol}</div>
