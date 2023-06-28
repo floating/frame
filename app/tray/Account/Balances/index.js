@@ -59,20 +59,25 @@ class Balances extends React.Component {
 
   getBalances(filter, tokenPreferences, returnHidden = false) {
     const { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains } = this.getStoreValues()
+    const shouldShowBalance = shouldShow(ethereumNetworks, tokenPreferences, populatedChains, returnHidden)
+    const createBalance = toBalance(networksMeta, rates, ethereumNetworks)
 
-    let totalValue = BigNumber(0)
-    const filteredBalances = []
+    const { filteredBalances, totalValue } = rawBalances.reduce(
+      ({ filteredBalances, totalValue }, rawBalance) => {
+        if (shouldShowBalance(rawBalance)) {
+          const balance = createBalance(rawBalance)
+          const chain = ethereumNetworks[rawBalance.chainId]
 
-    rawBalances.forEach((rawBalance) => {
-      if (shouldShow(ethereumNetworks, tokenPreferences, populatedChains, returnHidden)(rawBalance)) {
-        const balance = toBalance(networksMeta, rates, ethereumNetworks)(rawBalance)
-        const chain = ethereumNetworks[rawBalance.chainId]
-        if (matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])) {
-          filteredBalances.push(balance)
-          totalValue = totalValue.plus(BigNumber(balance.totalValue))
+          if (matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])) {
+            filteredBalances.push(balance)
+            totalValue = totalValue.plus(BigNumber(balance.totalValue))
+          }
         }
-      }
-    })
+
+        return { filteredBalances, totalValue }
+      },
+      { filteredBalances: [], totalValue: BigNumber(0) }
+    )
 
     const totalDisplayValue = formatUsdRate(totalValue, 0)
 
@@ -82,8 +87,8 @@ class Balances extends React.Component {
         return matchFilter(filter, [chain.name, rawBalance.name, rawBalance.symbol])
       })
       .sort((a, b) => {
-        const aId = a.symbol + ':' + a.address
-        const bId = b.symbol + ':' + b.address
+        const aId = `${a.symbol}:${a.address}`
+        const bId = `${b.symbol}:${b.address}`
         return aId < bId ? -1 : aId > bId ? 1 : 0
       })
       .sort((a, b) => {
