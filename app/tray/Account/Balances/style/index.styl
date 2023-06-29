@@ -23,7 +23,7 @@
   100%
     transform translateX(74px)
 
-.signerBalanceLoading
+.signerBalanceLoadingWave
   position absolute
   right 16px
   bottom 12px
@@ -238,17 +238,18 @@
     100%
       transform rotateZ(360deg) translateX(100%)
 
-  // .signerBalanceLoading
-  //   position absolute
-  //   top 0
-  //   bottom 0
-  //   left 0
-  //   transform rotateZ(360deg) translateX(-100%)
-  //   will-change transform
-  //   width 400%
-  //   background linear-gradient(90deg, var(--ghostB0) 25%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 75%)
-  //   animation sheenLoad 5s infinite linear
-  //   transition var(--standardFast)
+  .signerBalanceLoading
+    position absolute
+    top 0
+    bottom 0
+    left 0
+    transform rotateZ(360deg) translateX(-100%)
+    will-change transform
+    width 400%
+    background linear-gradient(90deg, var(--ghostB0) 25%, var(--ghostB) 48%, var(--ghostB) 52%, var(--ghostB0) 75%)
+    animation sheenLoad 3s infinite linear
+    transition var(--standardFast)
+    pointer-events none
 
   .signerBalanceInner
     position relative

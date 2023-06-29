@@ -172,7 +172,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
                           hidden: !isHidden
                         })
                         setConfirmHide(false)
-                        if (!isHidden) link.send('nav:back', 'panel')
+                        link.send('nav:back', 'panel')
                       }}
                     >
                       <div className='signerBalanceDrawerItem'>{svg.check(16)}</div>

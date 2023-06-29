@@ -19,3 +19,8 @@ const useStore = (...args) => {
 }
 
 export default useStore
+
+export const store = (...args) => {
+  const store = useContext(StoreContext)
+  return store(...args)
+}

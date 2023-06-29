@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import link from '../../../../../resources/link'
 
 import svg from '../../../../../resources/svg'
-import useStore from '../../../../../resources/Hooks/useStore'
+import { store } from '../../../../../resources/Hooks/useStore'
 import { matchFilter } from '../../../../../resources/utils'
 
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../resources/Components/Cluster'
@@ -40,7 +40,7 @@ const InventoryExpanded = ({ expandedData, moduleId, account, inventory, hiddenC
     if (!collection.meta) return false
     const collectionName = collection.meta.name || ''
     const collectionChain =
-      collection.meta.chainId && useStore('main.networks.ethereum', collection.meta.chainId)
+      collection.meta.chainId && store('main.networks.ethereum', collection.meta.chainId)
     const itemNames = collection.items.map((item) => {
       const { name } = collection.items[item] || {}
       return name
