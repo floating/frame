@@ -31,7 +31,7 @@ const BalanceListFooter = ({ displayValue, footerButton, shouldShowTotalValue })
           </div>
         </div>
       ) : (
-        <div className='signerBalanceLoading'>{svg.sine()}</div>
+        <div className='signerBalanceLoadingWave'>{svg.sine()}</div>
       )}
     </div>
   )
@@ -41,6 +41,9 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalVal
   const [open, setOpen] = useState(-1)
   const [confirming, setConfirming] = useState(false)
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
+
+  const toggleOpen = () => setOpen(open === i ? -1 : i)
+
   return (
     <>
       <Cluster>
@@ -53,11 +56,7 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalVal
           return (
             <React.Fragment key={tokenId}>
               <ClusterRow>
-                <ClusterValue
-                  onClick={() => {
-                    setOpen(open === i ? -1 : i)
-                  }}
-                >
+                <ClusterValue onClick={shouldShowTotalValue && toggleOpen()}>
                   {hidden && <HiddenOverlay />}
                   <Balance
                     key={chainId + address}
@@ -66,7 +65,7 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalVal
                     address={address}
                     balance={balance}
                     i={i}
-                    scanning={false}
+                    scanning={!shouldShowTotalValue}
                   />
                 </ClusterValue>
               </ClusterRow>
