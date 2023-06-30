@@ -42,8 +42,6 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalVal
   const [confirming, setConfirming] = useState(false)
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
 
-  const toggleOpen = () => setOpen(open === i ? -1 : i)
-
   return (
     <>
       <Cluster>
@@ -56,7 +54,7 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalVal
           return (
             <React.Fragment key={tokenId}>
               <ClusterRow>
-                <ClusterValue onClick={shouldShowTotalValue && toggleOpen()}>
+                <ClusterValue onClick={shouldShowTotalValue ? () => setOpen(open === i ? -1 : i) : null}>
                   {hidden && <HiddenOverlay />}
                   <Balance
                     key={chainId + address}
