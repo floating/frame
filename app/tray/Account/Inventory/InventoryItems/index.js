@@ -114,6 +114,57 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
       })
   }
 
+  const getCombinedItems = () => {
+    let items = inventory[k].items || []
+    let tokens = (inventory[k].meta.tokens || []).map((tokenId) => ({ tokenId }))
+
+    let combinedItems = [...items]
+
+    tokens.forEach((token) => {
+      if (!items.find((item) => item.tokenId === token.tokenId)) {
+        combinedItems.push(token)
+      }
+    })
+
+    combinedItems.sort((a, b) => {
+      a = a.tokenId
+      b = b.tokenId
+      return a < b ? -1 : b > a ? 1 : 0
+    })
+
+    return combinedItems
+  }
+
+  useEffect(() => {
+    const loadMedia = (itemList) => {
+      if (itemList.length === 0) return
+      const item = itemList.shift()
+      setTimeout(() => {
+        const main = item?.media?.cdn?.main
+        const format = item?.media?.format
+
+        if (main) {
+          if (format === 'video') {
+            const video = document.createElement('video')
+            video.src = main
+          } else {
+            const img = new Image()
+            img.src = main
+          }
+        }
+
+        const frozen = item?.media?.cdn?.frozen
+        if (frozen) {
+          const imgFrozen = new Image()
+          imgFrozen.src = frozen
+        }
+        loadMedia(itemList)
+      }, 0)
+    }
+    const items = getCombinedItems()
+    loadMedia([...items])
+  }, [])
+
   return (
     <div className='inventoryDisplay'>
       <InventoryPreview>
@@ -185,7 +236,6 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
                         {previewTitle(inventory[k].meta.name)}
                       </PreviewOptions>
                     </ClusterValue>
-
                     <ClusterValue
                       width={'42px'}
                       onClick={() => {
@@ -216,30 +266,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
               setHoverAsset(false)
             }}
           >
-            <ClusterScroll>
-              {group(
-                (() => {
-                  let items = inventory[k].items || []
-                  let tokens = (inventory[k].meta.tokens || []).map((tokenId) => ({ tokenId }))
-
-                  let combinedItems = [...items]
-
-                  tokens.forEach((token) => {
-                    if (!items.find((item) => item.tokenId === token.tokenId)) {
-                      combinedItems.push(token)
-                    }
-                  })
-
-                  combinedItems.sort((a, b) => {
-                    a = a.tokenId
-                    b = b.tokenId
-                    return a < b ? -1 : b > a ? 1 : 0
-                  })
-
-                  return combinedItems
-                })()
-              )}
-            </ClusterScroll>
+            <ClusterScroll>{group(getCombinedItems())}</ClusterScroll>
           </Container>
         </ClusterBox>
       </InventoryPreview>

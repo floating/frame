@@ -21,7 +21,7 @@ const Icon = ({ svgName, alt = '', svgSize = 16, img, small, nft, frozen, media,
 
   if (nft) return <div style={{ position: 'relative', top: '-1px' }}>{svg.inventory(13)}</div>
 
-  return svg.missing(small ? 8 : 12)
+  return svg.missing(10)
 }
 
 const RingIcon = ({ color, svgName, svgSize, img, small, block, noRing, alt, nft, frozen, media, thumb }) => {
