@@ -78,6 +78,29 @@ export const CollectionDot = styled.div`
   }
 `
 
+const pulse = keyframes`
+  0% { 
+    transform: scale(0.5); 
+    opacity: 0; 
+  }
+  20% { 
+    opacity: 1; 
+  }
+  80% { 
+    transform: scale(2); 
+    opacity: 0;
+  }
+`
+
+export const CollectionDotLoading = styled.div`
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+  margin: auto auto;
+  animation: ${pulse} 2.6s ease-out infinite;
+  opacity: 0;
+`
+
 export const CollectionDots = styled.div`
   display: flex;
   align-items: center;

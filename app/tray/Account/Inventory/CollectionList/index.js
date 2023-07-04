@@ -13,7 +13,8 @@ import {
   CollectionLine,
   CollectionDot,
   CollectionDots,
-  CollectionCount
+  CollectionCount,
+  CollectionDotLoading
 } from './styled'
 
 const displayName = (name = '') => {
@@ -37,7 +38,11 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
 
   const [active, setActive] = useState(false)
 
-  const previewItems = collection.items
+  const previewItems = collection.meta.tokens
+    .map((tokenId) => {
+      const item = collection.items.find((item) => item.tokenId === tokenId)
+      return item || { tokenId }
+    })
     .slice()
     .sort((x, y) => {
       const a = x.tokenId
@@ -97,7 +102,16 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
                 {previewItems.map((item, i) => {
                   return (
                     <CollectionDot key={item.tokenId}>
-                      <DisplayMedia media={item.media} thumb={true} frozen={true} />
+                      {item.media ? (
+                        <DisplayMedia media={item.media} thumb={true} frozen={true} />
+                      ) : (
+                        <CollectionDotLoading
+                          style={{
+                            animationDelay: 140 * i + 'ms',
+                            background: chainColor ? `var(--${chainColor})` : 'var(--outerspace)'
+                          }}
+                        />
+                      )}
                     </CollectionDot>
                   )
                 })}
