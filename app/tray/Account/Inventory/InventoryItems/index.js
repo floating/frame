@@ -115,24 +115,15 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
   }
 
   const getCombinedItems = () => {
-    let items = inventory[k].items || []
-    let tokens = (inventory[k].meta.tokens || []).map((tokenId) => ({ tokenId }))
+    const items = inventory[k].items || []
+    const tokens = (inventory[k].meta.tokens || []).map((tokenId) => ({ tokenId }))
+    const tokenItems = tokens.filter((token) => !items.some((item) => item.tokenId === token.tokenId))
 
-    let combinedItems = [...items]
-
-    tokens.forEach((token) => {
-      if (!items.find((item) => item.tokenId === token.tokenId)) {
-        combinedItems.push(token)
-      }
-    })
-
-    combinedItems.sort((a, b) => {
+    return [...items, ...tokenItems].sort((a, b) => {
       a = a.tokenId
       b = b.tokenId
       return a < b ? -1 : b > a ? 1 : 0
     })
-
-    return combinedItems
   }
 
   useEffect(() => {

@@ -41,7 +41,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
   const previewItems = collection.meta.tokens
     .map((tokenId) => {
       const item = collection.items.find((item) => item.tokenId === tokenId)
-      return item ? item : { tokenId }
+      return item || { tokenId }
     })
     .slice()
     .sort((x, y) => {
