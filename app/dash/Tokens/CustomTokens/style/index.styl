@@ -2,7 +2,7 @@
 
   .customTokensTitle
     font-size 16px
-    font-weight 300
+    font-weight 400
     height 47px
     display flex
     justify-content space-between
@@ -21,7 +21,7 @@
       font-size 11px
       padding 0px 12px
       letter-spacing 1px
-      font-weight 300
+      font-weight 400
       text-transform uppercase
       cursor pointer
       *
@@ -38,7 +38,7 @@
     height 64px
     font-family 'MainFont'
     font-size 20px
-    font-weight 400
+    font-weight 500
     display flex
     justify-content center
     align-items center
@@ -62,7 +62,7 @@
     bottom 0px
     display flex
     font-size 16px
-    font-weight 300
+    font-weight 400
     justify-content center
     align-items center
     text-transform uppercase
@@ -114,7 +114,36 @@
         justify-content center
         align-items center
         font-family 'MainFont'
-        font-weight 300
+        font-weight 400
+
+        img:before
+          content attr(alt)
+          top 0
+          bottom 0
+          left 0
+          right 0
+          border-radius 13px
+          position absolute
+          background var(--outerspace)
+          color var(--ghostD)
+          display flex
+          justify-content center
+          align-items center
+          font-size 11px
+          font-weight 400
+          letter-spacing -0.5px
+          margin-left -0.5px
+          top -0.5px
+
+        img
+          position relative
+          height 28px
+          width 28px
+          border-radius 20px
+          margin-right 12px
+          border 2px solid var(--ghostC)
+          background var(--ghostC)
+          overflow hidden
 
         .customTokensListItemText
           display flex
@@ -124,7 +153,7 @@
           margin-left 12px
 
         .customTokensListItemSymbol
-          font-weight 300
+          font-weight 400
           margin-bottom 1px
           margin-top 2px
           font-size 16px
@@ -134,12 +163,12 @@
 
         .customTokensListItemSub
           // margin-left 5px
-          font-weight 300
+          font-weight 400
           margin-top 4px
           margin-bottom 1px
           margin-left 0px
           font-size 12px
-          font-weight 300
+          font-weight 400
           font-family 'MainFont'
           color var(--outerspace05)
           line-height 12px
@@ -149,15 +178,15 @@
         justify-content center
         align-items center
         font-size 18px
-        font-weight 400
+        font-weight 500
 
     .customTokensListItemChainLabel
       font-size 10px
       text-transform uppercase
       margin 0px 5px 0px 1px
-      font-weight 300
+      font-weight 400
       margin-top 1px
-      font-weight 300
+      font-weight 400
 
     .customTokensListItemAddress
       display flex
@@ -218,4 +247,4 @@
     justify-content center
     align-items center
     font-size 18px
-    font-weight 400
+    font-weight 500

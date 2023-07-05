@@ -48,7 +48,7 @@ export const Cluster = styled.div`
   display: flow-root;
   background: var(--ghostZ);
   margin: 6px;
-  padding: 2px 0px 1px 0px;
+  padding: 1px 0px 1px 0px;
   position: relative;
 `
 
@@ -80,6 +80,23 @@ export const ClusterScroll = ({ height, ...props }) => {
   )
 }
 
+export const ClusterBoxHeader = styled.div`
+  position: relative;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 16px 90px 10px 20px;
+  height: 42px;
+  font-family: 'MainFont';
+  font-weight: 500;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  span {
+    margin-right: 8px;
+  }
+`
+
 export const ClusterValue = styled.div`
   flex-grow: ${(props) => props.grow || 1};
   width: ${(props) => props.width || 'auto'};
@@ -100,11 +117,20 @@ export const ClusterValue = styled.div`
   font-family: 'MainFont';
   background: var(--ghostA);
   box-shadow: 0px 1px 2px var(--ghostX);
-  border-bottom: 2px solid var(--ghostZ);
+  border-bottom: 2px solid var(--ghostAZ);
   overflow: hidden;
-  margin-top: 1px;
   pointer-events: auto !important;
-
+  margin-top: 2px;
+  ${(props) => {
+    return props.active
+      ? css`
+          background: var(--ghostB);
+          border-bottom: 2px solid var(--ghostA);
+          position: relative;
+          z-index: 300000;
+        `
+      : css``
+  }}
   ${(props) => {
     return props.allowPointer
       ? css`
@@ -114,11 +140,10 @@ export const ClusterValue = styled.div`
         `
       : css`
           * {
-            pointer-events: none;
+            pointer-events: none !important;
           }
         `
   }}
-
   ${(props) => {
     return (
       props.onClick &&
@@ -129,10 +154,11 @@ export const ClusterValue = styled.div`
         z-index: 3;
 
         &:hover {
+          transition: var(--standardFaster);
           background: var(--ghostB);
-          transform: translateY(-1px);
-          border-bottom: 2px solid var(--ghostZ);
-          box-shadow: 0px 4px 30px -8px var(--ghostX);
+          transform: translateY(0px);
+          border-bottom: 2px solid var(--ghostA);
+          box-shadow: 0px 4px 12px -4px var(--ghostX);
           position: relative;
           z-index: 300000;
         }
@@ -145,7 +171,6 @@ export const ClusterValue = styled.div`
       `
     )
   }}
-
   ${(props) => {
     return (
       props.transparent &&
@@ -155,7 +180,7 @@ export const ClusterValue = styled.div`
         border-bottom: 2px solid transparent;
       `
     )
-  }}
+  }};
 `
 
 export const ClusterInputLabel = styled.div`

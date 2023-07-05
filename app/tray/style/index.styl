@@ -64,7 +64,7 @@
     border-radius 3px
     background var(--spacewhite)
     font-size 14px
-    font-weight 300
+    font-weight 400
 
 .panelRequestGrant
   margin-top 40px
@@ -117,177 +117,176 @@
   opacity 1
   transform translate3d(0, 0, 0)
 
-  .panelMenuItem
-    height 38px
-    width 48px
-    top 9px
-    border-radius 16px
+.panelMenuItem
+  height 38px
+  width 48px
+  top 9px
+  border-radius 16px
+  display flex
+  justify-content center
+  align-items center
+  -webkit-app-region no-drag
+  transition none
+  pointer-events auto
+  transform translate3d(0, 0, 0)
+  background var(--ghostB)
+  position absolute
+  cursor pointer
+  border 3px solid var(--ghostZ)
+  // box-shadow 3px 3px 9px var(--ghostZ), 0px -3px 9px var(--ghostB)
+  // background blue
+
+  *
+    pointer-events none
+
+.panelMenuItem:hover
+  background var(--ghostC)
+  // box-shadow 3px 7px 9px var(--ghostZ), 0px -3px 9px var(--ghostB)
+
+.panelMenuItem:active
+  background var(--ghostC)
+  // box-shadow 0px 2px 9px var(--ghostZ), 0px 0px 9px var(--ghostB)
+
+.panelMenuItemOpen
+  left 0px
+
+.panelMenuItemSend
+  right 0px
+
+.panelTitle
+  position absolute
+  left 60px
+  right 170px
+  top 24px
+  bottom 10px
+  display flex
+  align-items center
+  justify-content center
+  font-family 'MainFont'
+  font-size 18px
+  font-weight 400
+  display none
+
+.mainWindowMarker
+  position absolute
+  left 9px
+  top 10px
+  height 3px
+  background var(--ghostZ)
+  border-radius 2px
+  z-index 20000
+  cursor pointer
+  width 50px
+
+.panelMenuMarker
+  position absolute
+  right 9px
+  top 10px
+  height 3px
+  background var(--ghostZ)
+  border-radius 2px
+  z-index 20000
+  cursor pointer
+  width 165px
+  // background blue
+
+.panelMenuMark
+  position relative
+  width 36px
+  height 3px
+  background var(--outerspace)
+  transform translateX(14px)
+  border-radius 2px
+  transition var(--standard)
+  margin-left -1px
+  z-index 20002
+
+.panelMenuMarkGood
+  background var(--good)
+  
+.panelDetail
+  display flex
+  align-items center
+  margin-left 0%
+  transition var(--standardSlow)
+
+.panelDetailText
+  transition var(--standard)
+  text-transform uppercase
+  font-size 10px
+  letter-spacing 1px
+  font-weight 400
+  color var(--outerspace08)
+  display flex
+  justify-content center
+  align-items center
+  font-weight 500
+  padding-right 8px
+  margin-right 8px
+  
+.panelMenuData
+  position absolute
+  top 23px
+  right 75px
+  left 176px
+  transition var(--standard)
+  letter-spacing 0px
+  text-transform uppercase
+  color var(--outerspace08)
+  display flex
+  justify-content center
+  align-items center
+  font-weight 400
+  font-size 11px
+  height 25px
+
+  .panelMenuDataDivide
+    height 100%
+    width 1px
+    background var(--ghostY)
+
+  .panelMenuDataItem
     display flex
     justify-content center
-    align-items center
-    -webkit-app-region no-drag
-    transition none
-    pointer-events auto
-    transform translate3d(0, 0, 0)
-    background var(--ghostB)
-    position absolute
-    cursor pointer
-    border 3px solid var(--ghostZ)
-    // box-shadow 3px 3px 9px var(--ghostZ), 0px -3px 9px var(--ghostB)
-    // background blue
+    padding 0px 5px 1px 5px
 
-    *
-      pointer-events none
+    .svg
+      position relative
+      margin-left 4px
+      margin-top 4px
+      margin-right 3px
 
-  .panelMenuItem:hover
-    background var(--ghostC)
-    // box-shadow 3px 7px 9px var(--ghostZ), 0px -3px 9px var(--ghostB)
+    .usd
+      position relative
+      margin-top 3px
+      margin-right 1px
 
-  .panelMenuItem:active
-    background var(--ghostC)
-    // box-shadow 0px 2px 9px var(--ghostZ), 0px 0px 9px var(--ghostB)
+.panelDetailIndicator
+  height 3px
+  width 23px
+  margin 10px 8px 10px 8px
+  border-radius 5px
+  display flex
+  align-items center
+  justify-content center
 
-  .panelMenuItemOpen
-    left 0px
-
-  .panelMenuItemSend
-    right 0px
-
-  .panelTitle
-    position absolute
-    left 60px
-    right 170px
-    top 24px
-    bottom 10px
-    display flex
-    align-items center
-    justify-content center
-    font-family 'MainFont'
-    font-size 18px
-    font-weight 300
-    display none
-
-  .mainWindowMarker
-    position absolute
-    left 9px
-    top 10px
-    height 3px
-    background var(--ghostZ)
-    border-radius 2px
-    z-index 20000
-    cursor pointer
-    width 50px
-    // background blue
-
-  .panelMenuMarker
-    position absolute
-    // left 8px
-    right 9px
-    top 10px
-    height 3px
-    background var(--ghostZ)
-    border-radius 2px
-    z-index 20000
-    cursor pointer
-    width 165px
-    // background blue
-
-  .panelMenuMark
-    position relative
-    width 36px
-    height 3px
-    background var(--outerspace)
-    transform translateX(14px)
-    border-radius 2px
-    transition var(--standard)
-    margin-left -1px
-    z-index 20002
-  .panelMenuMarkGood
-    background var(--good)
-    
-  .panelDetail
-    display flex
-    align-items center
-    margin-left 0%
-    transition var(--standardSlow)
-
-  .panelDetailText
-    transition var(--standard)
-    text-transform uppercase
-    font-size 10px
-    letter-spacing 1px
-    font-weight 300
-    color var(--outerspace08)
-    display flex
-    justify-content center
-    align-items center
-    font-weight 400
-    padding-right 8px
-    margin-right 8px
-    
-  .panelMenuData
-    position absolute
-    top 23px
-    right 75px
-    left 176px
-    transition var(--standard)
-    letter-spacing 0px
-    text-transform uppercase
-    color var(--outerspace08)
-    display flex
-    justify-content center
-    align-items center
-    font-weight 300
-    font-size 11px
-    height 25px
-
-    .panelMenuDataDivide
-      height 100%
-      width 1px
-      background var(--ghostY)
-
-    .panelMenuDataItem
-      display flex
-      justify-content center
-      padding 0px 5px 1px 5px
-
-      .svg
-        position relative
-        margin-left 4px
-        margin-top 4px
-        margin-right 3px
-
-      .usd
-        position relative
-        margin-top 3px
-        margin-right 1px
-
-  .panelDetailIndicator
+  .panelDetailIndicatorInner
     height 3px
     width 23px
-    margin 10px 8px 10px 8px
-    border-radius 5px
-    display flex
-    align-items center
-    justify-content center
+    border-radius 2px
 
-    .panelDetailIndicatorInner
-      height 3px
-      width 23px
-      border-radius 2px
+  .panelDetailIndicatorGood
+    background var(--good)
 
-    .panelDetailIndicatorGood
-      background var(--good)
+  .panelDetailIndicatorWaiting
+    background var(--moon)
 
-    .panelDetailIndicatorWaiting
-      background var(--moon)
+  .panelDetailIndicatorBad
+    background var(--bad)
 
-    .panelDetailIndicatorBad
-      background var(--bad)
-
-    .panelDetailIndicatorPending
-      transition var(--standardSlow)
-      background var(--pending)
+  .panelDetailIndicatorPending
+    transition var(--standardSlow)
+    background var(--pending)
 
 .appMenu
   position absolute
