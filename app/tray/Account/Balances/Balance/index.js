@@ -1,11 +1,27 @@
 import React from 'react'
+import styled from 'styled-components'
+
 import { DisplayFiatPrice, DisplayValue } from '../../../../../resources/Components/DisplayValue'
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import useStore from '../../../../../resources/Hooks/useStore'
 import { NATIVE_CURRENCY } from '../../../../../resources/constants'
 
 const displayName = (name = '') => (name.length > 24 ? name.slice(0, 22) + '..' : name)
-const displayChain = (name = '') => (name.length > 14 ? name.slice(0, 12) + '..' : name)
+
+const AccountOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  opacity: 0.02;
+  pointer-events: none;
+  background: ${({ color }) => `linear-gradient(90deg, transparent 0%, ${color} 20%, transparent 100%)`};
+`
+
+const displayChain = (name = '') => {
+  if (name.length > 14) {
+    return name.slice(0, 12).trim() + '..'
+  }
+  return name
+}
 
 const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
   const isNative = address === NATIVE_CURRENCY
@@ -44,6 +60,7 @@ const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
     <div className={'signerBalance'} key={symbol}>
       {scanning && <div className='signerBalanceLoading' style={{ animationDelay: `${0.15 * i}s` }} />}
       <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
+        <AccountOverlay color={chainColor ? `var(--${chainColor})` : ''} />
         <div className='signerBalanceIcon'>
           <RingIcon
             img={!isEth && !isTestnet && imageURL}

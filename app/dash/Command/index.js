@@ -3,6 +3,24 @@ import Restore from 'react-restore'
 import link from '../../../resources/link'
 import svg from '../../../resources/svg'
 
+import styled from 'styled-components'
+
+import { Cluster, ClusterRow, ClusterColumn, ClusterValue } from '../../../resources/Components/Cluster'
+
+export const PanelMenu = styled.div`
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 12px;
+  /* height: 63px; */
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  -webkit-app-region: no-drag;
+  z-index: 1000000000;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+`
 class Command extends React.Component {
   renderSignerIcon(type) {
     if (type === 'ledger') {
@@ -32,29 +50,37 @@ class Command extends React.Component {
   render() {
     const { view } = this.store('windows.dash.nav')[0] || { view: '', data: {} }
     return (
-      <div className='command'>
+      <PanelMenu>
         {this.store('windows.dash.nav').length ? (
-          <div
-            className='commandItem commandItemBack cardShow'
-            onClick={() => {
-              link.send('tray:action', 'backDash')
-            }}
-          >
-            {svg.chevronLeft(16)}
-          </div>
+          <Cluster>
+            <ClusterRow>
+              <ClusterValue
+                width={60}
+                onClick={() => {
+                  link.send('tray:action', 'backDash')
+                }}
+              >
+                <div style={{ width: '60px', height: '32px' }}>{svg.chevronLeft(16)}</div>
+              </ClusterValue>
+            </ClusterRow>
+          </Cluster>
         ) : null}
         <div key={view} className='commandTitle cardShow'>
           {view === 'expandedSigner' ? this.renderSignerTitle() : view}
         </div>
-        <div
-          className='commandItem commandItemClose'
-          onClick={() => {
-            link.send('tray:action', 'closeDash')
-          }}
-        >
-          {svg.x(16)}
-        </div>
-      </div>
+        <Cluster>
+          <ClusterRow>
+            <ClusterValue
+              width={60}
+              onClick={() => {
+                link.send('tray:action', 'closeDash')
+              }}
+            >
+              <div style={{ width: '60px', height: '32px' }}> {svg.x(16)}</div>
+            </ClusterValue>
+          </ClusterRow>
+        </Cluster>
+      </PanelMenu>
     )
   }
 }

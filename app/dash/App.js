@@ -1,7 +1,7 @@
 import React from 'react'
 import Restore from 'react-restore'
 
-import Command from './Command'
+// import Command from './Command'
 import Main from './Main'
 import Accounts from './Accounts'
 import Signer from './Signer'
@@ -13,6 +13,8 @@ import Settings from './Settings'
 import svg from '../../resources/svg'
 import link from '../../resources/link'
 import { capitalize } from '../../resources/utils'
+
+import PanelMenu from '../../resources/Components/PanelMenu'
 
 function itemName(view) {
   return capitalize(view.slice(0, -1))
@@ -71,7 +73,7 @@ class Dash extends React.Component {
 
     return (
       <div className='dash'>
-        <Command />
+        <PanelMenu window={'dash'} />
         <div className='dashMain' style={{ bottom: showAddButton ? '120px' : '40px' }}>
           <div className='dashMainOverlay' />
           <div className='dashMainScroll'>{this.renderPanel(view, data)}</div>

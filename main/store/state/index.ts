@@ -211,13 +211,12 @@ const initial = {
     account: {
       moduleOrder: [
         'requests',
-        // 'activity',
-        // 'gas',
         'chains',
+        'activity',
         'balances',
         'inventory',
+        'contacts',
         'permissions',
-        // 'verify',
         'signer',
         'settings'
       ],

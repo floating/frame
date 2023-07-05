@@ -18,15 +18,15 @@ import {
 } from './styled'
 
 const displayName = (name = '') => {
-  if (name.length > 24) {
-    return name.slice(0, 22) + '..'
+  if (name.length > 26) {
+    return name.slice(0, 24).trim() + '..'
   }
   return name
 }
 
 const displayChain = (name = '') => {
-  if (name.length > 14) {
-    return name.slice(0, 12) + '..'
+  if (name.length > 12) {
+    return name.slice(0, 10).trim() + '..'
   }
   return name
 }
