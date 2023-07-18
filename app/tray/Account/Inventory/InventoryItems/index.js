@@ -117,7 +117,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
   const getCombinedItems = () => {
     const items = inventory[k].items || []
     const tokens = (inventory[k].meta.tokens || [])
-      .filter(({ tokenId }) => !items.some((item) => item.tokenId === tokenId))
+      .filter((tokenId) => !items.some((item) => item.tokenId === tokenId))
       .map((tokenId) => ({ tokenId }))
 
     return [...items, ...tokens].sort(({ tokenId: a }, { tokenId: b }) => (a < b ? -1 : b > a ? 1 : 0))
