@@ -61,7 +61,6 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
       )
     }
     const { tokenId, name, media } = item
-
     return (
       <ClusterValue
         key={tokenId}
@@ -83,7 +82,7 @@ const InventoryCollection = ({ expandedData = {}, inventory, hiddenCollections, 
         }}
       >
         <div className='inventoryCollectionItem'>
-          {media ? (
+          {media?.cdn ? (
             <div className='inventoryCollectionItemImage'>
               <DisplayMedia
                 media={media}

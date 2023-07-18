@@ -103,7 +103,7 @@ const MainMedia = ({ full, media, loading, muted }) => {
       img.src = pylonURL(media.cdn?.main)
       img.onload = () => setMediaLoaded(true)
     }
-  }, [media.cdn?.main])
+  }, [media.cdn])
 
   if (media.format === 'video') {
     return (
@@ -163,7 +163,9 @@ const MainMedia = ({ full, media, loading, muted }) => {
 }
 
 const DisplayMedia = ({ media, alt, thumb, frozen, audio, full, lazy }) => {
-  if (!media || !media.source) return <SVGWrap>{svg.missing(thumb || frozen ? 10 : 20)}</SVGWrap>
+  if (!media || !media.source || !media.format) {
+    return <SVGWrap>{svg.missing(thumb || frozen ? 10 : 20)}</SVGWrap>
+  }
   if (media.format === 'image') {
     if (thumb || frozen) {
       if (frozen) {
