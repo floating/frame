@@ -37,7 +37,6 @@ const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
   const displayPriceChange = () => (priceChange ? `(${direction === 1 ? '+' : ''}${priceChange}%)` : '')
 
   const { name: chainName = '', isTestnet = false } = chain
-  const imageURL = media.cdn.thumb || media.cdn.main || media.source //TODO: should proxy non-cdn assets
   const isEth = isNative && [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)
 
   return (
@@ -46,7 +45,6 @@ const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
       <div className='signerBalanceInner' style={{ opacity: !scanning ? 1 : 0 }}>
         <div className='signerBalanceIcon'>
           <RingIcon
-            img={!isEth && !isTestnet && imageURL}
             thumb={true}
             frozen={true}
             media={!isEth && media}
