@@ -102,7 +102,7 @@ const Collection = ({ moduleId, account, collection, collectionId }) => {
                 {previewItems.map((item, i) => {
                   return (
                     <CollectionDot key={item.tokenId}>
-                      {item.media ? (
+                      {item.media?.cdn ? (
                         <DisplayMedia media={item.media} thumb={true} frozen={true} />
                       ) : (
                         <CollectionDotLoading
