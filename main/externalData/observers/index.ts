@@ -68,14 +68,14 @@ function createTokensObserver(handler: TokensChangedHandler) {
   let knownTokens = storeApi.getKnownTokens()
 
   return function () {
+    const currentAccount = storeApi.getActiveAddress()
     const currentCustomTokens = storeApi.getCustomTokens()
-    const currentKnownTokens = storeApi.getKnownTokens()
+    const currentKnownTokens = storeApi.getKnownTokens(currentAccount)
 
     if (!deepEqual(currentCustomTokens, customTokens)) {
       customTokens = currentCustomTokens
 
       setTimeout(() => {
-        const currentAccount = storeApi.getActiveAddress()
         handler.customTokensChanged(currentAccount, customTokens)
       }, 0)
     }
@@ -84,7 +84,6 @@ function createTokensObserver(handler: TokensChangedHandler) {
       knownTokens = currentKnownTokens
 
       setTimeout(() => {
-        const currentAccount = storeApi.getActiveAddress()
         handler.knownTokensChanged(currentAccount, knownTokens)
       }, 0)
     }
