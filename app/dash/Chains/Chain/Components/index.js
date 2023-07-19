@@ -26,17 +26,19 @@ export const ChainHeader = ({ type, id, primaryColor, icon, svgName, name, on, s
     cdn: {}
   }
   const isEth = [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(id)
+
   return (
     <div className='signerTop'>
       <div className='signerDetails'>
         <div className='signerIcon'>
-          {isEth ? (
-            <RingIcon color={`var(--${primaryColor})`} svgName={'ETH'} />
-          ) : (
-            <RingIcon color={`var(--${primaryColor})`} media={media} svgName={svgName} />
-          )}
+          <RingIcon
+            thumb={true}
+            media={!isEth && media}
+            svgName={isEth && 'eth'}
+            alt={id}
+            color={primaryColor ? `var(--${primaryColor})` : ''}
+          />
         </div>
-        {/* <div className='signerType' style={this.props.inSetup ? {top: '21px'} : {top: '24px'}}>{this.props.model}</div> */}
         <div role='chainName' className='signerName'>
           {name}
         </div>

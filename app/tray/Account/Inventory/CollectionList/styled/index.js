@@ -84,7 +84,7 @@ const pulse = keyframes`
     opacity: 0; 
   }
   20% { 
-    opacity: 1; 
+    opacity: 0.6; 
   }
   80% { 
     transform: scale(2); 
