@@ -8,11 +8,13 @@ const displayName = (name = '') => (name.length > 24 ? name.slice(0, 22) + '..' 
 const displayChain = (name = '') => (name.length > 14 ? name.slice(0, 12) + '..' : name)
 
 const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
-  console.log('balance', balance)
   const isNative = address === NATIVE_CURRENCY
 
   const chain = useStore('main.networks.ethereum', chainId)
   const chainColor = useStore('main.networksMeta.ethereum', chainId, 'primaryColor')
+
+  const customTokens = useStore('main.tokens.custom')
+  const isCustom = customTokens.some((token) => token.chainId === chainId && token.address === address)
 
   const displaySymbol = symbol.substring(0, 10)
   const {
@@ -47,7 +49,7 @@ const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
         <div className='signerBalanceIcon'>
           <RingIcon
             thumb={true}
-            frozen={true}
+            frozen={isCustom ? false : true}
             media={!isEth && media}
             svgName={isEth && 'eth'}
             alt={symbol.toUpperCase()}
