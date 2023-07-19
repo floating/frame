@@ -92,18 +92,21 @@ const MediaLoading = styled.div`
 const MainMedia = ({ full, media, loading, muted }) => {
   const [mediaLoaded, setMediaLoaded] = useState(false)
 
+  const mainUrl = pylonURL(media.cdn?.main || media.source)
+  const thumbUrl = pylonURL(media.cdn?.thumb || media.source)
+
   useEffect(() => {
     setMediaLoaded(false)
     if (media.format === 'video') {
       const video = document.createElement('video')
-      video.src = pylonURL(media.cdn?.main)
+      video.src = mainUrl
       video.onloadeddata = () => setMediaLoaded(true)
     } else {
       const img = new Image()
-      img.src = pylonURL(media.cdn?.main)
+      img.src = mainUrl
       img.onload = () => setMediaLoaded(true)
     }
-  }, [media.cdn])
+  }, [media.cdn, media.source])
 
   if (media.format === 'video') {
     return (
@@ -114,7 +117,7 @@ const MainMedia = ({ full, media, loading, muted }) => {
           </MediaLoading>
         )}
         <DisplayBox full={full} style={mediaLoaded ? { opacity: 1, zIndex: 3 } : { opacity: 0, zIndex: 3 }}>
-          <video autoPlay loop muted={muted} src={pylonURL(media.cdn?.main)} loading={loading} />
+          <video autoPlay loop muted={muted} src={mainUrl} loading={loading} />
         </DisplayBox>
         <DisplayBox
           style={{
@@ -128,7 +131,7 @@ const MainMedia = ({ full, media, loading, muted }) => {
             zIndex: 1
           }}
         >
-          <video autoPlay loop muted={true} src={pylonURL(media.cdn?.thumb)} loading={loading} />
+          <video autoPlay loop muted={true} src={thumbUrl} loading={loading} />
         </DisplayBox>
       </React.Fragment>
     )
@@ -141,9 +144,10 @@ const MainMedia = ({ full, media, loading, muted }) => {
           </MediaLoading>
         )}
         <DisplayBox full={full} style={mediaLoaded ? { opacity: 1 } : { opacity: 0 }}>
-          <img src={pylonURL(media.cdn?.main)} loading={loading} />
+          <img src={mainUrl} loading={loading} />
         </DisplayBox>
         <DisplayBox
+          key={thumbUrl}
           style={{
             position: 'absolute',
             top: '-20%',
@@ -151,11 +155,11 @@ const MainMedia = ({ full, media, loading, muted }) => {
             height: '140%',
             width: '140%',
             filter: 'blur(32px)',
-            opacity: 0.6,
+            opacity: 0.3,
             zIndex: 1
           }}
         >
-          <img src={pylonURL(media.cdn?.frozen)} loading={loading} />
+          <img src={thumbUrl} loading={loading} />
         </DisplayBox>
       </React.Fragment>
     )
@@ -169,22 +173,16 @@ const DisplayMedia = ({ media, alt, thumb, frozen, audio, full, lazy }) => {
   if (media.format === 'image') {
     if (thumb || frozen) {
       if (frozen) {
-        if (media.cdn?.frozen) {
-          return (
-            <img key={alt} src={pylonURL(media.cdn.frozen)} alt={alt} loading={lazy ? 'lazy' : 'eager'} />
-          )
+        const frozenUrl = pylonURL(media.cdn?.frozen)
+        if (frozenUrl) {
+          return <img key={alt} src={frozenUrl} alt={alt} loading={lazy ? 'lazy' : 'eager'} />
         } else {
           return <SVGWrap>{svg.missing(10)}</SVGWrap>
         }
       } else {
-        if (media.cdn?.thumb) {
-          return (
-            <img
-              key={alt}
-              src={pylonURL(media.cdn.thumb || media.cdn.main)}
-              loading={lazy ? 'lazy' : 'eager'}
-            />
-          )
+        const thumbUrl = pylonURL(media.cdn?.thumb || media.cdn?.main || media.source)
+        if (thumbUrl) {
+          return <img key={alt} src={thumbUrl} loading={lazy ? 'lazy' : 'eager'} />
         } else {
           return <SVGWrap>{svg.missing(10)}</SVGWrap>
         }
@@ -194,18 +192,13 @@ const DisplayMedia = ({ media, alt, thumb, frozen, audio, full, lazy }) => {
     }
   } else if (media.format === 'video') {
     if (thumb || frozen) {
+      const thumbUrl = pylonURL(media.cdn?.thumb || media.cdn?.main || media.source)
       return (
         <DisplayBox full={full}>
           {frozen ? (
-            <video loop muted src={pylonURL(media.cdn?.thumb)} loading={lazy ? 'lazy' : 'eager'} />
+            <video loop muted src={thumbUrl} loading={lazy ? 'lazy' : 'eager'} />
           ) : (
-            <video
-              autoPlay
-              loop
-              muted={!audio}
-              src={pylonURL(media.cdn?.thumb || media.cdn?.main)}
-              loading={lazy ? 'lazy' : 'eager'}
-            />
+            <video autoPlay loop muted={!audio} src={thumbUrl} loading={lazy ? 'lazy' : 'eager'} />
           )}
         </DisplayBox>
       )
