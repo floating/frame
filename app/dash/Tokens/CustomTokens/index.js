@@ -4,6 +4,7 @@ import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 
 import RingIcon from '../../../../resources/Components/RingIcon'
+import { NATIVE_CURRENCY } from '../../../../resources/constants'
 
 class CustomTokens extends React.Component {
   constructor(props, context) {
@@ -25,6 +26,11 @@ class CustomTokens extends React.Component {
                   return a.chainId <= b.chainId
                 })
                 .map((token, i) => {
+                  const { address, chainId, media } = token
+                  const isNative = address === NATIVE_CURRENCY
+                  const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
+                  const isEth = isNative && [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)
+
                   return (
                     <div
                       key={i}
@@ -36,7 +42,13 @@ class CustomTokens extends React.Component {
                     >
                       <div className='customTokensListItemTitle'>
                         <div className='customTokensListItemName'>
-                          <RingIcon media={token.media} alt={token.symbol.toUpperCase()}></RingIcon>
+                          <RingIcon
+                            thumb={true}
+                            media={!isEth && media}
+                            svgName={isEth && 'eth'}
+                            alt={token.symbol.toUpperCase()}
+                            color={chainColor ? `var(--${chainColor})` : ''}
+                          />
                           <div className='customTokensListItemText'>
                             <div className='customTokensListItemSymbol'>{token.symbol}</div>
                             <div className='customTokensListItemSub'>{token.name}</div>

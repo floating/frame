@@ -8,6 +8,7 @@ const displayName = (name = '') => (name.length > 24 ? name.slice(0, 22) + '..' 
 const displayChain = (name = '') => (name.length > 14 ? name.slice(0, 12) + '..' : name)
 
 const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
+  console.log('balance', balance)
   const isNative = address === NATIVE_CURRENCY
 
   const chain = useStore('main.networks.ethereum', chainId)

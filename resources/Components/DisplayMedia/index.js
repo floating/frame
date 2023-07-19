@@ -167,6 +167,7 @@ const MainMedia = ({ full, media, loading, muted }) => {
 }
 
 const DisplayMedia = ({ media, alt, thumb, frozen, audio, full, lazy }) => {
+  console.log('display media', media)
   if (!media || !media.source || !media.format) {
     return <SVGWrap>{svg.missing(thumb || frozen ? 10 : 20)}</SVGWrap>
   }
