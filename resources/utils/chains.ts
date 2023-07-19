@@ -11,3 +11,7 @@ export function isNetworkConnected(network: Chain) {
 export function isNetworkEnabled(network: Chain) {
   return network.on
 }
+
+export function chainUsesEth(chainId: number) {
+  return [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)
+}

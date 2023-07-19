@@ -3,6 +3,7 @@ import { DisplayFiatPrice, DisplayValue } from '../../../../../resources/Compone
 import RingIcon from '../../../../../resources/Components/RingIcon'
 import useStore from '../../../../../resources/Hooks/useStore'
 import { NATIVE_CURRENCY } from '../../../../../resources/constants'
+import { chainUsesEth } from '../../../../../resources/utils/chains'
 
 const displayName = (name = '') => (name.length > 24 ? name.slice(0, 22) + '..' : name)
 const displayChain = (name = '') => (name.length > 14 ? name.slice(0, 12) + '..' : name)
@@ -40,7 +41,7 @@ const Balance = ({ symbol = '', balance, i, scanning, chainId, address }) => {
   const displayPriceChange = () => (priceChange ? `(${direction === 1 ? '+' : ''}${priceChange}%)` : '')
 
   const { name: chainName = '', isTestnet = false } = chain
-  const isEth = isNative && [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)
+  const isEth = isNative && chainUsesEth(chainId)
 
   return (
     <div className={'signerBalance'} key={symbol}>

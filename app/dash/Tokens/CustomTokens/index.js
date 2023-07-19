@@ -5,6 +5,7 @@ import link from '../../../../resources/link'
 
 import RingIcon from '../../../../resources/Components/RingIcon'
 import { NATIVE_CURRENCY } from '../../../../resources/constants'
+import { chainUsesEth } from '../../../../resources/utils/chains'
 
 class CustomTokens extends React.Component {
   constructor(props, context) {
@@ -29,7 +30,7 @@ class CustomTokens extends React.Component {
                   const { address, chainId, media } = token
                   const isNative = address === NATIVE_CURRENCY
                   const chainColor = this.store('main.networksMeta.ethereum', chainId, 'primaryColor')
-                  const isEth = isNative && [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)
+                  const isEth = isNative && chainUsesEth(chainId)
 
                   return (
                     <div
