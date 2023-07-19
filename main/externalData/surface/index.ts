@@ -87,7 +87,7 @@ const Surface = () => {
   const subscribe = async (addr: string) => {
     const address = addr.toLowerCase()
 
-    log.verbose('Subscribing to Pylon data', { address })
+    log.debug('Subscribing to Pylon data', { address })
 
     const fallback = setTimeout(() => {
       log.warn('Failed to get data from Pylon, falling back to scan', { address })
@@ -112,9 +112,9 @@ const Surface = () => {
       },
       onData: (data) => {
         if (!data.length || !data[0]) return
-        log.debug(`Got update from Pylon surface for account ${address}`, { data })
 
         const [{ chainData: chains }] = data
+        log.debug(`Got update from Pylon surface for account ${address}`, { chains })
         clearTimeout(fallback)
 
         const chainIds: number[] = []
@@ -129,9 +129,11 @@ const Surface = () => {
 
           const { balances: chainBalances, inventory: chainInventory } = chain
           if (chainBalances) {
+            log.debug(`Balances for chain ${chainId}`, { balances: Object.keys(chainBalances).length })
             chainIds.push(Number(chainId))
             Object.values(chainBalances).forEach((balance) => balances.push(toTokenBalance(balance)))
           }
+
           if (chainInventory) {
             Object.entries(chainInventory).forEach(([collection, inventoryData]) => {
               if (inventoryData) {

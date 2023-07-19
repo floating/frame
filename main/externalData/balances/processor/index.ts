@@ -113,6 +113,8 @@ const mergeCustomAndNative = (balances: TokenBalance[], chains: number[]) => {
 }
 
 function updateStoredTokens(address: string, zeroBalances: TokenBalance[], tokenBalances: TokenBalance[]) {
+  log.debug('Updating stored tokens', { address, zeroBalances, tokenBalances })
+
   const zeroBalanceSet = new Set(zeroBalances.map(toTokenId))
   if (zeroBalanceSet.size) {
     storeApi.removeKnownTokens(address, zeroBalanceSet)
@@ -130,6 +132,7 @@ export function handleBalanceUpdate(
   mode: keyof typeof toExpiryWindow
 ) {
   log.debug('Handling balance update', { address, chains })
+
   const withLocalData = mergeCustomAndNative(balances, chains)
 
   const changedBalances = getChangedBalances(address, withLocalData)

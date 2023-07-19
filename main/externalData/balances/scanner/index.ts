@@ -153,12 +153,14 @@ function BalanceScanner() {
 
   function updateActiveBalances(address: Address) {
     const networks = Array.from(enabledNetworks)
-    log.info('Going to update balances for networks', networks, 'for address', address)
-    networks.length && updateBalances(address, networks)
+
+    if (networks.length > 0) {
+      log.verbose('Updating active balances', { networks, address })
+      updateBalances(address, networks)
+    }
   }
 
   function updateBalances(address: Address, chains: number[]) {
-    log.debug('updateBalances', { address, chains })
     const customTokens = storeApi.getCustomTokens()
     const knownTokens = storeApi
       .getKnownTokens(address)
@@ -241,21 +243,6 @@ function BalanceScanner() {
     }
   }
 
-  function addNetworks(address: Address, chains: number[]) {
-    if (!workerController) {
-      log.warn('tried to add networks but balances controller is not running')
-      return
-    }
-    chains.forEach((chainId) => enabledNetworks.add(chainId))
-
-    log.verbose('adding balances updates', { address, chains })
-    runWhenReady(() => updateBalances(address, chains))
-  }
-
-  function removeNetworks(chains: number[]) {
-    chains.forEach((chainId) => enabledNetworks.delete(chainId))
-  }
-
   function setNetworks(address: string, chains: number[]) {
     if (chains.length !== enabledNetworks.size || chains.some((chainId) => !enabledNetworks.has(chainId))) {
       enabledNetworks = new Set(chains)
@@ -273,7 +260,7 @@ function BalanceScanner() {
     runWhenReady(() => workerController?.updateKnownTokenBalances(address, tokens))
   }
 
-  return { start, stop, resume, pause, setAddress, addNetworks, removeNetworks, addTokens, setNetworks }
+  return { start, stop, resume, pause, setAddress, addTokens, setNetworks }
 }
 
 export default BalanceScanner

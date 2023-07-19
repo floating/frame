@@ -65,6 +65,8 @@ export default function rates(pylon: Pylon) {
     const nativeSubscriptions = networks.map(toNativeSubscription)
     const { tokenSubscriptions } = addresses.reduce(toTokenSubscriptions, tokenSubscriptionSet)
 
+    log.debug('Updating rates subscriptions', { tokenSubscriptions })
+
     subscribeToRates([...nativeSubscriptions, ...tokenSubscriptions])
 
     // if rates are not loaded after 2 seconds, populate with a blank
