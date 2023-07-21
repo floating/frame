@@ -10,8 +10,6 @@ import useStore from '../../../../../resources/Hooks/useStore'
 
 import Balance from '../Balance'
 
-import styled from 'styled-components'
-
 const MissingBalances = styled.div`
   position: absolute;
   right: 16px;
