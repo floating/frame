@@ -10,6 +10,37 @@ import useStore from '../../../../../resources/Hooks/useStore'
 
 import Balance from '../Balance'
 
+import styled from 'styled-components'
+
+const MissingBalances = styled.div`
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  height: 24px;
+  width: 90px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid var(--ghostZ);
+  color: var(--mint);
+  background: var(--ghostA);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+`
+
+const LoadingDot = styled.div`
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+  background: var(--moon);
+  margin: 0px 8px 0px 0px;
+`
+
 const HiddenOverlay = styled.div`
   position: absolute;
   inset: 0;
@@ -19,6 +50,13 @@ const HiddenOverlay = styled.div`
 `
 
 const BalanceListFooter = ({ displayValue, footerButton, shouldShowTotalValue }) => {
+  const [longLoading, setLongLoading] = useState(false)
+
+  useEffect(() => {
+    setLongLoading(false)
+    if (!shouldShowTotalValue) setTimeout(() => setLongLoading(true), 8000)
+  }, [shouldShowTotalValue])
+
   return (
     <div className='signerBalanceTotal'>
       {footerButton || <></>}
@@ -30,6 +68,11 @@ const BalanceListFooter = ({ displayValue, footerButton, shouldShowTotalValue })
             {displayValue}
           </div>
         </div>
+      ) : longLoading ? (
+        <MissingBalances onClick={() => link.send('tray:action', 'navDash', { view: 'chains', data: {} })}>
+          <LoadingDot />
+          {'pending'}
+        </MissingBalances>
       ) : (
         <div className='signerBalanceLoadingWave'>{svg.sine()}</div>
       )}
