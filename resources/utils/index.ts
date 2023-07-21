@@ -93,6 +93,9 @@ function minimumHex(hexValue: string, min = 0) {
   return addHexPrefix(BigNumber.maximum(hexValue, min).toString(16))
 }
 
+const displayName = (name = '', length = 16) =>
+  name.length > length ? name.substring(0, length - 3) + '...' : name
+
 export {
   getErrorCode,
   randomLetters,
@@ -114,5 +117,6 @@ export {
   stripHexPrefix,
   matchFilter,
   isNonZeroHex,
-  minimumHex
+  minimumHex,
+  displayName
 }

@@ -2,6 +2,8 @@ import React, { createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../resources/link'
 import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/chains'
+import { chainUsesEth } from '../../../resources/utils/chains'
+import { displayName } from '../../../resources/utils'
 // import svg from '../../../resources/svg'
 
 import RingIcon from '../../../resources/Components/RingIcon'
@@ -132,14 +134,27 @@ class _OriginModule extends React.Component {
 
 const OriginModule = Restore.connect(_OriginModule)
 
-const ChainOrigins = ({ chain: { name }, origins, primaryColor, icon }) => {
+const ChainOrigins = ({ chain: { name, id }, origins, primaryColor, icon }) => {
+  const media = {
+    format: 'image',
+    source: icon,
+    cdn: {}
+  }
+  const isEth = chainUsesEth(parseInt(id))
   return (
     <>
       <div className='originTitle'>
         <div className='originTitleIcon'>
-          <RingIcon small={true} color={`var(--${primaryColor})`} img={icon} />
+          <RingIcon
+            thumb={true}
+            small={true}
+            media={!isEth && media}
+            svgName={isEth && 'eth'}
+            alt={id}
+            color={primaryColor ? `var(--${primaryColor})` : ''}
+          />
         </div>
-        <div className='originTitleText'>{name}</div>
+        <div className='originTitleText'>{displayName(name, 26)}</div>
       </div>
       {origins.connected.map((origin) => (
         <OriginModule key={origin} origin={origin} connected={true} />
