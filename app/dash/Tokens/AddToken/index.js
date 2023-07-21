@@ -2,6 +2,8 @@ import { isValidAddress } from '@ethereumjs/util'
 import { Component, useEffect, useRef, useState } from 'react'
 import Restore from 'react-restore'
 import RingIcon from '../../../../resources/Components/RingIcon'
+import { chainUsesEth } from '../../../../resources/utils/chains'
+import { displayName } from '../../../../resources/utils'
 import link from '../../../../resources/link'
 import svg from '../../../../resources/svg'
 
@@ -67,6 +69,13 @@ class AddTokenChainScreenComponent extends Component {
               const chainId = chain.id
               const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
 
+              const media = {
+                format: 'image',
+                source: icon,
+                cdn: {}
+              }
+              const isEth = chainUsesEth(parseInt(chainId))
+
               return (
                 <div
                   className='originChainItem'
@@ -88,12 +97,14 @@ class AddTokenChainScreenComponent extends Component {
                 >
                   <div className='originChainItemIcon'>
                     <RingIcon
-                      color={primaryColor ? `var(--${primaryColor})` : 'var(--moon)'}
-                      img={icon}
-                      small={true}
+                      thumb={true}
+                      media={!isEth && media}
+                      svgName={isEth && 'eth'}
+                      alt={chainId}
+                      color={primaryColor ? `var(--${primaryColor})` : ''}
                     />
                   </div>
-                  {chain.name}
+                  {displayName(chain.name, 26)}
                 </div>
               )
             })}

@@ -2,6 +2,8 @@ import React from 'react'
 import Restore from 'react-restore'
 import link from '../../../../resources/link'
 import RingIcon from '../../../../resources/Components/RingIcon'
+import { chainUsesEth } from '../../../../resources/utils/chains'
+import { displayName } from '../../../../resources/utils'
 import svg from '../../../../resources/svg'
 
 class DappDetails extends React.Component {
@@ -17,6 +19,12 @@ class DappDetails extends React.Component {
             const chain = this.store('main.networks.ethereum', id)
             const selected = origin.chain.id === parseInt(id)
             const { primaryColor, icon } = this.store('main.networksMeta.ethereum', id)
+            const media = {
+              format: 'image',
+              source: icon,
+              cdn: {}
+            }
+            const isEth = chainUsesEth(parseInt(id))
             return (
               <div
                 key={id}
@@ -26,10 +34,16 @@ class DappDetails extends React.Component {
                 }}
               >
                 <div className='originChainItemIcon'>
-                  <RingIcon color={`var(--${primaryColor})`} img={icon} />
+                  <RingIcon
+                    thumb={true}
+                    media={!isEth && media}
+                    svgName={isEth && 'eth'}
+                    alt={id}
+                    color={primaryColor ? `var(--${primaryColor})` : ''}
+                  />
                 </div>
 
-                {chain.name}
+                {displayName(chain.name, 26)}
 
                 <div className='originChainItemCheck'>{selected ? svg.check(28) : null}</div>
               </div>
