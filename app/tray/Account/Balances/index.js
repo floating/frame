@@ -117,7 +117,10 @@ class Balances extends React.Component {
 
   shouldShowTotalValue() {
     const enabledChains = this.getEnabledChains()
-    return this.balancesSet(enabledChains) && this.tokenRatesSet(enabledChains)
+    const balancesSet = this.balancesSet(enabledChains)
+    const tokenRatesSet = this.tokenRatesSet(enabledChains)
+
+    return balancesSet && tokenRatesSet
   }
 
   isHotSigner() {
