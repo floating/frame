@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import link from '../../../../../resources/link'
@@ -42,6 +42,12 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalVal
   const [confirming, setConfirming] = useState(false)
   const tokenPreferences = useStore('main.assetPreferences.tokens') || {}
 
+  const [isLoading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 3000)
+  }, [])
+
   return (
     <>
       <Cluster>
@@ -63,7 +69,7 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalVal
                     address={address}
                     balance={balance}
                     i={i}
-                    scanning={!shouldShowTotalValue}
+                    scanning={!shouldShowTotalValue && isLoading}
                   />
                 </ClusterValue>
               </ClusterRow>
