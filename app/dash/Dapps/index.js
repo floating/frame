@@ -157,10 +157,10 @@ const ChainOrigins = ({ chain: { name, id }, origins, primaryColor, icon }) => {
         <div className='originTitleText'>{displayName(name, 26)}</div>
       </div>
       {origins.connected.map((origin) => (
-        <OriginModule key={origin} origin={origin} connected={true} />
+        <OriginModule key={origin.name} origin={origin} connected={true} />
       ))}
       {origins.disconnected.map((origin) => (
-        <OriginModule key={origin} origin={origin} connected={false} />
+        <OriginModule key={origin.name} origin={origin} connected={false} />
       ))}
       {origins.connected.length === 0 && origins.disconnected.length === 0 ? (
         <div className='sliceOriginNoDapp'>{'No Dapp Recently Connected'}</div>
