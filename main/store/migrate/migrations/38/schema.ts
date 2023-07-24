@@ -9,7 +9,7 @@ const v38MuteSchema = z
 
 const v38ConnectionSchema = z
   .object({
-    current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']),
+    current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa', 'pylon']),
     custom: z.string().default('')
   })
   .passthrough()
