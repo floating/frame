@@ -165,3 +165,35 @@ it('should keep a valid non-migrated chain in the state', () => {
     }
   })
 })
+
+it('should keep a valid already-migrated chain in the state', () => {
+  initChainState(state, 1)
+
+  state.main.networks.ethereum[1].name = 'Mainnet'
+
+  // this chain won't be migrated as there are no Infura or Alchemy connections
+  state.main.networks.ethereum[1].connection = {
+    primary: { current: 'pylon', on: true },
+    secondary: { current: 'custom', custom: 'myrpc', on: false }
+  }
+
+  const updatedState = migration.migrate(state)
+
+  const mainnet = updatedState.main.networks.ethereum['1']
+  expect(mainnet).toStrictEqual({
+    name: 'Mainnet',
+    id: 1,
+    connection: {
+      primary: {
+        current: 'pylon',
+        custom: '',
+        on: true
+      },
+      secondary: {
+        current: 'custom',
+        custom: 'myrpc',
+        on: false
+      }
+    }
+  })
+})
