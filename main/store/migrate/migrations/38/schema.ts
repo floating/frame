@@ -13,7 +13,7 @@ export const v38ShortcutsSchema = z.object({
 
 const v38ConnectionSchema = z
   .object({
-    current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']),
+    current: z.enum(['local', 'custom', 'infura', 'alchemy', 'pylon', 'poa']),
     custom: z.string().default('')
   })
   .passthrough()
