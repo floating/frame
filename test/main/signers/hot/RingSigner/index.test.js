@@ -11,6 +11,10 @@ const FILE_PATH = path.resolve(__dirname, 'keystore.json')
 jest.mock('electron')
 jest.mock('../../../../../main/store/persist')
 
+import persist from '../../../../../main/store/persist'
+
+console.log({ persist })
+
 // Stubs
 const signers = { add: () => {} }
 // Util

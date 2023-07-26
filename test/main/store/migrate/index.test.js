@@ -4,6 +4,7 @@ import migrations from '../../../../main/store/migrate'
 import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
 import { isWindows } from '../../../../resources/platform'
+import { createState, initChainState } from './setup'
 
 jest.mock('../../../../resources/platform')
 
@@ -1427,7 +1428,6 @@ describe('migration 34', () => {
     expect(getNativeCurrency(updatedState, 137)).toStrictEqual({ name: 'Matic', symbol: 'MATIC' })
   })
 })
-<<<<<<< HEAD:test/main/store/migrations/index.test.js
 
 describe('migration 35', () => {
   beforeEach(() => {
@@ -1592,5 +1592,3 @@ describe('migration 37', () => {
     })
   })
 })
-=======
->>>>>>> move migrations to separate files, use TS (#1482):test/main/store/migrate/index.test.js

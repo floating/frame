@@ -5,10 +5,8 @@
 import { v5 as uuidv5 } from 'uuid'
 import { z } from 'zod'
 
-import { accountNS, isDefaultAccountName } from '../../../resources/domain/account'
-import { isWindows } from '../../../resources/platform'
-
 import { accountNS, isDefaultAccountName } from '../../../../../resources/domain/account'
+import { isWindows } from '../../../../../resources/platform'
 
 const migrations = {
   4: (initial) => {
