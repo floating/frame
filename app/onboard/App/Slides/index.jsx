@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { SlideContainer, Slide, SlideTitle, SlideScroller } from '../styled'
 
+import appInfo from '../../../../package.json'
 import link from '../../../../resources/link'
 
 import Proceed from './Proceed'
@@ -16,7 +17,7 @@ import Outro from './Outro'
 
 const CurrentSlide = ({ slide, platform, setTitle, setProceed }) => {
   if (slide === 0) return null
-  else if (slide === 1) return <Intro setTitle={setTitle} setProceed={setProceed} />
+  else if (slide === 1) return <Intro setTitle={setTitle} setProceed={setProceed} version={appInfo.version} />
   else if (slide === 2) return <Access platform={platform} setTitle={setTitle} setProceed={setProceed} />
   else if (slide === 3) return <Chains setTitle={setTitle} setProceed={setProceed} />
   else if (slide === 4) return <Omnichain setTitle={setTitle} setProceed={setProceed} />
