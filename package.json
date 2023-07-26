@@ -1,6 +1,6 @@
 {
   "name": "frame",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "description": "System-wide web3",
   "main": "compiled/main",
   "scripts": {
@@ -251,6 +251,7 @@
       "@parcel/core>@parcel/cache>lmdb": true,
       "@parcel/core>msgpackr>msgpackr-extract": false,
       "@trezor/connect>@trezor/transport>protobufjs": false,
+      "@trezor/connect>@trezor/transport>usb": false,
       "@trezor/connect>@trezor/utxo-lib>blake-hash": false,
       "@trezor/connect>@trezor/utxo-lib>tiny-secp256k1": false,
       "electron": true,
