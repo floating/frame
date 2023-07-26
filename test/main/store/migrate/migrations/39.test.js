@@ -1,4 +1,4 @@
-import migration from '../../../../../main/store/migrate/migrations/36'
+import migration from '../../../../../main/store/migrate/migrations/39'
 import { createState } from '../setup'
 
 let state
@@ -17,9 +17,9 @@ beforeEach(() => {
   }
 })
 
-it('should have migration version 36', () => {
+it('should have migration version 39', () => {
   const { version } = migration
-  expect(version).toBe(36)
+  expect(version).toBe(39)
 })
 
 const connectionPriorities = ['primary', 'secondary']

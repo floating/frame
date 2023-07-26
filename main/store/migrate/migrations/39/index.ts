@@ -1,13 +1,13 @@
 import log from 'electron-log'
 
-import { v35Connection, v35StateSchema } from '../35/schema'
+import { v38Connection, v38StateSchema } from '../38/schema'
 
-function removePoaConnection(connection: v35Connection) {
+function removePoaConnection(connection: v38Connection) {
   // remove Gnosis chain preset
   const isPoa = connection.current === 'poa'
 
   if (isPoa) {
-    log.info('Migration 36: removing POA presets from Gnosis chain')
+    log.info('Migration 39: removing POA presets from Gnosis chain')
   }
 
   return {
@@ -19,7 +19,7 @@ function removePoaConnection(connection: v35Connection) {
 
 const migrate = (initial: unknown) => {
   try {
-    const state = v35StateSchema.parse(initial)
+    const state = v38StateSchema.parse(initial)
     const gnosisChainPresent = '100' in state.main.networks.ethereum
 
     if (gnosisChainPresent) {
@@ -36,13 +36,13 @@ const migrate = (initial: unknown) => {
 
     return state
   } catch (e) {
-    log.error('Migration 36: could not parse state', e)
+    log.error('Migration 39: could not parse state', e)
   }
 
   return initial
 }
 
 export default {
-  version: 36,
+  version: 39,
   migrate
 }

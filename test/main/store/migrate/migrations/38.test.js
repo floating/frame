@@ -1,4 +1,4 @@
-import migration from '../../../../../main/store/migrate/migrations/35'
+import migration from '../../../../../main/store/migrate/migrations/38'
 import { createState, initChainState } from '../setup'
 
 const providers = ['infura', 'alchemy']
@@ -21,9 +21,9 @@ beforeEach(() => {
   state = createState(migration.version - 1)
 })
 
-it('should have migration version 35', () => {
+it('should have migration version 38', () => {
   const { version } = migration
-  expect(version).toBe(35)
+  expect(version).toBe(38)
 })
 
 migratedChains.forEach(([id, chainName]) => {
