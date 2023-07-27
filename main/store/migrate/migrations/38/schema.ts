@@ -28,6 +28,10 @@ export const v38ChainSchema = z
   })
   .passthrough()
 
+export const v38ChainMetadataSchema = z.object({
+  ethereum: z.object({}).passthrough()
+})
+
 const EthereumChainsSchema = z.record(z.coerce.number(), v38ChainSchema)
 
 export const v38ChainsSchema = z.object({
@@ -37,6 +41,7 @@ export const v38ChainsSchema = z.object({
 export const v38MainSchema = z
   .object({
     networks: v38ChainsSchema,
+    networksMeta: v38ChainMetadataSchema,
     mute: v38MuteSchema,
     shortcuts: v38ShortcutsSchema
   })

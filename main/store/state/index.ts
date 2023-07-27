@@ -94,7 +94,7 @@ type M = Main & {
 }
 
 const mainState: M = {
-  _version: main('_version', 39),
+  _version: main('_version', 40),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {
@@ -344,6 +344,41 @@ const mainState: M = {
         },
         on: false
       },
+      8453: {
+        id: 8453,
+        type: 'ethereum',
+        layer: 'sidechain',
+        isTestnet: false,
+        name: 'Base Mainnet',
+        explorer: 'https://basescan.org',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        connection: {
+          primary: {
+            on: true,
+            current: 'pylon',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          },
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        },
+        on: false
+      },
       42161: {
         id: 42161,
         type: 'ethereum',
@@ -562,6 +597,28 @@ const mainState: M = {
         },
         icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
         primaryColor: 'accent6' // Polygon
+      },
+      8453: {
+        blockHeight: 0,
+        gas: {
+          fees: {},
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        nativeCurrency: {
+          symbol: 'ETH',
+          usd: {
+            price: 0,
+            change24hr: 0
+          },
+          icon: '',
+          name: 'Ether',
+          decimals: 18
+        },
+        icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
+        primaryColor: 'accent8' // Base
       },
       42161: {
         blockHeight: 0,
