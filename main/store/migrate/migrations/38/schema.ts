@@ -7,10 +7,6 @@ const v38MuteSchema = z
   .passthrough()
   .default({})
 
-export const v38ShortcutsSchema = z.object({
-  altSlash: z.boolean().default(false)
-})
-
 const v38ConnectionSchema = z
   .object({
     current: z.enum(['local', 'custom', 'infura', 'alchemy', 'pylon', 'poa']),
@@ -42,8 +38,7 @@ export const v38MainSchema = z
   .object({
     networks: v38ChainsSchema,
     networksMeta: v38ChainMetadataSchema,
-    mute: v38MuteSchema,
-    shortcuts: v38ShortcutsSchema
+    mute: v38MuteSchema
   })
   .passthrough()
 

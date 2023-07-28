@@ -1,6 +1,6 @@
 import log from 'electron-log'
 
-import { v38Chain, v38Connection, v38StateSchema } from '../38/schema'
+import { v38StateSchema } from '../38/schema'
 
 function baseMainnet() {
   const chain = {
