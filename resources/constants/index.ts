@@ -21,13 +21,13 @@ const NETWORK_PRESETS = {
       pylon: 'wss://evm.pylon.link/polygon'
     },
     8453: {
-      pylon: 'https://evm.pylon.link/base-mainnet'
+      pylon: 'wss://evm-dev.pylon.link/base-mainnet'
     },
     42161: {
       pylon: 'wss://evm.pylon.link/arbitrum'
     },
     84531: {
-      pylon: 'wss://evm.pylon.link/base-goerli'
+      pylon: 'wss://evm-dev.pylon.link/base-goerli'
     },
     11155111: {
       pylon: 'wss://evm.pylon.link/sepolia'
