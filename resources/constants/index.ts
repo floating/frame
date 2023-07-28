@@ -21,7 +21,7 @@ const NETWORK_PRESETS = {
       pylon: 'wss://evm.pylon.link/polygon'
     },
     8453: {
-      pylon: 'wss://evm.pylon.link/base-mainnet'
+      pylon: 'https://evm.pylon.link/base-mainnet'
     },
     42161: {
       pylon: 'wss://evm.pylon.link/arbitrum'
