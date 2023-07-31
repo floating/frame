@@ -8,7 +8,7 @@ function baseMainnet() {
     type: 'ethereum',
     layer: 'sidechain',
     isTestnet: false,
-    name: 'Base Mainnet',
+    name: 'Base',
     explorer: 'https://basescan.org',
     gas: {
       price: {
