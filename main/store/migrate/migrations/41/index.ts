@@ -10,20 +10,12 @@ function baseMainnet() {
     isTestnet: false,
     name: 'Base',
     explorer: 'https://basescan.org',
-    gas: {
-      price: {
-        selected: 'standard',
-        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-      }
-    },
     connection: {
       primary: {
         on: true,
         current: 'pylon',
         status: 'loading',
         connected: false,
-        type: '',
-        network: '',
         custom: ''
       },
       secondary: {
@@ -31,8 +23,6 @@ function baseMainnet() {
         current: 'custom',
         status: 'loading',
         connected: false,
-        type: '',
-        network: '',
         custom: ''
       }
     },
