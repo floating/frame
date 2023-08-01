@@ -6,15 +6,9 @@ import { DisplayCoinBalance, DisplayValue } from '../../../../../../resources/Co
 import { GasFeesSource, usesBaseFee } from '../../../../../../resources/domain/transaction'
 import { displayValueData } from '../../../../../../resources/utils/displayValue'
 import { hexToInt } from '../../../../../../resources/utils'
+import { chainUsesOptimismFees } from '../../../../../../resources/utils/chains'
 import link from '../../../../../../resources/link'
-import svg from '../../../../../../resources/svg'
-import {
-  ClusterBox,
-  Cluster,
-  ClusterRow,
-  ClusterColumn,
-  ClusterValue
-} from '../../../../../../resources/Components/Cluster'
+import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 
 const FEE_WARNING_THRESHOLD_USD = 50
 
