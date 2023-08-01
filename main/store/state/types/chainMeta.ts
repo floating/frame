@@ -115,6 +115,28 @@ export const chainMetaDefaults = {
     icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/polygon.svg',
     primaryColor: 'accent6' // Polygon
   },
+  8453: {
+    blockHeight: 0,
+    gas: {
+      fees: {},
+      price: {
+        selected: 'standard',
+        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+      }
+    },
+    nativeCurrency: {
+      symbol: 'ETH',
+      usd: {
+        price: 0,
+        change24hr: 0
+      },
+      icon: '',
+      name: 'Ether',
+      decimals: 18
+    },
+    icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
+    primaryColor: 'accent8' // Base
+  },
   42161: {
     blockHeight: 0,
     gas: {

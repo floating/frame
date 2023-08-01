@@ -132,6 +132,31 @@ export const chainDefaults = {
       }
     }
   },
+  8453: {
+    id: 8453,
+    type,
+    layer: 'sidechain' as const,
+    isTestnet: false,
+    name: 'Base',
+    explorer: 'https://basescan.org',
+    connection: {
+      primary: {
+        on: true,
+        current: 'pylon' as const,
+        status: 'loading' as const,
+        connected: false,
+        custom: ''
+      },
+      secondary: {
+        on: false,
+        current: 'custom' as const,
+        status: 'loading' as const,
+        connected: false,
+        custom: ''
+      }
+    },
+    on: false
+  },
   42161: {
     id: 42161,
     type,
