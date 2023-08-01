@@ -102,10 +102,9 @@ class TxFee extends React.Component {
 
     const maxGas = BigNumber(req.data.gasLimit, 16)
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
-    const maxFeeSourceValue =
-      chain.id === 10
-        ? this.getOptimismFee(maxFeePerGas, maxGas, req.classification)
-        : maxFeePerGas.multipliedBy(maxGas)
+    const maxFeeSourceValue = chainUsesOptimismFees(chain.id)
+      ? this.getOptimismFee(maxFeePerGas, maxGas, req.classification)
+      : maxFeePerGas.multipliedBy(maxGas)
     const maxFee = displayValueData(maxFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
@@ -117,10 +116,9 @@ class TxFee extends React.Component {
 
     // accounts for the 50% padding in the gas estimate in the provider
     const minGas = maxGas.dividedBy(BigNumber(1.5))
-    const minFeeSourceValue =
-      chain.id === 10
-        ? this.getOptimismFee(minFeePerGas, minGas, req.classification)
-        : minFeePerGas.multipliedBy(minGas)
+    const minFeeSourceValue = chainUsesOptimismFees(chain.id)
+      ? this.getOptimismFee(minFeePerGas, minGas, req.classification)
+      : minFeePerGas.multipliedBy(minGas)
     const minFee = displayValueData(minFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet

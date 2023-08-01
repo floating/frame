@@ -15,3 +15,7 @@ export function isNetworkEnabled(network: Chain) {
 export function chainUsesEth(chainId: number) {
   return [1, 3, 4, 5, 10, 42, 42161, 11155111].includes(chainId)
 }
+
+export function chainUsesOptimismFees(chainId: number) {
+  return [10, 420, 8453, 84531].includes(chainId)
+}

@@ -8,6 +8,7 @@ import { ClusterRow, ClusterValue } from '../Cluster'
 
 import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'
+import { chainUsesOptimismFees } from '../../utils/chains'
 
 // estimated gas to perform various common tasks
 const gasToSendEth = 21 * 1000
@@ -149,7 +150,7 @@ class ChainSummaryComponent extends Component {
       nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
     )
 
-    if (id === 10) {
+    if (chainUsesOptimismFees(10)) {
       // Optimism specific calculations
       // TODO: re-structure the way we store and model gas fees
 
