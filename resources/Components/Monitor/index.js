@@ -150,7 +150,7 @@ class ChainSummaryComponent extends Component {
       nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
     )
 
-    if (chainUsesOptimismFees(10)) {
+    if (chainUsesOptimismFees(id)) {
       // Optimism specific calculations
       // TODO: re-structure the way we store and model gas fees
 
