@@ -96,7 +96,7 @@ class ChainConnection extends EventEmitter {
       if (allowEip1559 && 'baseFeePerGas' in block) {
         try {
           // only consider this an EIP-1559 block if fee market can be loaded
-          const feeHistory = await gasMonitor.getFeeHistory(10, [10])
+          const feeHistory = await gasMonitor.getFeeHistory(10, [10, 50])
           feeMarket = this.gasCalculator.calculateGas(feeHistory)
 
           this.chainConfig.setHardforkByBlockNumber(block.number)

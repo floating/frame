@@ -2,7 +2,7 @@ export function getMaxTotalFee(tx = { chainId: '' }) {
   const chainId = parseInt(tx.chainId)
 
   // for ETH-based chains, the max fee should be 2 ETH
-  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 42161, 421611].includes(chainId)) {
+  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 8453, 42161, 421611, 7777777].includes(chainId)) {
     return 2 * 1e18
   }
 

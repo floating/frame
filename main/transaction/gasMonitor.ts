@@ -26,7 +26,7 @@ export default class GasMonitor {
   async getFeeHistory(
     numBlocks: number,
     rewardPercentiles: number[],
-    newestBlock = 'latest'
+    newestBlock = 'pending'
   ): Promise<Block[]> {
     const blockCount = intToHex(numBlocks)
     const payload = { method: 'eth_feeHistory', params: [blockCount, newestBlock, rewardPercentiles] }
