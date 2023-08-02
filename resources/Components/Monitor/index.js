@@ -8,6 +8,7 @@ import { ClusterRow, ClusterValue } from '../Cluster'
 
 import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'
+import { chainUsesOptimismFees, calculateOptimismL1DataFee } from '../../utils/chains'
 
 // estimated gas to perform various common tasks
 const gasToSendEth = 21 * 1000
@@ -32,6 +33,7 @@ function levelDisplay(level) {
 }
 
 function toDisplayUSD(bn) {
+  if (bn.toNumber() === 0) return '?'
   return parseFloat(
     bn.toNumber() >= 1
       ? bn.toFixed(0, BigNumber.ROUND_UP).toString()
@@ -131,15 +133,21 @@ class ChainSummaryComponent extends Component {
     const estimates = [
       {
         label: `Send ${currentSymbol}`,
-        estimatedGas: gasToSendEth
+        estimatedGas: gasToSendEth,
+        serializedTxExample:
+          '0x02ed0a80832463478324670d827b0c94b120c885f1527394c78d50e7c7da57defb24f6128802c68af0bb14000080c0'
       },
       {
         label: 'Send Tokens',
-        estimatedGas: gasToSendToken
+        estimatedGas: gasToSendToken,
+        serializedTxExample:
+          '0x02f86d0a808403b35e108403b35e6d8302137894420000000000000000000000000000000000004280b844a9059cbb000000000000000000000000b120c885f1527394c78d50e7c7da57defb24f6120000000000000000000000000000000000000000000000c23cb3bdafde405080c0'
       },
       {
         label: 'Dex Swap',
-        estimatedGas: gasForDexSwap
+        estimatedGas: gasForDexSwap,
+        serializedTxExample:
+          '0x02f903f60a808402bbcd0b8402bbcd638304b057943fc91a3afd70395cd496c647d5a6cc9d4b2b7fad8806e1a38167665296b903c43593564c000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000064cb05c500000000000000000000000000000000000000000000000000000000000000030b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000006e1a38167665296000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000420fbb40ad6fe5a000000000000000000000000000000000000000000000011ac6ccb6849433fc000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002b4200000000000000000000000000000000000006000bb842000000000000000000000000000000000000420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000002c0a7cd5c8f543c00000000000000000000000000000000000000000000000bc9f7effabef331c200000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002b42000000000000000000000000000000000000060001f44200000000000000000000000000000000000042000000000000000000000000000000000000000000c0'
       }
     ]
 
@@ -149,24 +157,22 @@ class ChainSummaryComponent extends Component {
       nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
     )
 
-    if (id === 10) {
+    if (chainUsesOptimismFees(id)) {
       // Optimism specific calculations
-      // TODO: re-structure the way we store and model gas fees
+      const price = calculatedFees?.actualFee || gasPrice
 
-      const l1GasEstimates = [4300, 5100, 6900]
-      const ethPriceLevels = this.store('main.networksMeta.ethereum', 1, 'gas.price.levels')
-      const l1Price = levelDisplay(ethPriceLevels.fast)
+      const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
 
-      const optimismEstimate = (l1Limit, l2Limit) => {
-        const l1Estimate = BigNumber(l1Price * l1Limit * 1.5)
-        const l2Estimate = BigNumber(gasPrice * l2Limit)
+      const optimismEstimate = (serializedTx, l2Limit) => {
+        const l1Estimate = BigNumber(calculateOptimismL1DataFee(serializedTx, ethBaseFee)).shiftedBy(-9)
+        const l2Estimate = BigNumber(price * l2Limit)
 
         return toDisplayUSD(l1Estimate.plus(l2Estimate).shiftedBy(-9).multipliedBy(nativeUSD))
       }
 
-      return estimates.map(({ label, estimatedGas }, i) => ({
-        low: optimismEstimate(l1GasEstimates[i], estimatedGas),
-        high: optimismEstimate(l1GasEstimates[i], estimatedGas),
+      return estimates.map(({ label, estimatedGas, serializedTxExample }, i) => ({
+        low: optimismEstimate(serializedTxExample, estimatedGas),
+        high: optimismEstimate(serializedTxExample, estimatedGas),
         label
       }))
     }
@@ -217,6 +223,12 @@ class ChainSummaryComponent extends Component {
     // fees is either a populated object (EIP-1559 compatible) or falsy
     const displayFeeMarket = !!fees
 
+    const actualFee = displayFeeMarket
+      ? roundGwei(
+          BigNumber(fees.maxPriorityFeePerGas).plus(BigNumber(fees.nextBaseFee)).shiftedBy(-9).toNumber()
+        )
+      : gasPrice
+
     return (
       <>
         <ClusterRow>
@@ -229,7 +241,7 @@ class ChainSummaryComponent extends Component {
               <div className='sliceTileGasPriceIcon' style={{ color: this.props.color }}>
                 {svg.gas(12)}
               </div>
-              <div className='sliceTileGasPriceNumber'>{gasPrice || '‹0.001'}</div>
+              <div className='sliceTileGasPriceNumber'>{actualFee || '‹0.001'}</div>
               <div className='sliceTileGasPriceUnit'>{'gwei'}</div>
             </div>
           </ClusterValue>
@@ -272,7 +284,7 @@ class ChainSummaryComponent extends Component {
                 <div className='gasEstimate'>
                   <div className='gasEstimateRange'>
                     <span className='gasEstimateSymbol'>
-                      {!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}
+                      {!estimate.low || estimate.low >= 0.01 || estimate.low === '?' ? `$` : '<$'}
                     </span>
                     <span className='gasEstimateRangeLow'>{`${
                       !estimate.low
