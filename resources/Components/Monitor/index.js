@@ -223,7 +223,9 @@ class ChainSummaryComponent extends Component {
     const displayFeeMarket = !!fees
 
     const actualFee = displayFeeMarket
-      ? Math.round(roundGwei(weiToGwei(hexToInt(fees.nextBaseFee))) + levelDisplay(fees.maxPriorityFeePerGas))
+      ? roundGwei(
+          BigNumber(fees.maxPriorityFeePerGas).plus(BigNumber(fees.nextBaseFee)).shiftedBy(-9).toNumber()
+        )
       : gasPrice
 
     return (
