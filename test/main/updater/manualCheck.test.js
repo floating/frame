@@ -89,5 +89,5 @@ it('handles an error parsing the JSON response', async () => {
 })
 
 function mockApiResponse(status, body, headers = { 'content-type': 'application/json' }) {
-  nock('https://api.github.com').get('/repos/frame-labs/frame-canary/releases').reply(status, body, headers)
+  nock('https://api.github.com').get('/repos/floating/frame/releases').reply(status, body, headers)
 }
