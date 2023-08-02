@@ -158,7 +158,7 @@ class ChainSummaryComponent extends Component {
 
     if (chainUsesOptimismFees(id)) {
       // Optimism specific calculations
-      const price = calculatedFees.actualFee || gasPrice
+      const price = calculatedFees?.actualFee || gasPrice
 
       const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
       const baseFeeL1 = hexToInt(ethBaseFee) || 0
