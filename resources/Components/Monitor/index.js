@@ -8,7 +8,7 @@ import { ClusterRow, ClusterValue } from '../Cluster'
 
 import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'
-import { chainUsesOptimismFees, optimismL1DataFee } from '../../utils/chains'
+import { chainUsesOptimismFees, calculateOptimismL1DataFee } from '../../utils/chains'
 
 // estimated gas to perform various common tasks
 const gasToSendEth = 21 * 1000
@@ -161,10 +161,9 @@ class ChainSummaryComponent extends Component {
       const price = calculatedFees?.actualFee || gasPrice
 
       const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
-      const baseFeeL1 = hexToInt(ethBaseFee) || 0
 
-      const optimismEstimate = (searlizedTx, l2Limit) => {
-        const l1Estimate = BigNumber(optimismL1DataFee(searlizedTx, baseFeeL1)).shiftedBy(-9)
+      const optimismEstimate = (serializedTx, l2Limit) => {
+        const l1Estimate = BigNumber(calculateOptimismL1DataFee(serializedTx, ethBaseFee)).shiftedBy(-9)
         const l2Estimate = BigNumber(price * l2Limit)
 
         return toDisplayUSD(l1Estimate.plus(l2Estimate).shiftedBy(-9).multipliedBy(nativeUSD))

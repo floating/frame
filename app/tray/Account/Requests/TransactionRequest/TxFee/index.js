@@ -7,7 +7,7 @@ import { DisplayCoinBalance, DisplayValue } from '../../../../../../resources/Co
 import { GasFeesSource, usesBaseFee } from '../../../../../../resources/domain/transaction'
 import { displayValueData } from '../../../../../../resources/utils/displayValue'
 import { hexToInt } from '../../../../../../resources/utils'
-import { chainUsesOptimismFees, optimismL1DataFee } from '../../../../../../resources/utils/chains'
+import { chainUsesOptimismFees, calculateOptimismL1DataFee } from '../../../../../../resources/utils/chains'
 import link from '../../../../../../resources/link'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 
@@ -73,13 +73,11 @@ class TxFee extends React.Component {
   }
 
   getOptimismFee = (l2Price, l2Limit, rawTx) => {
-    const sTx = utils.serializeTransaction(Object.assign({}, rawTx, { type: 2 }))
+    const serializedTransaction = utils.serializeTransaction(Object.assign({}, rawTx, { type: 2 }))
 
     // Get current Ethereum gas price
     const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
-    const l1GasPrice = hexToInt(ethBaseFee) || 0
-
-    const l1DataFee = optimismL1DataFee(sTx, l1GasPrice)
+    const l1DataFee = calculateOptimismL1DataFee(serializedTransaction, ethBaseFee)
 
     // Compute the L2 execution fee
     const l2ExecutionFee = l2Price * l2Limit
