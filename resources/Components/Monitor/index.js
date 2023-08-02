@@ -8,6 +8,7 @@ import { ClusterRow, ClusterValue } from '../Cluster'
 
 import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'
+import { chainUsesOptimismFees, calculateOptimismL1DataFee } from '../../utils/chains'
 
 // estimated gas to perform various common tasks
 const gasToSendEth = 21 * 1000
@@ -131,15 +132,21 @@ class ChainSummaryComponent extends Component {
     const estimates = [
       {
         label: `Send ${currentSymbol}`,
-        estimatedGas: gasToSendEth
+        estimatedGas: gasToSendEth,
+        serializedTxExample:
+          '0x02ed0a80832463478324670d827b0c94b120c885f1527394c78d50e7c7da57defb24f6128802c68af0bb14000080c0'
       },
       {
         label: 'Send Tokens',
-        estimatedGas: gasToSendToken
+        estimatedGas: gasToSendToken,
+        serializedTxExample:
+          '0x02f86b0a808319d7678319d7f38302135494420000000000000000000000000000000000004280b844a9059cbb000000000000000000000000b120c885f1527394c78d50e7c7da57defb24f612000000000000000000000000000000000000000000000001a055690d9db80000c0'
       },
       {
         label: 'Dex Swap',
-        estimatedGas: gasForDexSwap
+        estimatedGas: gasForDexSwap,
+        serializedTxExample:
+          '0x02f86a0a80830e9f70830ea00882b85894420000000000000000000000000000000000004280b844095ea7b3000000000000000000000000000000000022d473030f116ddee9f6b43ac78ba3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc0'
       }
     ]
 
@@ -149,24 +156,22 @@ class ChainSummaryComponent extends Component {
       nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
     )
 
-    if (id === 10) {
+    if (chainUsesOptimismFees(id)) {
       // Optimism specific calculations
-      // TODO: re-structure the way we store and model gas fees
+      const price = calculatedFees?.actualFee || gasPrice
 
-      const l1GasEstimates = [4300, 5100, 6900]
-      const ethPriceLevels = this.store('main.networksMeta.ethereum', 1, 'gas.price.levels')
-      const l1Price = levelDisplay(ethPriceLevels.fast)
+      const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
 
-      const optimismEstimate = (l1Limit, l2Limit) => {
-        const l1Estimate = BigNumber(l1Price * l1Limit * 1.5)
-        const l2Estimate = BigNumber(gasPrice * l2Limit)
+      const optimismEstimate = (serializedTx, l2Limit) => {
+        const l1Estimate = BigNumber(calculateOptimismL1DataFee(serializedTx, ethBaseFee)).shiftedBy(-9)
+        const l2Estimate = BigNumber(price * l2Limit)
 
         return toDisplayUSD(l1Estimate.plus(l2Estimate).shiftedBy(-9).multipliedBy(nativeUSD))
       }
 
-      return estimates.map(({ label, estimatedGas }, i) => ({
-        low: optimismEstimate(l1GasEstimates[i], estimatedGas),
-        high: optimismEstimate(l1GasEstimates[i], estimatedGas),
+      return estimates.map(({ label, estimatedGas, serializedTxExample }, i) => ({
+        low: optimismEstimate(serializedTxExample, estimatedGas),
+        high: optimismEstimate(serializedTxExample, estimatedGas),
         label
       }))
     }
