@@ -9,6 +9,8 @@ import { isNonZeroHex } from '../../resources/utils'
 import chainConfig from '../chains/config'
 import { TransactionRequest, TxClassification } from '../accounts/types'
 
+import type { Gas } from '../store/state'
+
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
   ring: () => true,
@@ -76,7 +78,7 @@ function maxFee(rawTx: TransactionData) {
   const chainId = parseInt(rawTx.chainId)
 
   // for ETH-based chains, the max fee should be 2 ETH
-  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 42161, 421611].includes(chainId)) {
+  if ([1, 3, 4, 5, 6, 10, 42, 61, 62, 63, 69, 8453, 42161, 421611, 7777777].includes(chainId)) {
     return 2 * 1e18
   }
 
@@ -94,7 +96,7 @@ function calculateMaxFeePerGas(maxBaseFee: string, maxPriorityFee: string) {
   return addHexPrefix(maxFeePerGas)
 }
 
-function populate(rawTx: TransactionData, chainConfig: Common, gas: GasData): TransactionData {
+function populate(rawTx: TransactionData, chainConfig: Common, gas: Gas): TransactionData {
   const txData: TransactionData = { ...rawTx }
 
   // non-EIP-1559 case
@@ -129,14 +131,16 @@ function populate(rawTx: TransactionData, chainConfig: Common, gas: GasData): Tr
     txData.gasFeesSource = GasFeesSource.Frame
   }
 
-  const maxPriorityFee = useFrameMaxPriorityFeePerGas
-    ? gas.price.fees.maxPriorityFeePerGas
-    : (rawTx.maxPriorityFeePerGas as string)
+  const maxPriorityFee =
+    useFrameMaxPriorityFeePerGas && gas.price.fees.maxPriorityFeePerGas
+      ? gas.price.fees.maxPriorityFeePerGas
+      : (rawTx.maxPriorityFeePerGas as string)
 
   // if no valid dapp-supplied value for maxFeePerGas we calculate it
-  txData.maxFeePerGas = useFrameMaxFeePerGas
-    ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee)
-    : txData.maxFeePerGas
+  txData.maxFeePerGas =
+    useFrameMaxFeePerGas && gas.price.fees.maxBaseFeePerGas
+      ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee)
+      : txData.maxFeePerGas
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
   txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas

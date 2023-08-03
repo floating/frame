@@ -4,7 +4,7 @@ jest.mock('fs')
 
 let mockLatestVersion = 0
 
-jest.mock('../../../../main/store/migrations', () => {
+jest.mock('../../../../main/store/migrate', () => {
   return {
     latest: mockLatestVersion,
     apply: (state) => {

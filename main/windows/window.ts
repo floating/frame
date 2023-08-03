@@ -4,6 +4,8 @@ import path from 'path'
 
 import store from '../store'
 
+import type { ChainId } from '../store/state'
+
 export function createWindow(
   name: string,
   opts?: BrowserWindowConstructorOptions,
@@ -87,7 +89,7 @@ const externalWhitelist = [
   'https://opensea.io'
 ]
 
-const isValidReleasePage = (url: string) => url.startsWith('https://github.com/floating/frame/releases/tag')
+const isValidReleasePage = (url: string) => url.startsWith('https://github.com/floating/frame/releases/tag/')
 const isWhitelistedHost = (url: string) =>
   externalWhitelist.some((entry) => url === entry || url.startsWith(entry + '/'))
 
@@ -97,7 +99,7 @@ export function openExternal(url = '') {
   }
 }
 
-export function openBlockExplorer({ id, type }: Chain, hash?: string, account?: string) {
+export function openBlockExplorer({ id, type }: ChainId, hash?: string, account?: string) {
   // remove trailing slashes from the base url
   const explorer = (store('main.networks', type, id, 'explorer') || '').replace(/\/+$/, '')
 

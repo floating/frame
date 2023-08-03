@@ -1,17 +1,19 @@
 import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
+import { utils } from 'ethers'
 
 import { DisplayCoinBalance, DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import { GasFeesSource, usesBaseFee } from '../../../../../../resources/domain/transaction'
 import { displayValueData } from '../../../../../../resources/utils/displayValue'
+import { chainUsesOptimismFees, calculateOptimismL1DataFee } from '../../../../../../resources/utils/chains'
 import link from '../../../../../../resources/link'
 import {
   ClusterBox,
   Cluster,
   ClusterRow,
-  ClusterColumn,
-  ClusterValue
+  ClusterValue,
+  ClusterColumn
 } from '../../../../../../resources/Components/Cluster'
 
 const FEE_WARNING_THRESHOLD_USD = 50
@@ -64,6 +66,20 @@ class TxFee extends React.Component {
     super(props, context)
   }
 
+  getOptimismFee = (l2Price, l2Limit, rawTx) => {
+    const serializedTransaction = utils.serializeTransaction(Object.assign({}, rawTx, { type: 2 }))
+
+    // Get current Ethereum gas price
+    const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
+    const l1DataFee = calculateOptimismL1DataFee(serializedTransaction, ethBaseFee)
+
+    // Compute the L2 execution fee
+    const l2ExecutionFee = l2Price * l2Limit
+
+    // Return the sum of both fees
+    return l2ExecutionFee + l1DataFee
+  }
+
   render() {
     const req = this.props.req
     const chain = {
@@ -75,7 +91,10 @@ class TxFee extends React.Component {
 
     const maxGas = BigNumber(req.data.gasLimit, 16)
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
-    const maxFee = displayValueData(maxFeePerGas.multipliedBy(maxGas), {
+    const maxFeeSourceValue = chainUsesOptimismFees(chain.id)
+      ? this.getOptimismFee(maxFeePerGas, maxGas, req.data)
+      : maxFeePerGas.multipliedBy(maxGas)
+    const maxFee = displayValueData(maxFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
     })
@@ -86,7 +105,10 @@ class TxFee extends React.Component {
 
     // accounts for the 50% padding in the gas estimate in the provider
     const minGas = maxGas.dividedBy(BigNumber(1.5))
-    const minFee = displayValueData(minFeePerGas.multipliedBy(minGas), {
+    const minFeeSourceValue = chainUsesOptimismFees(chain.id)
+      ? this.getOptimismFee(minFeePerGas, minGas, req.data)
+      : minFeePerGas.multipliedBy(minGas)
+    const minFee = displayValueData(minFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
     })

@@ -1,9 +1,10 @@
 import log from 'electron-log'
 
-import migrations from '../../../../main/store/migrations'
+import migrations from '../../../../main/store/migrate'
 import { getDefaultAccountName } from '../../../../resources/domain/account'
 import { capitalize } from '../../../../resources/utils'
 import { isWindows } from '../../../../resources/platform'
+import { createState, initChainState } from './setup'
 
 jest.mock('../../../../resources/platform')
 
@@ -18,16 +19,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  state = {
-    main: {
-      _version: 0,
-      networks: { ethereum: {} },
-      networksMeta: { ethereum: {} },
-      accounts: {},
-      balances: {},
-      tokens: { known: {} }
-    }
-  }
+  state = createState()
 })
 
 describe('migration 13', () => {
@@ -1335,10 +1327,6 @@ describe('migration 32', () => {
 
 describe('migration 34', () => {
   const getNativeCurrency = (state, chainId) => state.main.networksMeta.ethereum[chainId].nativeCurrency
-  const createChainState = (chainId) => {
-    state.main.networks.ethereum[chainId] = { id: chainId }
-    state.main.networksMeta.ethereum[chainId] = { nativeCurrency: {} }
-  }
 
   const expectedData = {
     1: {
@@ -1384,14 +1372,14 @@ describe('migration 34', () => {
 
   Object.entries(expectedData).forEach(([chainId, { chainName, currencyName, currencySymbol }]) => {
     it(`should set the native currency name for ${chainName} to ${currencyName} if currently undefined`, () => {
-      createChainState(chainId)
+      initChainState(state, chainId)
 
       const updatedState = migrations.apply(state, 34)
       expect(getNativeCurrency(updatedState, chainId).name).toBe(currencyName)
     })
 
     it(`should set the native currency name for ${chainName} to ${currencyName} if currently an empty string'`, () => {
-      createChainState(chainId)
+      initChainState(state, chainId)
       state.main.networksMeta.ethereum[chainId].nativeCurrency.name = ''
 
       const updatedState = migrations.apply(state, 34)
@@ -1399,7 +1387,7 @@ describe('migration 34', () => {
     })
 
     it(`should set the native currency symbol for ${chainName} to ${currencySymbol} if currently not set`, () => {
-      createChainState(chainId)
+      initChainState(state, chainId)
 
       const updatedState = migrations.apply(state, 34)
       expect(getNativeCurrency(updatedState, chainId).symbol).toBe(currencySymbol)
@@ -1410,7 +1398,7 @@ describe('migration 34', () => {
 
   fields.forEach((field) => {
     it(`should not overwrite an existing native currency ${field}`, () => {
-      createChainState(10)
+      initChainState(state, 10)
       state.main.networksMeta.ethereum[10].nativeCurrency[field] = 'CUSTOM'
 
       const updatedState = migrations.apply(state, 34)
@@ -1418,7 +1406,7 @@ describe('migration 34', () => {
     })
 
     it(`should set a missing custom chain native currency ${field} to an empty string`, () => {
-      createChainState(56)
+      initChainState(state, 56)
 
       const updatedState = migrations.apply(state, 34)
       expect(getNativeCurrency(updatedState, 56)[field]).toBe('')
@@ -1433,7 +1421,7 @@ describe('migration 34', () => {
   })
 
   it('should set native currency data when none previously existed', () => {
-    createChainState(137)
+    initChainState(state, 137)
     delete state.main.networksMeta.ethereum[137].nativeCurrency
 
     const updatedState = migrations.apply(state, 34)

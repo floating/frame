@@ -27,6 +27,7 @@ link.rpc('getState', (err, state) => {
   const store = appStore(state)
   link.send('tray:ready') // turn on api
   link.send('tray:refreshMain')
+
   store.observer(() => {
     document.body.classList.remove('dark', 'light')
     document.body.classList.add('clip', store('main.colorway'))

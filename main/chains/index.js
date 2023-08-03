@@ -11,6 +11,7 @@ const { default: BlockMonitor } = require('./blocks')
 const { default: chainConfig } = require('./config')
 const { default: GasMonitor } = require('../transaction/gasMonitor')
 const { createGasCalculator } = require('./gas')
+const { NETWORK_PRESETS } = require('../../resources/constants')
 
 // These chain IDs are known to not support EIP-1559 and will be forced
 // not to use that mechanism
@@ -69,9 +70,7 @@ class ChainConnection extends EventEmitter {
 
     this[priority].provider = provider(target, {
       name: priority,
-      origin: 'frame',
-      infuraId: '786ade30f36244469480aa5c2bf0743b',
-      alchemyId: 'NBms1eV9i16RFHpFqQxod56OLdlucIq0'
+      origin: 'frame'
     })
 
     this[priority].blockMonitor = this._createBlockMonitor(this[priority].provider, priority)
@@ -96,7 +95,7 @@ class ChainConnection extends EventEmitter {
       if (allowEip1559 && 'baseFeePerGas' in block) {
         try {
           // only consider this an EIP-1559 block if fee market can be loaded
-          const feeHistory = await gasMonitor.getFeeHistory(10, [10])
+          const feeHistory = await gasMonitor.getFeeHistory(20, [10, 60])
           feeMarket = this.gasCalculator.calculateGas(feeHistory)
 
           this.chainConfig.setHardforkByBlockNumber(block.number)
@@ -250,8 +249,7 @@ class ChainConnection extends EventEmitter {
       this.network = connection.network
     }
 
-    const presets = store('main.networkPresets', this.type)
-    const currentPresets = Object.assign({}, presets.default, presets[this.chainId])
+    const currentPresets = { ...NETWORK_PRESETS.ethereum.default, ...NETWORK_PRESETS.ethereum[this.chainId] }
 
     const { primary, secondary } = store('main.networks', this.type, this.chainId, 'connection')
     const secondaryTarget =

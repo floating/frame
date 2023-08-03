@@ -1,0 +1,43 @@
+import * as Sentry from '@sentry/electron'
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import Restore from 'react-restore'
+
+import App from './App'
+
+import link from '../../resources/link'
+import appStore from '../store'
+
+Sentry.init({ dsn: 'https://7b09a85b26924609bef5882387e2c4dc@o1204372.ingest.sentry.io/6331069' })
+
+document.addEventListener('dragover', (e) => e.preventDefault())
+document.addEventListener('drop', (e) => e.preventDefault())
+
+if (process.env.NODE_ENV !== 'development') {
+  window.eval = global.eval = () => {
+    throw new Error(`This app does not support window.eval()`)
+  } // eslint-disable-line
+}
+
+function AppComponent() {
+  return <App />
+}
+
+link.rpc('getState', (err, state) => {
+  if (err) return console.error('Could not get initial state from main')
+  const store = appStore(state)
+  window.store = store
+  store.observer(() => {
+    document.body.classList.remove('dark', 'light')
+    document.body.classList.add('clip', store('main.colorway'))
+    setTimeout(() => {
+      document.body.classList.remove('clip')
+    }, 100)
+  })
+
+  const root = createRoot(document.getElementById('notify'))
+  const Notify = Restore.connect(AppComponent, store)
+  root.render(<Notify />)
+})
+
+document.addEventListener('contextmenu', (e) => link.send('*:contextmenu', e.clientX, e.clientY))
