@@ -347,9 +347,9 @@ const mainState: M = {
       8453: {
         id: 8453,
         type: 'ethereum',
-        layer: 'sidechain',
+        layer: 'rollup',
         isTestnet: false,
-        name: 'Base Mainnet',
+        name: 'Base',
         explorer: 'https://basescan.org',
         gas: {
           price: {
