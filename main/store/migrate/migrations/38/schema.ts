@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const v38MuteSchema = z
   .object({
-    migrateToPylon: z.boolean().default(false)
+    migrateToPylon: z.boolean().default(true)
   })
   .passthrough()
   .default({})
