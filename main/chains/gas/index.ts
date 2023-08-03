@@ -91,7 +91,7 @@ function estimateGasFees(blocks: Block[], opts: CalcOpts = {}) {
 
   // the last block contains only the base fee for the next block but no fee history, so
   // don't use it in the block reward calculation
-  const medianBlockReward = calculateReward(blocks.slice(0, blocks.length - 1))
+  const medianBlockReward = calculateReward(blocks.slice(0, blocks.length - 1), opts)
 
   const estimatedGasFees = {
     nextBaseFee: nextBlockFee,
@@ -139,14 +139,15 @@ function OpStackGasCalculator() {
   }
 }
 
-export function createGasCalculator(chainId: number): GasCalculator {
+export function createGasCalculator(chainId: string): GasCalculator {
+  const id = parseInt(chainId)
   // TODO: maybe this can be tied into chain config somehow
-  if (chainId === 137 || chainId === 80001) {
+  if (id === 137 || id === 80001) {
     // Polygon and Mumbai testnet
     return PolygonGasCalculator()
   }
 
-  if (chainUsesOptimismFees(chainId)) {
+  if (chainUsesOptimismFees(id)) {
     return OpStackGasCalculator()
   }
 
