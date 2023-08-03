@@ -41,7 +41,6 @@ let onboard: Onboard
 let notify: Notify
 let mouseTimeout: NodeJS.Timeout
 let glide = false
-let summonShortcutAccelerator = 'Alt+/'
 
 const app = {
   hide: () => {
