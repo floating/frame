@@ -21,7 +21,7 @@ export function chainUsesEth(chainId: number) {
 }
 
 export function chainUsesOptimismFees(chainId: number) {
-  return [10, 420, 8453, 84531].includes(chainId)
+  return [10, 420, 8453, 84531, 7777777].includes(chainId)
 }
 
 export function calculateOptimismL1DataFee(serializedTx: string, baseFeeL1: HexString) {

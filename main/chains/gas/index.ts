@@ -1,10 +1,16 @@
 import { intToHex } from '@ethereumjs/util'
+import { chainUsesOptimismFees } from '../../../resources/utils/chains'
 
 import type { GasFees } from '../../store/state'
 
 interface GasCalculator {
   calculateGas: (blocks: Block[]) => GasFees
 }
+
+type CalcOpts = Partial<{
+  percentileBand: number
+  averageMethod: 'average' | 'median'
+}>
 
 type RawGasFees = {
   nextBaseFee: number
@@ -28,8 +34,9 @@ function feesToHex(fees: RawGasFees) {
   }
 }
 
-function calculateReward(blocks: Block[]) {
+function calculateReward(blocks: Block[], opts: CalcOpts = {}) {
   const recentBlocks = 10
+  const { percentileBand = 0, averageMethod = 'median' } = opts
   const allBlocks = blocks.length
 
   // these strategies will be tried in descending order until one finds
@@ -60,23 +67,31 @@ function calculateReward(blocks: Block[]) {
     return foundBlocks
   }, [] as Block[])
 
-  // use the median reward from the block sample or use the fee from the last block as a last resort
-  const lastBlockFee = blocks[blocks.length - 1].rewards[0]
-  return (
-    eligibleRewardsBlocks.map((block) => block.rewards[0]).sort()[
-      Math.floor(eligibleRewardsBlocks.length / 2)
-    ] || lastBlockFee
-  )
+  if (averageMethod === 'average') {
+    return Math.floor(
+      eligibleRewardsBlocks
+        .map((block) => block.rewards[Math.min(percentileBand, block.rewards.length - 1)])
+        .reduce((sum, reward) => sum + reward, 0) / eligibleRewardsBlocks.length
+    )
+  } else {
+    // use the median reward from the block sample or use the fee from the last block as a last resort
+    const lastBlockFee = blocks[blocks.length - 1].rewards[0]
+    return (
+      eligibleRewardsBlocks
+        .map((block) => block.rewards[Math.min(percentileBand, block.rewards.length - 1)])
+        .sort()[Math.floor(eligibleRewardsBlocks.length / 2)] || lastBlockFee
+    )
+  }
 }
 
-function estimateGasFees(blocks: Block[]) {
+function estimateGasFees(blocks: Block[], opts: CalcOpts = {}) {
   // plan for max fee of 2 full blocks, each one increasing the fee by 12.5%
   const nextBlockFee = blocks[blocks.length - 1].baseFee // base fee for next block
   const calculatedFee = Math.ceil(nextBlockFee * 1.125 * 1.125)
 
   // the last block contains only the base fee for the next block but no fee history, so
   // don't use it in the block reward calculation
-  const medianBlockReward = calculateReward(blocks.slice(0, blocks.length - 1))
+  const medianBlockReward = calculateReward(blocks.slice(0, blocks.length - 1), opts)
 
   const estimatedGasFees = {
     nextBaseFee: nextBlockFee,
@@ -114,11 +129,26 @@ function PolygonGasCalculator() {
   }
 }
 
-export function createGasCalculator(chainId: number): GasCalculator {
+function OpStackGasCalculator() {
+  return {
+    calculateGas: (blocks: Block[]) => {
+      const estimatedGasFees = estimateGasFees(blocks, { percentileBand: 1, averageMethod: 'average' })
+
+      return feesToHex(estimatedGasFees)
+    }
+  }
+}
+
+export function createGasCalculator(chainId: string): GasCalculator {
+  const id = parseInt(chainId)
   // TODO: maybe this can be tied into chain config somehow
-  if (chainId === 137 || chainId === 80001) {
+  if (id === 137 || id === 80001) {
     // Polygon and Mumbai testnet
     return PolygonGasCalculator()
+  }
+
+  if (chainUsesOptimismFees(id)) {
+    return OpStackGasCalculator()
   }
 
   return DefaultGasCalculator()
