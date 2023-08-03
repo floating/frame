@@ -33,6 +33,7 @@ function levelDisplay(level) {
 }
 
 function toDisplayUSD(bn) {
+  if (bn.toNumber() === 0) return '?'
   return parseFloat(
     bn.toNumber() >= 1
       ? bn.toFixed(0, BigNumber.ROUND_UP).toString()
@@ -287,7 +288,7 @@ class ChainSummaryComponent extends Component {
                 <div className='gasEstimate'>
                   <div className='gasEstimateRange'>
                     <span className='gasEstimateSymbol'>
-                      {!estimate.low || estimate.low >= 0.01 ? `$` : '<$'}
+                      {!estimate.low || estimate.low >= 0.01 || estimate.low === '?' ? `$` : '<$'}
                     </span>
                     <span className='gasEstimateRangeLow'>{`${
                       !estimate.low
