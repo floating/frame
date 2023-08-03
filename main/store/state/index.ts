@@ -111,7 +111,7 @@ const mainState = {
     gasFeeWarning: main('mute.gasFeeWarning', false),
     betaDisclosure: main('mute.betaDisclosure', false),
     onboardingWindow: main('mute.onboardingWindow', false),
-    migrateToPylon: main('mute.migrateToPylon', false),
+    migrateToPylon: main('mute.migrateToPylon', true),
     signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
   },
   shortcuts: {

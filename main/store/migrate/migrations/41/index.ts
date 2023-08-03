@@ -6,7 +6,7 @@ function baseMainnet() {
   const chain = {
     id: 8453,
     type: 'ethereum',
-    layer: 'sidechain',
+    layer: 'rollup',
     isTestnet: false,
     name: 'Base',
     explorer: 'https://basescan.org',

@@ -135,7 +135,7 @@ export const chainDefaults = {
   8453: {
     id: 8453,
     type,
-    layer: 'sidechain' as const,
+    layer: 'rollup' as const,
     isTestnet: false,
     name: 'Base',
     explorer: 'https://basescan.org',
