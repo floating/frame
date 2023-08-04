@@ -437,51 +437,24 @@ class Chains extends EventEmitter {
     super()
     this.connections = {}
 
-    const suspendedConnections = []
+    setTimeout(() => {
+      powerMonitor.emit('resume')
+    }, 15000)
 
-    powerMonitor.on('suspend', (e) => {
-      const toggleConnectionOff = (chainId, node) => {
-        log.debug('Suspending connection', { chainId, node })
+    const removeConnection = (chainId, type = 'ethereum') => {
+      console.log({ chainId, type })
+      this.connections[type][chainId].removeAllListeners()
+      this.connections[type][chainId].close(false)
+      delete this.connections[type][chainId]
+    }
 
-        suspendedConnections.push(`${chainId}:${node}`)
-        store.toggleConnection('ethereum', chainId, node, false)
-      }
-
-      const networks = store('main.networks.ethereum')
-
-      Object.entries(networks).forEach(([chainId, chain]) => {
-        const nodes = ['primary', 'secondary']
-
-        nodes.forEach((node) => {
-          if (chain.connection[node].on) {
-            toggleConnectionOff(chainId, node)
-          }
-        })
-      })
-
-      log.info('System suspending', { suspendedConnections })
-    })
-
-    powerMonitor.on('resume', () => {
-      log.info('System resuming, toggling connections on', { suspendedConnections })
-
-      while (suspendedConnections.length > 0) {
-        const [chainId, node] = suspendedConnections.pop().split(':')
-
-        log.debug('Reconnecting', { chainId, node })
-        store.toggleConnection('ethereum', chainId, node, true)
-      }
-    })
-
-    store.observer(() => {
+    const updateConnections = () => {
       const networks = store('main.networks')
 
       Object.keys(this.connections).forEach((type) => {
         Object.keys(this.connections[type]).forEach((chainId) => {
           if (!networks[type][chainId]) {
-            this.connections[type][chainId].removeAllListeners()
-            this.connections[type][chainId].close(false)
-            delete this.connections[type][chainId]
+            removeConnection(chainId, type)
           }
         })
       })
@@ -519,7 +492,26 @@ class Chains extends EventEmitter {
           }
         })
       })
+    }
+
+    powerMonitor.on('resume', () => {
+      const activeConnections = Object.keys(this.connections)
+        .map((type) => {
+          return Object.keys(this.connections[type]).map((chainId) => `${type}:${chainId}`)
+        })
+        .flat()
+
+      log.info('System resuming, resetting active connections', { chains: activeConnections })
+
+      activeConnections.forEach((id) => {
+        const [type, chainId] = id.split(':')
+        removeConnection(chainId, type)
+      })
+
+      updateConnections()
     })
+
+    store.observer(updateConnections, 'chains:connections')
   }
 
   send(payload, res, targetChain) {
