@@ -201,6 +201,10 @@ function BalanceScanner() {
         })
       }
     }
+
+    if (balances.length > 0) {
+      storeApi.setAccountTokensUpdated(address.toLowerCase())
+    }
   }
 
   function handleTokenBalanceUpdate(balances: TokenBalance[], address: Address) {
