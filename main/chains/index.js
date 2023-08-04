@@ -1,5 +1,5 @@
 // status = Network Mismatch, Not Connected, Connected, Standby, Syncing
-
+const { powerMonitor } = require('electron')
 const EventEmitter = require('events')
 const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
@@ -436,15 +436,21 @@ class Chains extends EventEmitter {
     super()
     this.connections = {}
 
-    store.observer(() => {
+    const removeConnection = (chainId, type = 'ethereum') => {
+      if (type in this.connections && chainId in this.connections[type]) {
+        this.connections[type][chainId].removeAllListeners()
+        this.connections[type][chainId].close(false)
+        delete this.connections[type][chainId]
+      }
+    }
+
+    const updateConnections = () => {
       const networks = store('main.networks')
 
       Object.keys(this.connections).forEach((type) => {
         Object.keys(this.connections[type]).forEach((chainId) => {
           if (!networks[type][chainId]) {
-            this.connections[type][chainId].removeAllListeners()
-            this.connections[type][chainId].close(false)
-            delete this.connections[type][chainId]
+            removeConnection(chainId, type)
           }
         })
       })
@@ -482,7 +488,24 @@ class Chains extends EventEmitter {
           }
         })
       })
+    }
+
+    powerMonitor.on('resume', () => {
+      const activeConnections = Object.keys(this.connections)
+        .map((type) => Object.keys(this.connections[type]).map((chainId) => `${type}:${chainId}`))
+        .flat()
+
+      log.info('System resuming, resetting active connections', { chains: activeConnections })
+
+      activeConnections.forEach((id) => {
+        const [type, chainId] = id.split(':')
+        removeConnection(chainId, type)
+      })
+
+      updateConnections()
     })
+
+    store.observer(updateConnections, 'chains:connections')
   }
 
   send(payload, res, targetChain) {
