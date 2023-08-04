@@ -437,10 +437,6 @@ class Chains extends EventEmitter {
     super()
     this.connections = {}
 
-    setTimeout(() => {
-      powerMonitor.emit('resume')
-    }, 15000)
-
     const removeConnection = (chainId, type = 'ethereum') => {
       this.connections[type][chainId].removeAllListeners()
       this.connections[type][chainId].close(false)
