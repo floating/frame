@@ -442,7 +442,6 @@ class Chains extends EventEmitter {
     }, 15000)
 
     const removeConnection = (chainId, type = 'ethereum') => {
-      console.log({ chainId, type })
       this.connections[type][chainId].removeAllListeners()
       this.connections[type][chainId].close(false)
       delete this.connections[type][chainId]
