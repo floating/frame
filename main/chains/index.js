@@ -438,9 +438,11 @@ class Chains extends EventEmitter {
     this.connections = {}
 
     const removeConnection = (chainId, type = 'ethereum') => {
-      this.connections[type][chainId].removeAllListeners()
-      this.connections[type][chainId].close(false)
-      delete this.connections[type][chainId]
+      if (type in this.connections && chainId in this.connections[type]) {
+        this.connections[type][chainId].removeAllListeners()
+        this.connections[type][chainId].close(false)
+        delete this.connections[type][chainId]
+      }
     }
 
     const updateConnections = () => {
@@ -491,9 +493,7 @@ class Chains extends EventEmitter {
 
     powerMonitor.on('resume', () => {
       const activeConnections = Object.keys(this.connections)
-        .map((type) => {
-          return Object.keys(this.connections[type]).map((chainId) => `${type}:${chainId}`)
-        })
+        .map((type) => Object.keys(this.connections[type]).map((chainId) => `${type}:${chainId}`))
         .flat()
 
       log.info('System resuming, resetting active connections', { chains: activeConnections })
