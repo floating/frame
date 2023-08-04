@@ -10,7 +10,7 @@ import {
   v38StateSchema
 } from './schema'
 
-const pylonChainIds = ['1', '5', '10', '138', '42161', '11155111']
+const pylonChainIds = ['1', '5', '10', '137', '42161', '11155111']
 const retiredChainIds = ['3', '4', '42']
 const chainsToMigrate = [...pylonChainIds, ...retiredChainIds]
 

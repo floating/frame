@@ -10,7 +10,7 @@ const migratedChains = [
   [5, 'Goerli'],
   [10, 'Optimism'],
   [42, 'Kovan'],
-  [138, 'Polygon'],
+  [137, 'Polygon'],
   [42161, 'Arbitrum'],
   [11155111, 'Sepolia']
 ]
