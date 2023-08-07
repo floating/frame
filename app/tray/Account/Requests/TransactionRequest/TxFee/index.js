@@ -67,7 +67,15 @@ class TxFee extends React.Component {
   }
 
   getOptimismFee = (l2Price, l2Limit, rawTx) => {
-    const serializedTransaction = utils.serializeTransaction(Object.assign({}, rawTx, { type: 2 }))
+    const { maxFeePerGas, maxPriorityFeePerGas, gasPrice, data, gasLimit, nonce, to, value } = rawTx
+    const chainId = parseInt(rawTx.chainId, 16)
+    const txData = { chainId, data, gasLimit, nonce, to, value }
+
+    const tx = !!maxFeePerGas
+      ? { ...txData, maxFeePerGas, maxPriorityFeePerGas, type: 2 }
+      : { ...txData, gasPrice, type: 0 }
+
+    const serializedTransaction = utils.serializeTransaction(tx)
 
     // Get current Ethereum gas price
     const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')

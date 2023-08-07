@@ -497,7 +497,7 @@ export class Provider extends EventEmitter {
         const populatedTransaction = populateTransaction(tx, chainConfig, gas)
         const checkedTransaction = checkExistingNonceGas(populatedTransaction)
 
-        log.verbose('Succesfully populated transaction', checkedTransaction)
+        log.verbose('Successfully populated transaction', checkedTransaction)
 
         cb(null, { tx: checkedTransaction, approvals })
       } catch (error) {
