@@ -6,7 +6,7 @@ import log from 'electron-log'
 const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 
-jest.mock('electron')
+jest.mock('electron', () => ({}))
 jest.mock('../../../../../main/store/persist')
 
 // Stubs

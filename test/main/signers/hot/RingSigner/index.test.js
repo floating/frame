@@ -8,7 +8,7 @@ const PASSWORD = 'fr@///3_password'
 const SIGNER_PATH = path.resolve(__dirname, '../.userData/signers')
 const FILE_PATH = path.resolve(__dirname, 'keystore.json')
 
-jest.mock('electron')
+jest.mock('electron', () => ({}))
 jest.mock('../../../../../main/store/persist')
 
 // Stubs
