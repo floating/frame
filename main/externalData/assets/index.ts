@@ -18,6 +18,7 @@ export default function rates(pylon: Pylon, store: Store) {
   const storeApi = {
     getKnownTokens: (address?: Address) =>
       ((address && store('main.tokens.known', address)) || []) as Token[],
+    getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
     setNativeCurrencyData: (chainId: number, currencyData: NativeCurrency) =>
       store.setNativeCurrencyData('ethereum', chainId, currencyData),
     setNativeCurrencyRate: (chainId: number, rate: Rate) =>
@@ -67,7 +68,13 @@ export default function rates(pylon: Pylon, store: Store) {
   function updateSubscription(chains: number[], address?: Address) {
     const subscribedCurrencies = chains.map((chainId) => ({ type: AssetType.NativeCurrency, chainId }))
     const knownTokens = storeApi.getKnownTokens(address).filter((token) => chains.includes(token.chainId))
-    const subscribedTokens = knownTokens.map((token) => ({
+    const customTokens = storeApi
+      .getCustomTokens()
+      .filter(
+        (token) => !knownTokens.some((kt) => kt.address === token.address && kt.chainId === token.chainId)
+      )
+
+    const subscribedTokens = [...knownTokens, ...customTokens].map((token) => ({
       type: AssetType.Token,
       chainId: token.chainId,
       address: token.address
