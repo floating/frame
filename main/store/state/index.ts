@@ -432,12 +432,12 @@ const mainState: M = {
         connection: {
           primary: {
             on: true,
-            current: 'custom',
+            current: 'pylon',
             status: 'loading',
             connected: false,
             type: '',
             network: '',
-            custom: 'https://goerli.base.org'
+            custom: ''
           },
           secondary: {
             on: false,
