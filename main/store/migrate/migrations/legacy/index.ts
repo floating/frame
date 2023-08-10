@@ -9,7 +9,9 @@ import log from 'electron-log'
 import { accountNS, isDefaultAccountName } from '../../../../../resources/domain/account'
 import { isWindows } from '../../../../../resources/platform'
 
-const migrations = {
+type LegacyMigration = (initial: unknown) => unknown
+
+const migrations: Record<number, LegacyMigration> = {
   4: (initial) => {
     // If persisted state still has main.gasPrice, move gas settings into networks
     const gasPrice = initial.main.gasPrice // ('gasPrice', false)

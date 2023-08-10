@@ -1,5 +1,5 @@
 import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
-import { z } from 'zod'
+import { SafeParseSuccess, z } from 'zod'
 import log from 'electron-log'
 
 import persist from '../persist'
@@ -7,8 +7,8 @@ import migrations from '../migrate'
 import { queueError } from '../../errors/queue'
 
 import { MainSchema } from './types/main'
-import { Chain, chainDefaults } from './types/chain'
-import { ChainMetadata, chainMetaDefaults } from './types/chainMeta'
+import { Chain } from './types/chain'
+import { ChainMetadata } from './types/chainMeta'
 import type { Origin } from './types/origin'
 import type { Dapp } from './types/dapp'
 
@@ -31,19 +31,34 @@ export type { InventoryAsset, InventoryCollection, Inventory } from './types/inv
 export type { Media } from './types/media'
 export type { AssetPreferences } from './types/preferences'
 
-const StateSchema = z.object({
-  main: MainSchema.passthrough(), // TODO: remove passthrough once all pieces of state have been defined
-  windows: z.any(),
-  view: z.any(),
-  selected: z.any(),
-  panel: z.any(),
-  tray: z.any(),
-  platform: z.string()
-})
+const StateSchema = z
+  .object({
+    main: MainSchema, // TODO: remove passthrough once all pieces of state have been defined
+    windows: z.any().default({}),
+    view: z.any().default({}),
+    selected: z.any().default({}),
+    panel: z.any().default({}),
+    tray: z.any().default({}),
+    platform: z.string().default(process.platform)
+  })
+  .default({})
 
 export type Migration = {
   version: number
   migrate: (initial: unknown) => any
+}
+
+type State = {
+  __?: Record<number, unknown>
+}
+
+function loadState() {
+  const state = persist.get('main') as State
+  console.log({ state })
+  if (!state || !state.__) {
+    log.verbose('Persisted state: returning base state')
+    return state
+  }
 }
 
 const latestStateVersion = () => {
@@ -166,8 +181,6 @@ const mainState = {
   updater: {
     dontRemind: main('updater.dontRemind', [])
   },
-  networks: main('networks', { ethereum: chainDefaults }),
-  networksMeta: main('networksMeta', { ethereum: chainMetaDefaults }),
   dapps: main('dapps', {}),
   ipfs: {},
   frames: {},
@@ -319,18 +332,6 @@ Object.keys(initial.main.accounts).forEach((id) => {
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
 
-Object.values(initial.main.networks.ethereum as Record<string, Chain>).forEach((chain) => {
-  chain.connection.primary = { ...chain.connection.primary, connected: false }
-  chain.connection.secondary = { ...chain.connection.secondary, connected: false }
-})
-
-Object.values(initial.main.networksMeta).forEach((chains) => {
-  Object.values(chains as Record<string, ChainMetadata>).forEach((chainMeta) => {
-    // remove stale price data
-    chainMeta.nativeCurrency = { ...chainMeta.nativeCurrency, usd: { price: 0, change24hr: 0 } }
-  })
-})
-
 initial.main.origins = Object.entries(initial.main.origins as Record<string, Origin>).reduce(
   (origins, [id, origin]) => {
     if (id !== uuidv5('Unknown', uuidv5.DNS)) {
@@ -363,16 +364,22 @@ initial.main.dapps = Object.fromEntries(
 // ---
 
 export default function () {
-  const migratedState = migrations.apply(initial)
+  const persistedState = loadState()
+
+  const migratedState = persistedState // migrations.apply(initial)
   const result = StateSchema.safeParse(migratedState)
 
   if (!result.success) {
+    // this can only happen if the state is corrupted in an unrecoverable way
     queueError(result.error)
 
     const issues = result.error.issues
     log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
+
+    const defaultState = StateSchema.safeParse(undefined)
+
+    return defaultState.success && defaultState.data
   }
 
-  // return result.data
-  return migratedState
+  return result.data
 }

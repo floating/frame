@@ -1,48 +1,65 @@
-jest.mock('electron-log', () => ({ info: console.log, warn: jest.fn(), error: jest.fn() }))
 jest.mock('electron', () => ({ app: { on: jest.fn(), getPath: jest.fn() } }))
 jest.mock('fs')
 
+import getState from '../../../../main/store/state'
+import persist from '../../../../main/store/persist'
+
 let mockLatestVersion = 0
 
-jest.mock('../../../../main/store/migrate', () => {
-  return {
-    latest: mockLatestVersion,
-    apply: (state) => {
-      return mockLatestVersion === 2
-        ? { ...state, main: { ...state.main, _version: 2, instanceId: 'test-brand-new-frame' } }
-        : { ...state }
-    }
-  }
-})
+jest.mock('../../../../main/errors/queue', () => ({
+  queueError: console.log
+}))
 
-jest.mock('../../../../main/store/persist', () => {
-  const get = (path) => {
-    if (path === 'main')
-      // simulate state that has already been migrated to version 2
-      return {
-        __: {
-          1: {
-            main: {
-              _version: 1,
-              instanceId: 'test-frame'
-            }
-          },
-          2: {
-            main: {
-              _version: 2,
-              instanceId: 'test-brand-new-frame'
-            }
-          }
-        }
-      }
-  }
+jest.mock('../../../../main/store/persist', () => ({
+  get: jest.fn()
+}))
 
-  return { get }
-})
+// jest.mock('../../../../main/store/migrate', () => {
+//   return {
+//     latest: mockLatestVersion,
+//     apply: (state) => {
+//       return mockLatestVersion === 2
+//         ? { ...state, main: { ...state.main, _version: 2, instanceId: 'test-brand-new-frame' } }
+//         : { ...state }
+//     }
+//   }
+// })
+
+// jest.mock('../../../../main/store/persist', () => {
+//   const get = (path) => {
+//     if (path === 'main')
+//       // simulate state that has already been migrated to version 2
+//       return {
+//         __: {
+//           1: {
+//             main: {
+//               _version: 1,
+//               instanceId: 'test-frame'
+//             }
+//           },
+//           2: {
+//             main: {
+//               _version: 2,
+//               instanceId: 'test-brand-new-frame'
+//             }
+//           }
+//         }
+//       }
+//   }
+
+//   return { get }
+// })
 
 afterEach(() => {
   // ensure modules are reloaded before each test
-  jest.resetModules()
+  //jest.resetModules()
+})
+
+it('loads new state when none exists', () => {
+  persist.get.mockReturnValueOnce(undefined)
+  const state = getState()
+
+  console.log(JSON.stringify(state, null, 2))
 })
 
 it('maintains backwards compatible access to the current version of state', async () => {

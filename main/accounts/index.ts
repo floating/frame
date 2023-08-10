@@ -553,7 +553,7 @@ export class Accounts extends EventEmitter {
           const gas = store('main.networksMeta', chain.type, chain.id, 'gas') as Gas
 
           if (usesBaseFee(tx)) {
-            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees || {}
+            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.fees || {}
 
             if (maxPriorityFeePerGas && maxBaseFeePerGas) {
               this.setPriorityFee(maxPriorityFeePerGas, id, false)

@@ -1,9 +1,10 @@
 import { z } from 'zod'
+import { v4 as uuid } from 'uuid'
 
 import { AccountMetadataSchema, AccountSchema } from './account'
 import { BalanceSchema } from './balance'
 import { EthereumChainsSchema } from './chain'
-import { ChainMetadataSchema } from './chainMeta'
+import { EthereumChainsMetadataSchema } from './chainMeta'
 import { ColorwayPrimarySchema } from './colors'
 import { DappSchema } from './dapp'
 import { FrameSchema } from './frame'
@@ -34,38 +35,43 @@ const MainPreferences = {
   menubarGasPrice: z.boolean().default(false).describe('Show gas price in menu bar')
 }
 
-export const MainSchema = z.object({
-  _version: z.coerce.number(),
-  instanceId: z.string(), // TODO: uuid
-  networks: EthereumChainsSchema,
-  networksMeta: z.object({
-    ethereum: z.record(z.coerce.number(), ChainMetadataSchema)
-  }),
-  origins: KnownOriginsSchema,
-  knownExtensions: z.record(z.string(), z.boolean()),
-  assetPreferences: AssetPreferencesSchema,
-  permissions: z.record(
-    z.string().describe('Address'),
-    z.record(z.string().describe('Origin Id'), PermissionSchema)
-  ),
-  tokens: z.object({
-    custom: z.array(TokenSchema),
-    known: z.record(z.string(), z.array(TokenBalanceSchema))
-  }),
-  accounts: z.record(z.string(), AccountSchema),
-  accountsMeta: z.record(z.string(), AccountMetadataSchema),
-  signers: z.record(z.string(), SignerSchema),
-  balances: z.record(z.string().describe('Address'), z.array(BalanceSchema)),
-  dapps: z.record(z.string(), DappSchema),
-  mute: MuteSchema,
-  privacy: PrivacySchema,
-  colorway: z.enum(['light', 'dark']),
-  colorwayPrimary: ColorwayPrimarySchema,
-  shortcuts: ShortcutsSchema,
-  updater: UpdaterPreferencesSchema,
-  frames: z.record(z.string(), FrameSchema),
-  rates: RatesSchema,
-  ...MainPreferences
-})
+const defaultValues = {
+  _version: 41,
+  instanceId: uuid()
+}
+
+export const MainSchema = z
+  .object({
+    _version: z.coerce.number().default(defaultValues._version),
+    instanceId: z.string().catch(defaultValues.instanceId).default(defaultValues.instanceId),
+    networks: EthereumChainsSchema,
+    networksMeta: EthereumChainsMetadataSchema
+    // origins: KnownOriginsSchema,
+    // knownExtensions: z.record(z.string(), z.boolean()),
+    // assetPreferences: AssetPreferencesSchema,
+    // permissions: z.record(
+    //   z.string().describe('Address'),
+    //   z.record(z.string().describe('Origin Id'), PermissionSchema)
+    // ),
+    // tokens: z.object({
+    //   custom: z.array(TokenSchema),
+    //   known: z.record(z.string(), z.array(TokenBalanceSchema))
+    // }),
+    // accounts: z.record(z.string(), AccountSchema),
+    // accountsMeta: z.record(z.string(), AccountMetadataSchema),
+    // signers: z.record(z.string(), SignerSchema),
+    // balances: z.record(z.string().describe('Address'), z.array(BalanceSchema)),
+    // dapps: z.record(z.string(), DappSchema),
+    // mute: MuteSchema,
+    // privacy: PrivacySchema,
+    // colorway: z.enum(['light', 'dark']),
+    // colorwayPrimary: ColorwayPrimarySchema,
+    // shortcuts: ShortcutsSchema,
+    // updater: UpdaterPreferencesSchema,
+    // frames: z.record(z.string(), FrameSchema),
+    // rates: RatesSchema,
+    // ...MainPreferences
+  })
+  .default({})
 
 export type Main = z.infer<typeof MainSchema>

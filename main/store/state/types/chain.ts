@@ -6,7 +6,7 @@ import { ConnectionSchema } from './connection'
 const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet'] as const
 const type = 'ethereum' as const
 
-export const chainDefaults = {
+const chainDefaults = {
   1: {
     id: 1,
     type,
@@ -234,11 +234,12 @@ export const chainDefaults = {
   }
 }
 
-function getDefaultChain(chainId: keyof typeof chainDefaults) {
+function getReplacementChain(chainId: keyof typeof chainDefaults) {
   const defaultChain = chainDefaults[chainId]
 
   // ensure all chains that are replaced in state with a
-  // default value are not using any custom RPC presets
+  // default value are not using any custom RPC presets to prevent
+  // forcing users to use unwanted third party connections
   defaultChain.connection.primary.current = 'custom'
   defaultChain.connection.secondary.current = 'custom'
 
@@ -262,69 +263,59 @@ export const ChainSchema = ChainIdSchema.merge(
     isTestnet: z.boolean().default(false),
     explorer: z.string().default('')
   })
-)
+).transform((chain) => {
+  // all chains should start disconnected by default
+  return {
+    ...chain,
+    connection: {
+      ...chain.connection,
+      primary: {
+        ...chain.connection.primary,
+        connected: false
+      },
+      secondary: {
+        ...chain.connection.secondary,
+        connected: false
+      }
+    }
+  }
+})
 
-// create a version of the schema that removes invalid chains, allowing them to
-// also be "false" so that we can filter them out later in a transform
-const ParsedChainSchema = z.union([ChainSchema, z.boolean()]).catch((ctx) => {
-  const { id: chainId } = (ctx.input || {}) as any
+const ChainsSchema = z.record(z.coerce.number(), z.unknown()).transform((chainsObject) => {
+  const chains = {} as Record<number, Chain>
 
-  if (chainId in chainDefaults) {
-    return getDefaultChain(chainId as keyof typeof chainDefaults)
+  for (const id in chainsObject) {
+    const chainId = parseInt(id)
+    const chain = chainsObject[chainId]
+    const result = ChainSchema.safeParse(chain)
+
+    if (!result.success) {
+      log.info(`Removing invalid chain ${id} from state`, result.error)
+
+      if (chainId in chainDefaults) {
+        chains[chainId] = getReplacementChain(chainId as keyof typeof chainDefaults)
+      }
+    } else {
+      chains[chainId] = result.data
+    }
   }
 
-  return false
+  // add mainnet if it's not already there
+  return {
+    ...chains,
+    1: chains['1'] || getReplacementChain(1)
+  } as Record<number, Chain>
 })
 
-const ChainsSchema = z
-  .record(z.coerce.number(), ParsedChainSchema)
-  .transform((parsedChains) => {
-    // remove any chains that failed to parse, which will now be set to "false"
-    const chains = Object.fromEntries(
-      Object.entries(parsedChains).filter(([id, chain]) => {
-        if (chain === false) {
-          log.info(`State parsing: removing invalid chain ${id} from state`)
-          return false
-        }
-
-        return true
-      })
-    ) as Record<string, Chain>
-
-    // add mainnet if it's not already there
-    return {
-      ...chains,
-      1: chains['1'] || getDefaultChain(1)
-    }
+export const EthereumChainsSchema = z
+  .object({
+    ethereum: ChainsSchema
   })
-  .transform((chains) => {
-    const disconnectedChains = Object.entries(chains).map(([id, chain]) => {
-      // all chains should start disconnected by default
-      return [
-        id,
-        {
-          ...chain,
-          connection: {
-            ...chain.connection,
-            primary: {
-              ...chain.connection.primary,
-              connected: false
-            },
-            secondary: {
-              ...chain.connection.secondary,
-              connected: false
-            }
-          }
-        }
-      ]
-    })
-
-    return Object.fromEntries(disconnectedChains)
+  .catch((ctx) => {
+    log.error('Could not parse chains, falling back to defaults', ctx.error)
+    return { ethereum: chainDefaults }
   })
-
-export const EthereumChainsSchema = z.object({
-  ethereum: ChainsSchema
-})
+  .default({ ethereum: chainDefaults })
 
 export type ChainId = z.infer<typeof ChainIdSchema>
 export type Chain = z.infer<typeof ChainSchema>

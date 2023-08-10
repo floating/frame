@@ -1,8 +1,12 @@
-const debug = jest.fn()
-const verbose = jest.fn()
-const info = jest.fn()
-const warn = jest.fn()
-const error = jest.fn()
+function createLogLevel() {
+  return process.env.NODE_ENV === 'development' ? console.log : jest.fn()
+}
+
+const debug = createLogLevel()
+const verbose = createLogLevel()
+const info = createLogLevel()
+const warn = createLogLevel()
+const error = createLogLevel()
 
 const transports = {
   console: {

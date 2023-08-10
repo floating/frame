@@ -17,10 +17,10 @@ export const GasFeesSchema = z.object({
 })
 
 export const GasSchema = z.object({
+  fees: GasFeesSchema.nullish(),
   price: z.object({
     selected: GasLevelsSchema.keyof(),
-    levels: GasLevelsSchema,
-    fees: GasFeesSchema.nullish()
+    levels: GasLevelsSchema
   })
 })
 
