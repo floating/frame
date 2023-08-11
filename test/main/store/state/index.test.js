@@ -1,5 +1,7 @@
 jest.mock('electron', () => ({ app: { on: jest.fn(), getPath: jest.fn() } }))
-jest.mock('fs')
+//jest.mock('fs')
+
+import fs from 'fs'
 
 import getState from '../../../../main/store/state'
 import persist from '../../../../main/store/persist'
@@ -56,7 +58,9 @@ afterEach(() => {
 })
 
 it('loads new state when none exists', () => {
-  persist.get.mockReturnValueOnce(undefined)
+  const onDisk = fs.readFileSync('/home/matt/.config/frame/config.json', 'utf8')
+  const json = JSON.parse(onDisk)
+  persist.get.mockReturnValueOnce(json.main)
   const state = getState()
 
   console.log(JSON.stringify(state, null, 2))

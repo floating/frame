@@ -17,6 +17,7 @@ import { TokenBalanceSchema, TokenSchema } from './token'
 import { SignerSchema } from './signer'
 import { AssetPreferencesSchema } from './preferences'
 import { RatesSchema } from './rate'
+import { currentVersion } from '..'
 
 const UpdaterPreferencesSchema = z.object({
   dontRemind: z.array(z.string())
@@ -36,13 +37,12 @@ const MainPreferences = {
 }
 
 const defaultValues = {
-  _version: 41,
   instanceId: uuid()
 }
 
 export const MainSchema = z
   .object({
-    _version: z.coerce.number().default(defaultValues._version),
+    _version: z.coerce.number().default(currentVersion),
     instanceId: z.string().catch(defaultValues.instanceId).default(defaultValues.instanceId),
     networks: EthereumChainsSchema,
     networksMeta: EthereumChainsMetadataSchema

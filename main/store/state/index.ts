@@ -1,5 +1,5 @@
 import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
-import { SafeParseSuccess, z } from 'zod'
+import { z } from 'zod'
 import log from 'electron-log'
 
 import persist from '../persist'
@@ -7,8 +7,6 @@ import migrations from '../migrate'
 import { queueError } from '../../errors/queue'
 
 import { MainSchema } from './types/main'
-import { Chain } from './types/chain'
-import { ChainMetadata } from './types/chainMeta'
 import type { Origin } from './types/origin'
 import type { Dapp } from './types/dapp'
 
@@ -31,6 +29,8 @@ export type { InventoryAsset, InventoryCollection, Inventory } from './types/inv
 export type { Media } from './types/media'
 export type { AssetPreferences } from './types/preferences'
 
+const currentVersion = 41
+
 const StateSchema = z
   .object({
     main: MainSchema, // TODO: remove passthrough once all pieces of state have been defined
@@ -43,62 +43,49 @@ const StateSchema = z
   })
   .default({})
 
-export type Migration = {
-  version: number
-  migrate: (initial: unknown) => any
+type StateVersion = {
+  main: {
+    _version: number
+  }
 }
 
-type State = {
-  __?: Record<number, unknown>
+type VersionedState = {
+  __: Record<number, StateVersion>
 }
 
 function loadState() {
-  const state = persist.get('main') as State
-  console.log({ state })
-  if (!state || !state.__) {
-    log.verbose('Persisted state: returning base state')
-    return state
-  }
-}
+  const currentBaseState = { main: { _version: currentVersion } } as StateVersion
+  const state = persist.get('main') as Record<string, unknown> | undefined
 
-const latestStateVersion = () => {
-  // TODO: validate state and type it here?
-  // TODO: what does this top-level state object look like?
-  const state = persist.get('main') as any
-  if (!state || !state.__) {
-    // log.info('Persisted state: returning base state')
-    return state
+  if (!state) {
+    log.verbose('Persisted state: no state found')
+    return currentBaseState
   }
 
-  // valid states are less than or equal to the latest migration we know about
-  const versions = Object.keys(state.__)
-    .filter((v) => parseInt(v) <= migrations.latest)
-    .sort((a, b) => parseInt(a) - parseInt(b))
+  if (!state.__) {
+    log.verbose('Persisted state: legacy state found, returning base state')
+    return state as StateVersion
+  }
+
+  const versionedState = state as VersionedState
+
+  const versions = Object.keys(versionedState.__)
+    .map((v) => parseInt(v))
+    .filter((v) => v <= migrations.latest)
+    .sort((a, b) => a - b)
 
   if (versions.length === 0) {
-    // log.info('Persisted state: returning base state')
-    return state
+    log.verbose('Persisted state: no valid state versions found')
+    return currentBaseState
   }
 
   const latest = versions[versions.length - 1]
-  // log.info('Persisted state: returning latest state version: ', latest)
-  return state.__[latest].main
-}
-
-const get = (path: string, obj = latestStateVersion()) => {
-  path.split('.').some((key) => {
-    if (typeof obj !== 'object') {
-      obj = undefined
-    } else {
-      obj = obj[key]
-    }
-    return obj === undefined // Stop navigating the path if we get to undefined value
-  })
-  return obj
+  log.verbose('Persisted state: returning latest state', { version: latest })
+  return versionedState.__[latest]
 }
 
 const main = (path: string, def: any) => {
-  const found = get(path)
+  const found = undefined //get(path)
   if (found === undefined) return def
   return found
 }
@@ -363,10 +350,13 @@ initial.main.dapps = Object.fromEntries(
 
 // ---
 
+export { currentVersion }
+export type { StateVersion }
+
 export default function () {
   const persistedState = loadState()
 
-  const migratedState = persistedState // migrations.apply(initial)
+  const migratedState = migrations.apply(persistedState)
   const result = StateSchema.safeParse(migratedState)
 
   if (!result.success) {
