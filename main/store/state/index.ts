@@ -30,6 +30,7 @@ export type { Media } from './types/media'
 export type { AssetPreferences } from './types/preferences'
 
 const currentVersion = 41
+const currentBaseState = { main: { _version: currentVersion } } as StateVersion
 
 const StateSchema = z
   .object({
@@ -54,7 +55,6 @@ type VersionedState = {
 }
 
 function loadState() {
-  const currentBaseState = { main: { _version: currentVersion } } as StateVersion
   const state = persist.get('main') as Record<string, unknown> | undefined
 
   if (!state) {
@@ -366,7 +366,7 @@ export default function () {
     const issues = result.error.issues
     log.warn(`Found ${issues.length} issues while parsing saved state`, issues)
 
-    const defaultState = StateSchema.safeParse(undefined)
+    const defaultState = StateSchema.safeParse(currentBaseState)
 
     return defaultState.success && defaultState.data
   }
