@@ -358,6 +358,8 @@ const migrations: Record<number, LegacyMigration> = {
       }
     }
 
+    initial.main.networksMeta = initial.main.networksMeta || { ethereum: {} }
+
     // ensure all network configurations have corresponding network meta
     Object.keys(initial.main.networks.ethereum).forEach((networkId) => {
       if (initial.main.networksMeta.ethereum[networkId]) {
@@ -775,6 +777,8 @@ const migrations: Record<number, LegacyMigration> = {
   31: (initial) => {
     const dodgyAddress = '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000'
 
+    initial.main.balances = initial.main.balances || {}
+
     Object.entries(initial.main.balances).forEach(([address, balances]) => {
       initial.main.balances[address] = balances.filter(({ address }) => address !== dodgyAddress)
     })
@@ -913,7 +917,7 @@ const migrations: Record<number, LegacyMigration> = {
   },
   35: (initial) => {
     const { shortcuts } = initial.main || {}
-    const { altSlash: summonShortcutEnabled, ...otherShortcuts } = shortcuts
+    const { altSlash: summonShortcutEnabled, ...otherShortcuts } = shortcuts || {}
 
     initial.main.shortcuts = {
       ...otherShortcuts,
