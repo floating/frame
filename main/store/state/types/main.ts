@@ -45,7 +45,7 @@ export const MainSchema = z
     _version: z.coerce.number().default(currentVersion),
     instanceId: z.string().catch(defaultValues.instanceId).default(defaultValues.instanceId),
     networks: EthereumChainsSchema,
-    networksMeta: EthereumChainsMetadataSchema
+    networksMeta: EthereumChainsMetadataSchema,
     // origins: KnownOriginsSchema,
     // knownExtensions: z.record(z.string(), z.boolean()),
     // assetPreferences: AssetPreferencesSchema,
@@ -59,7 +59,7 @@ export const MainSchema = z
     // }),
     // accounts: z.record(z.string(), AccountSchema),
     // accountsMeta: z.record(z.string(), AccountMetadataSchema),
-    // signers: z.record(z.string(), SignerSchema),
+    signers: z.record(z.string(), SignerSchema).default({})
     // balances: z.record(z.string().describe('Address'), z.array(BalanceSchema)),
     // dapps: z.record(z.string(), DappSchema),
     // mute: MuteSchema,

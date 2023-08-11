@@ -35,7 +35,23 @@ const currentBaseState = { main: { _version: currentVersion } } as StateVersion
 const StateSchema = z
   .object({
     main: MainSchema, // TODO: remove passthrough once all pieces of state have been defined
-    windows: z.any().default({}),
+    windows: z.any().default({
+      panel: {
+        show: false,
+        nav: [],
+        footer: {
+          height: 40
+        }
+      },
+      dash: {
+        show: false,
+        nav: [],
+        footer: {
+          height: 40
+        }
+      },
+      frames: []
+    }),
     view: z.any().default({}),
     selected: z.any().default({}),
     panel: z.any().default({}),
@@ -184,23 +200,6 @@ const mainState = {
 }
 
 const initial = {
-  windows: {
-    panel: {
-      show: false,
-      nav: [],
-      footer: {
-        height: 40
-      }
-    },
-    dash: {
-      show: false,
-      nav: [],
-      footer: {
-        height: 40
-      }
-    },
-    frames: []
-  },
   panel: {
     // Panel view
     showing: false,

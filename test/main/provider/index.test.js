@@ -827,13 +827,13 @@ describe('#send', () => {
 
       chainIds.forEach((chainId) => {
         store.set('main.networksMeta.ethereum', chainId, 'gas', {
+          fees: {
+            maxPriorityFeePerGas: gweiToHex(1),
+            maxBaseFeePerGas: gweiToHex(8)
+          },
           price: {
             selected: 'standard',
-            levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
-            fees: {
-              maxPriorityFeePerGas: gweiToHex(1),
-              maxBaseFeePerGas: gweiToHex(8)
-            }
+            levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' }
           }
         })
 
@@ -962,13 +962,13 @@ describe('#send', () => {
             initialRequest.mode = 'monitor'
 
             store.set('main.networksMeta.ethereum', 137, 'gas', {
+              fees: {
+                maxPriorityFeePerGas: gweiToHex(1),
+                maxBaseFeePerGas: gweiToHex(8)
+              },
               price: {
                 selected: 'standard',
-                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
-                fees: {
-                  maxPriorityFeePerGas: gweiToHex(1),
-                  maxBaseFeePerGas: gweiToHex(8)
-                }
+                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' }
               }
             })
 
@@ -1034,13 +1034,13 @@ describe('#send', () => {
             initialRequest.mode = 'monitor'
 
             store.set('main.networksMeta.ethereum', 1, 'gas', {
+              fees: {
+                maxPriorityFeePerGas: gweiToHex(1),
+                maxBaseFeePerGas: gweiToHex(20)
+              },
               price: {
                 selected: 'standard',
-                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
-                fees: {
-                  maxPriorityFeePerGas: gweiToHex(1),
-                  maxBaseFeePerGas: gweiToHex(20)
-                }
+                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' }
               }
             })
 
@@ -1074,13 +1074,13 @@ describe('#send', () => {
 
             initialRequest.mode = 'monitor'
             store.set('main.networksMeta.ethereum', 1, 'gas', {
+              fees: {
+                maxPriorityFeePerGas: gweiToHex(2),
+                maxBaseFeePerGas: gweiToHex(14)
+              },
               price: {
                 selected: 'standard',
-                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' },
-                fees: {
-                  maxPriorityFeePerGas: gweiToHex(2),
-                  maxBaseFeePerGas: gweiToHex(14)
-                }
+                levels: { slow: '', standard: '', fast: gweiToHex(40), asap: '', custom: '' }
               }
             })
 
@@ -1561,13 +1561,13 @@ describe('#signAndSend', () => {
       })
 
       store.set('main.networksMeta.ethereum.1.gas', {
+        fees: {
+          maxPriorityFeePerGas: gweiToHex(1),
+          maxBaseFeePerGas: gweiToHex(8)
+        },
         price: {
           selected: 'standard',
-          levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' },
-          fees: {
-            maxPriorityFeePerGas: gweiToHex(1),
-            maxBaseFeePerGas: gweiToHex(8)
-          }
+          levels: { slow: '', standard: '', fast: gweiToHex(30), asap: '', custom: '' }
         }
       })
     })
