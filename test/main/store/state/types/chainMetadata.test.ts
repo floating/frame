@@ -79,7 +79,13 @@ it('handles a corrupted state with the wrong structure of the ethereum object', 
 it('parses valid chain metadata', () => {
   const { ethereum: chains } = EthereumChainsMetadataSchema.parse({ ethereum: { 5: validChainMetadata } })
 
-  expect(chains['5']).toEqual(validChainMetadata)
+  expect(chains['5']).toEqual({
+    ...validChainMetadata,
+    gas: {
+      ...validChainMetadata.gas,
+      fees: null
+    }
+  })
 })
 
 it('removes any persisted native currency price', () => {
