@@ -4,6 +4,7 @@
 
 import { v5 as uuidv5 } from 'uuid'
 import { z } from 'zod'
+import log from 'electron-log'
 
 import { accountNS, isDefaultAccountName } from '../../../../../resources/domain/account'
 import { isWindows } from '../../../../../resources/platform'
