@@ -161,7 +161,8 @@ class ChainSummaryComponent extends Component {
       // Optimism specific calculations
       const price = calculatedFees?.actualFee || gasPrice
 
-      const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
+      const feeMarket = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees') || {}
+      const { nextBaseFee: ethBaseFee } = feeMarket
 
       const optimismEstimate = (serializedTx, l2Limit) => {
         const l1Estimate = BigNumber(calculateOptimismL1DataFee(serializedTx, ethBaseFee)).shiftedBy(-9)
