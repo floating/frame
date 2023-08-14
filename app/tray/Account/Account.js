@@ -259,7 +259,7 @@ class _AccountBody extends React.Component {
     if (crumb.view === 'requestView') {
       const { accountId, requestId } = crumb.data
       const req = this.store('main.accounts', accountId, 'requests', requestId)
-      const accountViewTitle = this.getAccountViewTitle(req)
+      const accountViewTitle = (req && this.getAccountViewTitle(req)) || ''
 
       return (
         <AccountView
@@ -269,7 +269,7 @@ class _AccountBody extends React.Component {
           {...this.props}
           accountViewTitle={accountViewTitle}
         >
-          {this.renderRequest(req, crumb.data)}
+          {req && this.renderRequest(req, crumb.data)}
         </AccountView>
       )
     } else if (crumb.view === 'expandedModule') {
