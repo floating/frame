@@ -188,6 +188,9 @@ const Surface = () => {
 
   const subscribeToItems = (addr: string, items: CollectionItem[]) => {
     const account = addr.toLowerCase()
+
+    if (!subscriptions[account]) return
+
     const sub = Pylon.items.subscribe(items, {
       onStarted() {
         log.debug(`Created subscription to items`, { account, items })
