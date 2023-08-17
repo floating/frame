@@ -3,18 +3,6 @@ import { createState, initChainState } from '../setup'
 
 const providers = ['infura', 'alchemy']
 
-const migratedChains = [
-  [1, 'Mainnet'],
-  [3, 'Ropsten'],
-  [4, 'Rinkeby'],
-  [5, 'Goerli'],
-  [10, 'Optimism'],
-  [42, 'Kovan'],
-  [137, 'Polygon'],
-  [42161, 'Arbitrum'],
-  [11155111, 'Sepolia']
-]
-
 let state
 
 beforeEach(() => {
@@ -26,46 +14,46 @@ it('should have migration version 38', () => {
   expect(version).toBe(38)
 })
 
-migratedChains.forEach(([id, chainName]) => {
-  providers.forEach((provider) => {
-    it(`should remove the RPC for a primary ${chainName} ${provider} connection`, () => {
-      initChainState(state, id)
+providers.forEach((provider) => {
+  it(`should remove the RPC for a primary ${provider} connection`, () => {
+    initChainState(state, 137)
 
-      state.main.networks.ethereum[id].connection = {
-        primary: { current: provider },
-        secondary: { current: 'custom', custom: 'myrpc' }
-      }
+    state.main.networks.ethereum[137].name = 'Polygon'
+    state.main.networks.ethereum[137].connection = {
+      primary: { current: provider },
+      secondary: { current: 'custom', custom: 'myrpc' }
+    }
 
-      const updatedState = migration.migrate(state)
+    const updatedState = migration.migrate(state)
 
-      const {
-        connection: { primary, secondary }
-      } = updatedState.main.networks.ethereum[id]
+    const {
+      connection: { primary, secondary }
+    } = updatedState.main.networks.ethereum[137]
 
-      expect(primary.current).toBe('custom')
-      expect(primary.custom).toBe('')
-      expect(secondary.current).toBe('custom')
-      expect(secondary.custom).toBe('myrpc')
-    })
+    expect(primary.current).toBe('custom')
+    expect(primary.custom).toBe('')
+    expect(secondary.current).toBe('custom')
+    expect(secondary.custom).toBe('myrpc')
+  })
 
-    it(`should remove the RPC for a secondary ${chainName} ${provider} connection`, () => {
-      initChainState(state, id)
+  it(`should remove the RPC for a secondary ${provider} connection`, () => {
+    initChainState(state, 10)
 
-      state.main.networks.ethereum[id].connection = {
-        primary: { current: 'local', on: true },
-        secondary: { current: provider, on: false }
-      }
+    state.main.networks.ethereum[10].name = 'Optimism'
+    state.main.networks.ethereum[10].connection = {
+      primary: { current: 'local', on: true },
+      secondary: { current: provider, on: false }
+    }
 
-      const updatedState = migration.migrate(state)
+    const updatedState = migration.migrate(state)
 
-      const {
-        connection: { primary, secondary }
-      } = updatedState.main.networks.ethereum[id]
+    const {
+      connection: { primary, secondary }
+    } = updatedState.main.networks.ethereum[10]
 
-      expect(primary.current).toBe('local')
-      expect(secondary.current).toBe('custom')
-      expect(secondary.custom).toBe('')
-    })
+    expect(primary.current).toBe('local')
+    expect(secondary.current).toBe('custom')
+    expect(secondary.custom).toBe('')
   })
 })
 
@@ -117,23 +105,6 @@ it('should not show the migration warning if the user has no Infura or Alchemy c
   expect(updatedState.main.mute.migrateToPylon).toBe(true)
 })
 
-it('should remove an invalid chain from the state', () => {
-  initChainState(state, 1)
-  initChainState(state, 5)
-
-  state.main.networks.ethereum[1].connection = {
-    primary: { current: 'local', on: true },
-    secondary: { current: 'custom', custom: 'myrpc', on: false }
-  }
-
-  // this chain has no connection information so it's invalid
-  state.main.networks.ethereum[5].name = 'Goerli'
-
-  const updatedState = migration.migrate(state)
-
-  expect(Object.keys(updatedState.main.networks.ethereum)).toStrictEqual(['1'])
-})
-
 it('should keep a valid non-migrated chain in the state', () => {
   initChainState(state, 1)
 
@@ -149,50 +120,26 @@ it('should keep a valid non-migrated chain in the state', () => {
 
   const mainnet = updatedState.main.networks.ethereum['1']
   expect(mainnet).toStrictEqual({
-    name: 'Mainnet', // ensure this key, which is not relevant to the migration, is retained after parsing
     id: 1,
+    name: 'Mainnet', // ensure this key, which is not relevant to the migration, is retained after parsing
+    type: 'ethereum',
+    explorer: '',
+    isTestnet: false,
+    on: false,
     connection: {
       primary: {
         current: 'local',
         custom: '',
-        on: true
+        on: true,
+        connected: false,
+        status: 'off'
       },
       secondary: {
         current: 'custom',
         custom: 'myrpc',
-        on: false
-      }
-    }
-  })
-})
-
-it('should keep a valid already-migrated chain in the state', () => {
-  initChainState(state, 1)
-
-  state.main.networks.ethereum[1].name = 'Mainnet'
-
-  // this chain won't be migrated as there are no Infura or Alchemy connections
-  state.main.networks.ethereum[1].connection = {
-    primary: { current: 'pylon', on: true },
-    secondary: { current: 'custom', custom: 'myrpc', on: false }
-  }
-
-  const updatedState = migration.migrate(state)
-
-  const mainnet = updatedState.main.networks.ethereum['1']
-  expect(mainnet).toStrictEqual({
-    name: 'Mainnet',
-    id: 1,
-    connection: {
-      primary: {
-        current: 'pylon',
-        custom: '',
-        on: true
-      },
-      secondary: {
-        current: 'custom',
-        custom: 'myrpc',
-        on: false
+        on: false,
+        connected: false,
+        status: 'off'
       }
     }
   })

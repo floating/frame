@@ -1,4 +1,4 @@
-import { EthereumChainsSchema } from '../../../../../main/store/state/types/chain'
+import { EthereumChainsSchema } from '../../../../../main/store/state/types/chains'
 
 const validChain = {
   id: 5,
