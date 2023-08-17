@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import log from 'electron-log'
 
-import { ConnectionSchema } from './connection'
+import { v37 as v37Connection, v38 as v38Connection, v39 as v39Connection } from './connection'
 
 const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet'] as const
 const type = 'ethereum' as const
@@ -251,35 +251,50 @@ export const ChainIdSchema = z.object({
   type: z.literal('ethereum')
 })
 
-export const ChainSchema = ChainIdSchema.merge(
-  z.object({
-    name: z.string(),
-    on: z.boolean().default(false),
-    connection: z.object({
-      primary: ConnectionSchema,
-      secondary: ConnectionSchema
-    }),
-    layer: z.enum(layerValues).optional(),
-    isTestnet: z.boolean().default(false),
-    explorer: z.string().default('')
-  })
-).transform((chain) => {
-  // all chains should start disconnected by default
-  return {
-    ...chain,
-    connection: {
-      ...chain.connection,
-      primary: {
-        ...chain.connection.primary,
-        connected: false
-      },
-      secondary: {
-        ...chain.connection.secondary,
-        connected: false
-      }
-    }
-  }
+const v37 = z.object({
+  ethereum: z.record(
+    ChainIdSchema.merge(
+      z.object({
+        name: z.string(),
+        on: z.boolean().default(false),
+        connection: z.object({
+          primary: v37Connection,
+          secondary: v37Connection
+        }),
+        layer: z.enum(layerValues).optional(),
+        isTestnet: z.boolean().default(false),
+        explorer: z.string().default('')
+      })
+    )
+  )
 })
+
+const v38 = v37.extend({
+  ethereum: z.record(
+    v37.shape.ethereum.valueSchema.extend({
+      connection: z.object({
+        primary: v38Connection,
+        secondary: v38Connection
+      })
+    })
+  )
+})
+
+const v39 = v38.extend({
+  ethereum: z.record(
+    v38.shape.ethereum.valueSchema.extend({
+      connection: z.object({
+        primary: v39Connection,
+        secondary: v39Connection
+      })
+    })
+  )
+})
+
+const latestSchema = v39
+
+const ChainSchema = latestSchema.shape.ethereum.valueSchema
+type Chain = z.infer<typeof ChainSchema>
 
 const ChainsSchema = z.record(z.coerce.number(), z.unknown()).transform((chainsObject) => {
   const chains = {} as Record<number, Chain>
@@ -307,15 +322,9 @@ const ChainsSchema = z.record(z.coerce.number(), z.unknown()).transform((chainsO
   } as Record<number, Chain>
 })
 
-export const EthereumChainsSchema = z
-  .object({
-    ethereum: ChainsSchema
-  })
-  .catch((ctx) => {
-    log.error('Could not parse chains, falling back to defaults', ctx.error)
-    return { ethereum: chainDefaults }
-  })
-  .default({ ethereum: chainDefaults })
+const latest = ChainsSchema.catch((ctx) => {
+  log.error('Could not parse chains, falling back to defaults', ctx.error)
+  return { ethereum: chainDefaults }
+}).default({ ethereum: chainDefaults })
 
-export type ChainId = z.infer<typeof ChainIdSchema>
-export type Chain = z.infer<typeof ChainSchema>
+export { v37, v38, v39, latest }

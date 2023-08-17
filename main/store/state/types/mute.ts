@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const notificationTypes = z.enum([
+const notificationTypes = [
   'alphaWarning',
   'welcomeWarning',
   'externalLinkWarning',
@@ -9,8 +9,12 @@ const notificationTypes = z.enum([
   'gasFeeWarning',
   'betaDisclosure',
   'onboardingWindow',
-  'signerCompatibilityWarning',
-  'migrateToPylon'
-])
+  'signerCompatibilityWarning'
+] as const
 
-export const MuteSchema = z.record(notificationTypes, z.boolean())
+const v37 = z.record(z.enum(notificationTypes), z.boolean().default(false))
+const v38 = z.record(z.enum([...notificationTypes, 'migrateToPylon']), z.boolean().default(false))
+
+const latest = v38
+
+export { v37, v38, latest }
