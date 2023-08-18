@@ -1,9 +1,8 @@
-import { z } from 'zod'
 import log from 'electron-log'
+import { z } from 'zod'
 
-import { ColorwayPaletteSchema } from './colors'
-import { GasSchema } from './gas'
-import { NativeCurrencySchema } from './nativeCurrency'
+import { v37 as v37GasSchema, latest as latestGasSchema } from './gas'
+import { v37 as v37NativeCurrencySchema, latest as latestNativeCurrencySchema } from './nativeCurrency'
 
 export const chainMetadataDefaults = {
   1: {
@@ -206,24 +205,43 @@ export const chainMetadataDefaults = {
   }
 }
 
-const MetadataSchema = z
-  .object({
-    blockHeight: z.number().default(0),
-    gas: GasSchema,
-    icon: z.string().optional(),
-    primaryColor: ColorwayPaletteSchema.keyof(),
-    nativeCurrency: NativeCurrencySchema
-  })
-  .transform((metadata) => {
-    // remove stale price data
-    return {
-      ...metadata,
-      nativeCurrency: {
-        ...metadata.nativeCurrency,
-        usd: { price: 0, change24hr: 0 }
-      }
-    }
-  })
+const ColorSchema = z.object({
+  r: z.number(),
+  g: z.number(),
+  b: z.number()
+})
+
+const ColorwayPaletteSchema = z.object({
+  accent1: ColorSchema,
+  accent2: ColorSchema,
+  accent3: ColorSchema,
+  accent4: ColorSchema,
+  accent5: ColorSchema,
+  accent6: ColorSchema,
+  accent7: ColorSchema,
+  accent8: ColorSchema
+})
+
+const v37 = z.object({
+  ethereum: z.record(
+    z.object({
+      blockHeight: z.number().default(0),
+      gas: v37GasSchema,
+      icon: z.string().optional(),
+      primaryColor: ColorwayPaletteSchema.keyof().catch('accent1').default('accent1'),
+      nativeCurrency: v37NativeCurrencySchema
+    })
+  )
+})
+
+const latestSchema = v37
+
+// use the latest versions of all schemas when parsing in order to provide correct
+// defaults and transformations
+const LatestMetadataSchema = latestSchema.shape.ethereum.valueSchema.extend({
+  gas: latestGasSchema,
+  nativeCurrency: latestNativeCurrencySchema
+})
 
 const ChainMetadataSchema = z.record(z.coerce.number(), z.unknown()).transform((metadataObject) => {
   const chains = {} as Record<number, ChainMetadata>
@@ -231,7 +249,7 @@ const ChainMetadataSchema = z.record(z.coerce.number(), z.unknown()).transform((
   for (const id in metadataObject) {
     const chainId = parseInt(id)
     const chain = metadataObject[chainId]
-    const result = MetadataSchema.safeParse(chain)
+    const result = LatestMetadataSchema.safeParse(chain)
 
     if (!result.success) {
       log.info(`Removing invalid chain metadata ${id} from state`, result.error)
@@ -251,7 +269,7 @@ const ChainMetadataSchema = z.record(z.coerce.number(), z.unknown()).transform((
   } as Record<number, ChainMetadata>
 })
 
-export const EthereumChainsMetadataSchema = z
+const latest = z
   .object({
     ethereum: ChainMetadataSchema
   })
@@ -261,4 +279,6 @@ export const EthereumChainsMetadataSchema = z
   })
   .default({ ethereum: chainMetadataDefaults })
 
-export type ChainMetadata = z.infer<typeof MetadataSchema>
+export { v37, latest }
+export type ChainMetadata = z.infer<typeof LatestMetadataSchema>
+export type ColorwayPalette = z.infer<typeof ColorwayPaletteSchema>

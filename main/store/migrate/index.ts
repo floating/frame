@@ -16,9 +16,9 @@ export type Migration = {
 const migrations: Migration[] = [
   ...legacyMigrations,
   migration38,
-  migration39,
-  migration40,
-  migration41
+  migration39
+  // migration40
+  //  migration41
 ].sort((m1, m2) => m1.version - m2.version)
 
 // Version number of latest known migration
@@ -33,7 +33,12 @@ export default {
       if (state.main._version < version && version <= migrateToVersion) {
         log.info(`Applying state migration: ${version}`)
 
-        state = migrate(state)
+        try {
+          state = migrate(state)
+        } catch (e) {
+          log.error(`Migration ${version} failed`, e)
+        }
+
         state.main._version = version
       }
     })

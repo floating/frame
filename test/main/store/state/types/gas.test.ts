@@ -1,4 +1,4 @@
-import { GasSchema } from '../../../../../main/store/state/types/gas'
+import { latest as GasSchema } from '../../../../../main/store/state/types/gas'
 
 const validGas = {
   fees: {

@@ -1,15 +1,14 @@
 import { z } from 'zod'
 
-export const CurrencyRateSchema = z.object({
-  price: z.number(),
-  change24hr: z.number()
-})
+const v37 = z
+  .object({
+    price: z.number(),
+    change24hr: z.number()
+  })
+  // remove stale price data
+  .transform((rate) => ({ ...rate, price: 0, change24hr: 0 }))
 
-// key is the currency symbol
-const RateSchema = z.record(CurrencyRateSchema)
+const latest = v37
 
-// key is the identifier of the asset
-export const RatesSchema = z.record(RateSchema)
-
-export type Rate = z.infer<typeof CurrencyRateSchema>
-export type Rates = z.infer<typeof RatesSchema>
+export { v37, latest }
+export type Rate = z.infer<typeof latest>

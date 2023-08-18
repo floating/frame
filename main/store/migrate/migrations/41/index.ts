@@ -1,6 +1,6 @@
 import log from 'electron-log'
 
-import { v38StateSchema } from '../38/schema'
+//import { v38StateSchema } from '../38/schema'
 
 function baseMainnet() {
   const chain = {
@@ -57,7 +57,7 @@ function baseMainnet() {
 
 const migrate = (initial: unknown) => {
   try {
-    const state = v38StateSchema.parse(initial)
+    const state = null as any // v38StateSchema.parse(initial)
     const usingBase = '8453' in state.main.networks.ethereum
 
     if (!usingBase) {

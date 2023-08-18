@@ -13,8 +13,8 @@ const statusValues = [
 const v37 = z.object({
   on: z.boolean().default(false),
   connected: z.boolean().default(false),
-  current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']).default('custom'),
-  status: z.enum(statusValues).default('off'),
+  current: z.enum(['local', 'custom', 'infura', 'alchemy', 'poa']).default('custom').catch('custom'),
+  status: z.enum(statusValues).default('off').catch('off'),
   custom: z.string().default('')
 })
 
@@ -32,3 +32,4 @@ const latestSchema = v39
 const latest = latestSchema.transform((connection) => ({ ...connection, connected: false }))
 
 export { v37, v38, v39, latest }
+export type Connection = z.infer<typeof latest>

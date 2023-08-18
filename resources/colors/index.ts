@@ -1,6 +1,6 @@
 import { padToEven } from '@ethereumjs/util'
 
-import type { ColorwayPalette } from '../../main/store/state'
+import type { ColorwayPalette } from '../../main/store/state/types'
 
 const light: ColorwayPalette = {
   accent1: { r: 0, g: 170, b: 120 },

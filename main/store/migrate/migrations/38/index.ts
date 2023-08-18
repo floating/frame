@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import log from 'electron-log'
+import { z } from 'zod'
 
 import { v37 as LegacyChainSchema, v38 as NewChainSchema } from '../../../state/types/chains'
 import { v37 as LegacyMuteSchema, v38 as NewMuteSchema } from '../../../state/types/mute'

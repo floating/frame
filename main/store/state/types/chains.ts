@@ -1,9 +1,14 @@
-import { z } from 'zod'
 import log from 'electron-log'
+import { z } from 'zod'
 
-import { v37 as v37Connection, v38 as v38Connection, v39 as v39Connection } from './connection'
+import {
+  v37 as v37Connection,
+  v38 as v38Connection,
+  v39 as v39Connection,
+  latest as latestConnection
+} from './connection'
 
-const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet'] as const
+const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet', 'other'] as const
 const type = 'ethereum' as const
 
 const chainDefaults = {
@@ -261,7 +266,7 @@ const v37 = z.object({
           primary: v37Connection,
           secondary: v37Connection
         }),
-        layer: z.enum(layerValues).optional(),
+        layer: z.enum(layerValues).optional().catch('other'),
         isTestnet: z.boolean().default(false),
         explorer: z.string().default('')
       })
@@ -293,8 +298,12 @@ const v39 = v38.extend({
 
 const latestSchema = v39
 
-const ChainSchema = latestSchema.shape.ethereum.valueSchema
-type Chain = z.infer<typeof ChainSchema>
+const LatestChainSchema = latestSchema.shape.ethereum.valueSchema.extend({
+  connection: z.object({
+    primary: latestConnection,
+    secondary: latestConnection
+  })
+})
 
 const ChainsSchema = z.record(z.coerce.number(), z.unknown()).transform((chainsObject) => {
   const chains = {} as Record<number, Chain>
@@ -302,7 +311,7 @@ const ChainsSchema = z.record(z.coerce.number(), z.unknown()).transform((chainsO
   for (const id in chainsObject) {
     const chainId = parseInt(id)
     const chain = chainsObject[chainId]
-    const result = ChainSchema.safeParse(chain)
+    const result = LatestChainSchema.safeParse(chain)
 
     if (!result.success) {
       log.info(`Removing invalid chain ${id} from state`, result.error)
@@ -322,9 +331,14 @@ const ChainsSchema = z.record(z.coerce.number(), z.unknown()).transform((chainsO
   } as Record<number, Chain>
 })
 
-const latest = ChainsSchema.catch((ctx) => {
-  log.error('Could not parse chains, falling back to defaults', ctx.error)
-  return { ethereum: chainDefaults }
-}).default({ ethereum: chainDefaults })
+const latest = z
+  .object({ ethereum: ChainsSchema })
+  .catch((ctx) => {
+    log.error('Could not parse chains, falling back to defaults', ctx.error)
+    return { ethereum: chainDefaults }
+  })
+  .default({ ethereum: chainDefaults })
 
 export { v37, v38, v39, latest }
+export type ChainId = z.infer<typeof ChainIdSchema>
+export type Chain = z.infer<typeof LatestChainSchema>

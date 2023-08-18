@@ -1,16 +1,15 @@
 import { z } from 'zod'
-import { v4 as uuid } from 'uuid'
 
 import { AccountMetadataSchema, AccountSchema } from './account'
-import { BalanceSchema } from './balance'
-import { EthereumChainsSchema } from './chain'
+import { BalanceSchema } from './balances'
+import { EthereumChainsSchema } from './chains'
 import { EthereumChainsMetadataSchema } from './chainMeta'
-import { ColorwayPrimarySchema } from './colors'
+import { ColorwayPrimarySchema } from './colorway'
 import { DappSchema } from './dapp'
 import { FrameSchema } from './frame'
 import { MuteSchema } from './mute'
-import { KnownOriginsSchema } from './origin'
-import { PermissionSchema } from './permission'
+import { KnownOriginsSchema } from './origins'
+import { PermissionSchema } from './permissions'
 import { PrivacySchema } from './privacy'
 import { ShortcutsSchema } from './shortcuts'
 import { TokenBalanceSchema, TokenSchema } from './token'
@@ -36,23 +35,10 @@ const MainPreferences = {
   menubarGasPrice: z.boolean().default(false).describe('Show gas price in menu bar')
 }
 
-const defaultValues = {
-  instanceId: uuid()
-}
-
 export const MainSchema = z
   .object({
-    _version: z.coerce.number().default(currentVersion),
-    instanceId: z.string().catch(defaultValues.instanceId).default(defaultValues.instanceId),
-    networks: EthereumChainsSchema,
-    networksMeta: EthereumChainsMetadataSchema,
-    // origins: KnownOriginsSchema,
     // knownExtensions: z.record(z.string(), z.boolean()),
     // assetPreferences: AssetPreferencesSchema,
-    // permissions: z.record(
-    //   z.string().describe('Address'),
-    //   z.record(z.string().describe('Origin Id'), PermissionSchema)
-    // ),
     // tokens: z.object({
     //   custom: z.array(TokenSchema),
     //   known: z.record(z.string(), z.array(TokenBalanceSchema))
@@ -62,14 +48,10 @@ export const MainSchema = z
     signers: z.record(z.string(), SignerSchema).default({})
     // balances: z.record(z.string().describe('Address'), z.array(BalanceSchema)),
     // dapps: z.record(z.string(), DappSchema),
-    // mute: MuteSchema,
     // privacy: PrivacySchema,
-    // colorway: z.enum(['light', 'dark']),
-    // colorwayPrimary: ColorwayPrimarySchema,
     // shortcuts: ShortcutsSchema,
     // updater: UpdaterPreferencesSchema,
     // frames: z.record(z.string(), FrameSchema),
-    // rates: RatesSchema,
     // ...MainPreferences
   })
   .default({})

@@ -6,59 +6,49 @@ import persist from '../persist'
 import migrations from '../migrate'
 import { queueError } from '../../errors/queue'
 
-import { MainSchema } from './types/main'
-import type { Origin } from './types/origin'
+import StateSchema from './schema'
 import type { Dapp } from './types/dapp'
 
-export type { ChainId, Chain } from './types/chain'
-export type { Connection } from './types/connection'
-export type { Origin } from './types/origin'
-export type { Permission } from './types/permission'
-export type { HardwareSignerType, HotSignerType, SignerType, Signer } from './types/signer'
-export type { Account, AccountMetadata } from './types/account'
-export type { Balance } from './types/balance'
-export type { WithTokenId, Token, TokenBalance } from './types/token'
-export type { Dapp } from './types/dapp'
-export type { NativeCurrency } from './types/nativeCurrency'
-export type { Gas, GasFees } from './types/gas'
-export type { Rate } from './types/rate'
-export type { Frame, ViewMetadata } from './types/frame'
-export type { Shortcut, ShortcutKey, ModifierKey } from './types/shortcuts'
-export type { ColorwayPalette } from './types/colors'
-export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
-export type { Media } from './types/media'
-export type { AssetPreferences } from './types/preferences'
+// export type { HardwareSignerType, HotSignerType, SignerType, Signer } from './types/signer'
+// export type { Account, AccountMetadata } from './types/account'
+// export type { WithTokenId, Token, TokenBalance } from './types/token'
+// //export type { Dapp } from './types/dapp'
+// export type { NativeCurrency } from './types/nativeCurrency'
+// export type { Frame, ViewMetadata } from './types/frame'
+// export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
+// export type { Media } from './types/media'
+// export type { AssetPreferences } from './types/preferences'
 
 const currentVersion = 41
 const currentBaseState = { main: { _version: currentVersion } } as StateVersion
 
-const StateSchema = z
-  .object({
-    main: MainSchema, // TODO: remove passthrough once all pieces of state have been defined
-    windows: z.any().default({
-      panel: {
-        show: false,
-        nav: [],
-        footer: {
-          height: 40
-        }
-      },
-      dash: {
-        show: false,
-        nav: [],
-        footer: {
-          height: 40
-        }
-      },
-      frames: []
-    }),
-    view: z.any().default({}),
-    selected: z.any().default({}),
-    panel: z.any().default({}),
-    tray: z.any().default({}),
-    platform: z.string().default(process.platform)
-  })
-  .default({})
+// const StateSchema = z
+//   .object({
+//     main: MainSchema, // TODO: remove passthrough once all pieces of state have been defined
+//     windows: z.any().default({
+//       panel: {
+//         show: false,
+//         nav: [],
+//         footer: {
+//           height: 40
+//         }
+//       },
+//       dash: {
+//         show: false,
+//         nav: [],
+//         footer: {
+//           height: 40
+//         }
+//       },
+//       frames: []
+//     }),
+//     view: z.any().default({}),
+//     selected: z.any().default({}),
+//     panel: z.any().default({}),
+//     tray: z.any().default({}),
+//     platform: z.string().default(process.platform)
+//   })
+//   .default({})
 
 type StateVersion = {
   main: {
@@ -120,18 +110,6 @@ const mainState = {
       text: 'rgb(20, 40, 60)'
     }
   },
-  mute: {
-    alphaWarning: main('mute.alphaWarning', false),
-    welcomeWarning: main('mute.welcomeWarning', false),
-    externalLinkWarning: main('mute.externalLinkWarning', false),
-    explorerWarning: main('mute.explorerWarning', false),
-    signerRelockChange: main('mute.signerRelockChange', false),
-    gasFeeWarning: main('mute.gasFeeWarning', false),
-    betaDisclosure: main('mute.betaDisclosure', false),
-    onboardingWindow: main('mute.onboardingWindow', false),
-    migrateToPylon: main('mute.migrateToPylon', true),
-    signerCompatibilityWarning: main('mute.signerCompatibilityWarning', false)
-  },
   shortcuts: {
     altSlash: main('shortcuts.altSlash', true),
     summon: main('shortcuts.summon', {
@@ -163,7 +141,6 @@ const mainState = {
   trezor: {
     derivation: main('trezor.derivation', 'standard')
   },
-  origins: main('origins', {}),
   knownExtensions: main('knownExtensions', {}),
   privacy: {
     errorReporting: main('privacy.errorReporting', true)
@@ -171,14 +148,11 @@ const mainState = {
   accounts: main('accounts', {}),
   accountsMeta: main('accountsMeta', {}),
   addresses: main('addresses', {}), // Should be removed after 0.5 release
-  permissions: main('permissions', {}),
-  balances: {},
   assetPreferences: main('assetPreferences', {
     tokens: {},
     collections: {}
   }),
   tokens: main('tokens', { custom: [], known: {} }),
-  rates: {}, // main('rates', {}),
   inventory: {}, // main('rates', {}),
   signers: {},
   updater: {
@@ -308,33 +282,11 @@ const initial = {
 // --- remove state that should not persist from session to session
 
 Object.keys(initial.main.accounts).forEach((id) => {
-  // Remove permissions granted to unknown origins
-  const permissions = initial.main.permissions[id]
-  if (permissions) delete permissions[uuidv5('Unknown', uuidv5.DNS)]
-
   // remote lastUpdated timestamp from balances
   // TODO: define account schema more accurately
   // @ts-ignore
   initial.main.accounts[id].balances = { lastUpdated: undefined }
 })
-
-initial.main.origins = Object.entries(initial.main.origins as Record<string, Origin>).reduce(
-  (origins, [id, origin]) => {
-    if (id !== uuidv5('Unknown', uuidv5.DNS)) {
-      // don't persist unknown origin
-      origins[id] = {
-        ...origin,
-        session: {
-          ...origin.session,
-          endedAt: origin.session.lastUpdatedAt
-        }
-      }
-    }
-
-    return origins
-  },
-  {} as Record<string, Origin>
-)
 
 initial.main.knownExtensions = Object.fromEntries(
   Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)

@@ -1,4 +1,4 @@
-import { EthereumChainsSchema } from '../../../../../main/store/state/types/chains'
+import { latest as EthereumChainsSchema } from '../../../../../main/store/state/types/chains'
 
 const validChain = {
   id: 5,
@@ -54,6 +54,7 @@ it('sets the primary connection to disconnected to start', () => {
   const previouslyConnectedChain = {
     ...validChain,
     connection: {
+      ...validChain.connection,
       primary: {
         ...validChain.connection.primary,
         connected: true

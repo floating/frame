@@ -1,16 +1,14 @@
 import { z } from 'zod'
 
-// fees and prices arent persisted so always load them as null to begin with
-
 const emptyGasLevels = {
   slow: '',
   standard: '',
   fast: '',
   asap: '',
   custom: ''
-}
+} as const
 
-const GasLevelsObjectSchema = z.object({
+const GasLevelsSchema = z.object({
   slow: z.string().optional(),
   standard: z.string().optional(),
   fast: z.string().optional(),
@@ -18,11 +16,7 @@ const GasLevelsObjectSchema = z.object({
   custom: z.string().optional()
 })
 
-export type GasLevels = z.infer<typeof GasLevelsObjectSchema>
-
-export const GasLevelsSchema = GasLevelsObjectSchema.transform(() => emptyGasLevels).catch(emptyGasLevels)
-
-const GasFeesObjectSchema = z
+const GasFeesSchema = z
   .object({
     nextBaseFee: z.string(),
     maxBaseFeePerGas: z.string(),
@@ -30,20 +24,37 @@ const GasFeesObjectSchema = z
     maxFeePerGas: z.string()
   })
   .nullish()
-
-export type GasFees = z.infer<typeof GasFeesObjectSchema> | null
-
-// TODO: validate these fields as hex amount values
-export const GasFeesSchema = GasFeesObjectSchema.nullish()
-  .transform(() => null as GasFees)
+  .default(null)
   .catch(null)
 
-export const GasSchema = z.object({
-  fees: GasFeesSchema,
-  price: z.object({
-    selected: GasLevelsObjectSchema.keyof(),
+const GasPricesSchema = z
+  .object({
+    selected: GasLevelsSchema.keyof(),
     levels: GasLevelsSchema
   })
+  .catch({ selected: 'standard', levels: emptyGasLevels })
+  .default({ selected: 'standard', levels: emptyGasLevels })
+
+const v37 = z.object({
+  fees: GasFeesSchema,
+  price: GasPricesSchema
 })
 
-export type Gas = z.infer<typeof GasSchema>
+const latestSchema = v37
+
+const nullGasFees = null as z.infer<typeof GasFeesSchema>
+
+const latest = latestSchema.transform((gas) => {
+  // fees and prices arent persisted so always load them as null to begin with
+  gas.fees = nullGasFees
+  gas.price = {
+    selected: gas.price.selected,
+    levels: emptyGasLevels
+  }
+
+  return gas
+})
+
+export { v37, latest }
+export type GasFees = z.infer<typeof GasFeesSchema>
+export type Gas = z.infer<typeof latest>

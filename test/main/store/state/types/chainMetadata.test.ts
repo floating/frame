@@ -1,4 +1,4 @@
-import { EthereumChainsMetadataSchema } from '../../../../../main/store/state/types/chainMeta'
+import { latest as EthereumChainsMetadataSchema } from '../../../../../main/store/state/types/chainMeta'
 
 const validChainMetadata = {
   blockHeight: 164738849,
