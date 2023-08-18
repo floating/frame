@@ -9,6 +9,7 @@ import { latest as ColorwaySchema } from './types/colorway'
 import { latest as MuteSchema } from './types/mute'
 import { latest as PermissionsSchema } from './types/permissions'
 import { latest as OriginsSchema } from './types/origins'
+import { latest as DappsSchema } from './types/dapps'
 import { latest as BalancesSchema } from './types/balances'
 import { latest as RatesSchema } from './types/rates'
 import { latest as ShortcutsSchema } from './types/shortcuts'
@@ -27,6 +28,7 @@ const State = z.object({
     mute: MuteSchema,
     permissions: PermissionsSchema,
     origins: OriginsSchema,
+    dapps: DappsSchema,
     balances: BalancesSchema,
     rates: RatesSchema,
     shortcuts: ShortcutsSchema

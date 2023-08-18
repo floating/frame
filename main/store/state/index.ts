@@ -7,7 +7,7 @@ import migrations from '../migrate'
 import { queueError } from '../../errors/queue'
 
 import StateSchema from './schema'
-import type { Dapp } from './types/dapp'
+import type { Dapp } from './types/dapps'
 
 // export type { HardwareSignerType, HotSignerType, SignerType, Signer } from './types/signer'
 // export type { Account, AccountMetadata } from './types/account'

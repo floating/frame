@@ -1,7 +1,7 @@
 import { utils } from 'ethers'
 import { hexToInt } from '.'
 
-import type { Chain } from '../../main/store/state'
+import type { Chain } from '../../main/store/state/types'
 import type { HexString } from '../../main/store/state/types/utils'
 
 export function isNetworkConnected(network: Chain) {
