@@ -1,29 +1,33 @@
 import { z } from 'zod'
-import { MediaSchema } from './media'
+import { v40 as v40MediaSchema } from './media'
 
-const InventoryAssetSchema = z.object({
+const v40InventoryAssetSchema = z.object({
   name: z.string(),
   tokenId: z.string(),
   contract: z.string(),
-  media: MediaSchema,
+  media: v40MediaSchema,
   externalLink: z.string().optional()
 })
 
-const InventoryCollectionSchema = z.object({
+const v40InventoryCollection = z.object({
   meta: z.object({
     name: z.string(),
     description: z.string(),
-    media: MediaSchema,
+    media: v40MediaSchema,
     chainId: z.number(),
     tokens: z.array(z.string()),
     external_url: z.string().optional(),
     hideByDefault: z.boolean()
   }),
-  items: z.array(InventoryAssetSchema)
+  items: z.array(v40InventoryAssetSchema)
 })
 
-const InventorySchema = z.record(InventoryCollectionSchema)
+const v40 = z.record(v40InventoryCollection)
+const latestCollectionSchema = v40InventoryCollection
 
-export type InventoryAsset = z.infer<typeof InventoryAssetSchema>
-export type InventoryCollection = z.infer<typeof InventoryCollectionSchema>
-export type Inventory = z.infer<typeof InventorySchema>
+const latest = v40.catch({}).default({})
+
+export { v40InventoryCollection as v40, latest }
+
+export type InventoryAsset = z.infer<typeof latestCollectionSchema.shape.items.element>
+export type InventoryCollection = z.infer<typeof latestCollectionSchema>

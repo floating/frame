@@ -26,3 +26,14 @@ it('updates valid dapp state to app defaults', () => {
   expect(openWhenReady).toBe(false)
   expect(checkStatusRetryCount).toBe(0)
 })
+
+it('removes an invalid dapp from the state', () => {
+  const invalidDapp = {
+    ...validDapp,
+    status: 'bogus'
+  }
+
+  const dapps = DappsSchema.parse({ valid: validDapp, invalid: invalidDapp })
+
+  expect(Object.keys(dapps)).toStrictEqual(['valid'])
+})

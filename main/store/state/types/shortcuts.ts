@@ -90,14 +90,16 @@ const v37 = z.object({
   summon: ShortcutSchema
 })
 
-const defaultSummonShortcut = {
-  modifierKeys: ['Alt' as const],
-  shortcutKey: 'Slash' as const,
-  enabled: true,
-  configuring: false
+const defaultShortcuts = {
+  summon: {
+    modifierKeys: ['Alt' as const],
+    shortcutKey: 'Slash' as const,
+    enabled: true,
+    configuring: false
+  }
 }
 
-const latest = v37.catch({ summon: defaultSummonShortcut }).default({ summon: defaultSummonShortcut })
+const latest = v37.catch(defaultShortcuts).default(defaultShortcuts)
 
 export { v37, latest }
 

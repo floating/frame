@@ -20,7 +20,8 @@ const v37 = z.record(z.string().describe('Dapp Id'), DappSchema)
 const latestSchema = v37
 const LatestDappSchema = latestSchema.valueSchema
 
-const latest = v37
+const latest = z
+  .record(z.unknown())
   .catch({})
   .default({})
   .transform((dappsObject) => {

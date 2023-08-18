@@ -1,7 +1,7 @@
 import log from 'electron-log'
 import { z } from 'zod'
 
-import { AddressSchema, ChainIdSchema, HexStringSchema } from '../../../state/types/utils'
+import { AddressSchema, ChainIdSchema, HexStringSchema } from '../../../state/types/common'
 
 const v39TokenSchema = z.object({
   name: z.string().default(''),
@@ -21,16 +21,6 @@ const v39TokenBalanceSchema = z.object({
   logoURI: z.string().optional(),
   balance: HexStringSchema.default('0x0'),
   displayBalance: z.string().default('0')
-})
-
-export const v40MediaSchema = z.object({
-  source: z.string(),
-  format: z.enum(['image', 'video', '']),
-  cdn: z.object({
-    main: z.string().optional(),
-    thumb: z.string().optional(),
-    frozen: z.string().optional()
-  })
 })
 
 export const v40TokenBalanceSchema = z.object({

@@ -280,14 +280,6 @@ const initial = {
 }
 
 // --- remove state that should not persist from session to session
-
-Object.keys(initial.main.accounts).forEach((id) => {
-  // remote lastUpdated timestamp from balances
-  // TODO: define account schema more accurately
-  // @ts-ignore
-  initial.main.accounts[id].balances = { lastUpdated: undefined }
-})
-
 initial.main.knownExtensions = Object.fromEntries(
   Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)
 )
