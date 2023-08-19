@@ -65,7 +65,7 @@ it('loads new state when none exists', () => {
   persist.get.mockReturnValueOnce(json.main)
   const state = getState()
 
-  console.log(JSON.stringify(state, null, 2))
+  // console.log(JSON.stringify(state, null, 2))
 })
 
 it.skip('maintains backwards compatible access to the current version of state', async () => {

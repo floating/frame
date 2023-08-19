@@ -1,10 +1,11 @@
-// @ts-nocheck
 // TODO: finish converting this
 
 import log from 'electron-log'
 import { z } from 'zod'
 
 import { AddressSchema, ChainIdSchema, HexStringSchema } from '../../../state/types/common'
+
+const v40MediaSchema = z.any()
 
 const v39TokenSchema = z.object({
   name: z.string().default(''),
