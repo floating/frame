@@ -9,7 +9,7 @@ const v37 = z.object({
     .boolean()
     .default(false)
     .describe("Lock an account when it's closed instead of when Frame restarts"),
-  showLocalNameWithENS: z.boolean(),
+  showLocalNameWithENS: z.boolean().default(false),
   menubarGasPrice: z.boolean().default(false).describe('Show gas price in menu bar')
 })
 

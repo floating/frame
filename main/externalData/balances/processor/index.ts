@@ -1,12 +1,12 @@
 import log from 'electron-log'
-
 import { isEqual } from 'lodash'
+
 import surface from '../../surface'
 import { storeApi } from '../../storeApi'
 import { isNativeCurrency, toTokenId } from '../../../../resources/domain/balance'
-
-import type { Token, TokenBalance } from '../../../store/state'
 import { NATIVE_CURRENCY } from '../../../../resources/constants'
+
+import type { Token, TokenBalance } from '../../../store/state/types'
 
 type UpdatedBalance = TokenBalance & { hideByDefault?: boolean }
 

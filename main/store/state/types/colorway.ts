@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const v37 = z.enum(['light', 'dark']).catch('light').default('light')
+const v37 = z.enum(['light', 'dark']).catch('dark').default('dark')
 
 const latest = v37
 

@@ -1,10 +1,10 @@
-import electron, { BrowserView, BrowserWindow } from 'electron'
 import path from 'path'
+import electron, { BrowserView, BrowserWindow } from 'electron'
 
-import { createWindow } from '../window'
 import topRight from './topRight'
+import { createWindow } from '../window'
 
-import type { Frame } from '../../store/state'
+import type { Frame } from '../../store/state/types'
 
 const isDev = process.env.NODE_ENV === 'development'
 

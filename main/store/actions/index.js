@@ -293,8 +293,6 @@ module.exports = {
     u('main.networksMeta', netType, netId, 'gas.price.selected', () => level)
     if (level === 'custom') {
       u('main.networksMeta', netType, netId, 'gas.price.levels.custom', () => price)
-    } else {
-      u('main.networksMeta', netType, netId, 'gas.price.lastLevel', () => level)
     }
   },
   setNativeCurrencyData: (u, netType, netId, currency) => {

@@ -6,7 +6,7 @@ const ManifestSchema = z.any()
 
 const DappSchema = z.object({
   id: z.string().optional(),
-  ens: z.string().optional(),
+  ens: z.string(),
   status: z.enum(['initial', 'loading', 'updating', 'ready', 'failed']),
   config: z.record(z.string()),
   content: z.string().optional(),

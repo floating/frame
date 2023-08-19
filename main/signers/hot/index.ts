@@ -15,7 +15,7 @@ import RingSigner, { RingSignerData } from './RingSigner'
 
 import type { Signers } from '..'
 import type Signer from '../Signer'
-import type { HotSignerType } from '../../store/state'
+import type { HotSignerType } from '../../store/state/types'
 
 export interface HotSignerData {
   type: HotSignerType

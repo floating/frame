@@ -1,5 +1,3 @@
-import { v4 as generateUuid, v5 as uuidv5 } from 'uuid'
-import { z } from 'zod'
 import log from 'electron-log'
 
 import persist from '../persist'
@@ -7,17 +5,6 @@ import migrations from '../migrate'
 import { queueError } from '../../errors/queue'
 
 import StateSchema from './schema'
-import type { Dapp } from './types/dapps'
-
-// export type { HardwareSignerType, HotSignerType, SignerType, Signer } from './types/signer'
-// export type { Account, AccountMetadata } from './types/account'
-// export type { WithTokenId, Token, TokenBalance } from './types/token'
-// //export type { Dapp } from './types/dapp'
-// export type { NativeCurrency } from './types/nativeCurrency'
-// export type { Frame, ViewMetadata } from './types/frame'
-// export type { InventoryAsset, InventoryCollection, Inventory } from './types/inventory'
-// export type { Media } from './types/media'
-// export type { AssetPreferences } from './types/preferences'
 
 const currentVersion = 41
 const currentBaseState = { main: { _version: currentVersion } } as StateVersion
@@ -98,7 +85,7 @@ const main = (path: string, def: any) => {
 
 const mainState = {
   _version: main('_version', 41),
-  instanceId: main('instanceId', generateUuid()),
+  //instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {
     dark: {
@@ -125,7 +112,6 @@ const mainState = {
   showLocalNameWithENS: main('showLocalNameWithENS', false),
   autohide: main('autohide', false),
   accountCloseLock: main('accountCloseLock', false),
-  hardwareDerivation: main('hardwareDerivation', 'mainnet'),
   menubarGasPrice: main('menubarGasPrice', false),
   lattice: main('lattice', {}),
   latticeSettings: {
@@ -173,125 +159,111 @@ const mainState = {
   }
 }
 
-const initial = {
-  panel: {
-    // Panel view
-    showing: false,
-    nav: [],
-    show: false,
-    view: 'default',
-    viewData: '',
-    account: {
-      moduleOrder: [
-        'requests',
-        // 'activity',
-        // 'gas',
-        'chains',
-        'balances',
-        'inventory',
-        'permissions',
-        // 'verify',
-        'signer',
-        'settings'
-      ],
-      modules: {
-        requests: {
-          height: 0
-        },
-        activity: {
-          height: 0
-        },
-        balances: {
-          height: 0
-        },
-        inventory: {
-          height: 0
-        },
-        permissions: {
-          height: 0
-        },
-        verify: {
-          height: 0
-        },
-        gas: {
-          height: 100
-        }
-      }
-    }
-  },
-  flow: {},
-  dapps: {},
-  view: {
-    current: '',
-    list: [],
-    data: {},
-    notify: '',
-    notifyData: {},
-    badge: '',
-    addAccount: '', // Add view (needs to be merged into Phase)
-    addNetwork: false, // Phase view (needs to be merged with Add)
-    clickGuard: false
-  },
-  signers: {},
-  tray: {
-    open: false,
-    initial: true
-  },
-  balances: {},
-  selected: {
-    minimized: true,
-    open: false,
-    current: '',
-    view: 'default',
-    settings: {
-      viewIndex: 0,
-      views: ['permissions', 'verify', 'control'],
-      subIndex: 0
-    },
-    addresses: [],
-    showAccounts: false,
-    accountPage: 0,
-    position: {
-      scrollTop: 0,
-      initial: {
-        top: 5,
-        left: 5,
-        right: 5,
-        bottom: 5,
-        height: 5,
-        index: 0
-      }
-    }
-  },
-  frame: {
-    type: 'tray'
-  },
-  node: {
-    provider: false
-  },
-  provider: {
-    events: []
-  },
-  external: {
-    rates: {}
-  },
-  platform: process.platform,
-  main: mainState
-}
-
-// --- remove state that should not persist from session to session
-initial.main.knownExtensions = Object.fromEntries(
-  Object.entries(initial.main.knownExtensions).filter(([_id, allowed]) => allowed)
-)
-
-initial.main.dapps = Object.fromEntries(
-  Object.entries(initial.main.dapps as Record<string, Dapp>).map(([id, dapp]) => [
-    id,
-    { ...dapp, openWhenReady: false }
-  ])
-)
-
-// ---
+// const initial = {
+//   panel: {
+//     // Panel view
+//     showing: false,
+//     nav: [],
+//     show: false,
+//     view: 'default',
+//     viewData: '',
+//     account: {
+//       moduleOrder: [
+//         'requests',
+//         // 'activity',
+//         // 'gas',
+//         'chains',
+//         'balances',
+//         'inventory',
+//         'permissions',
+//         // 'verify',
+//         'signer',
+//         'settings'
+//       ],
+//       modules: {
+//         requests: {
+//           height: 0
+//         },
+//         activity: {
+//           height: 0
+//         },
+//         balances: {
+//           height: 0
+//         },
+//         inventory: {
+//           height: 0
+//         },
+//         permissions: {
+//           height: 0
+//         },
+//         verify: {
+//           height: 0
+//         },
+//         gas: {
+//           height: 100
+//         }
+//       }
+//     }
+//   },
+//   flow: {},
+//   dapps: {},
+//   view: {
+//     current: '',
+//     list: [],
+//     data: {},
+//     notify: '',
+//     notifyData: {},
+//     badge: '',
+//     addAccount: '', // Add view (needs to be merged into Phase)
+//     addNetwork: false, // Phase view (needs to be merged with Add)
+//     clickGuard: false
+//   },
+//   signers: {},
+//   tray: {
+//     open: false,
+//     initial: true
+//   },
+//   balances: {},
+//   selected: {
+//     minimized: true,
+//     open: false,
+//     current: '',
+//     view: 'default',
+//     settings: {
+//       viewIndex: 0,
+//       views: ['permissions', 'verify', 'control'],
+//       subIndex: 0
+//     },
+//     addresses: [],
+//     showAccounts: false,
+//     accountPage: 0,
+//     position: {
+//       scrollTop: 0,
+//       initial: {
+//         top: 5,
+//         left: 5,
+//         right: 5,
+//         bottom: 5,
+//         height: 5,
+//         index: 0
+//       }
+//     }
+//   },
+//   frame: {
+//     type: 'tray'
+//   },
+//   node: {
+//     provider: false
+//   },
+//   provider: {
+//     events: []
+//   },
+//   external: {
+//     rates: {}
+//   },
+//   platform: process.platform,
+//   main: mainState
+// }
 
 export { currentVersion }
 export type { StateVersion }

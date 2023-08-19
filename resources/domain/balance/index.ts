@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 
 import { NATIVE_CURRENCY } from '../../constants'
 
-import type { WithTokenId, Balance, Rate, TokenBalance } from '../../../main/store/state'
+import type { WithTokenId, Balance, Rate, TokenBalance } from '../../../main/store/state/types'
 
 interface DisplayedBalance extends Balance {
   displayBalance: string

@@ -5,7 +5,7 @@ import ethProvider from 'eth-provider'
 import nebulaApi from '../../nebula'
 import defaultTokenList from './default-tokens.json'
 
-import type { Token } from '../../store/state'
+import type { Token } from '../../store/state/types'
 
 const TOKENS_ENS_DOMAIN = 'tokens.frame.eth'
 

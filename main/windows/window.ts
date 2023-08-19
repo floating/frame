@@ -1,11 +1,9 @@
-import { BrowserWindow, BrowserView, BrowserWindowConstructorOptions, shell } from 'electron'
 import log from 'electron-log'
 import path from 'path'
-import { COLORWAY_SKINS } from '../../resources/constants'
+import { BrowserWindow, BrowserView, BrowserWindowConstructorOptions, shell } from 'electron'
 
 import store from '../store'
-
-import type { ChainId } from '../store/state'
+import { COLORWAY_SKINS } from '../../resources/constants'
 
 type OpenExplorer = {
   chain: {

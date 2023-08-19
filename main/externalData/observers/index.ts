@@ -1,10 +1,9 @@
 import deepEqual from 'deep-equal'
 
-import store from '../../store'
 import { arraysEqual } from '../../../resources/utils'
 import { storeApi } from '../storeApi'
 
-import type { Token } from '../../store/state'
+import type { Token } from '../../store/state/types'
 
 interface ActiveAddressChangedHandler {
   addressChanged: (address: Address) => void

@@ -6,6 +6,7 @@ const HardwareSignerValues = ['trezor', 'ledger', 'lattice'] as const
 
 const HotSignerTypes = z.enum(HotSignerValues)
 const HardwareSignerTypes = z.enum(HardwareSignerValues)
+export const DerivationTypes = z.enum(['legacy', 'standard', 'testnet'])
 export const SignerTypes = z.enum([...HotSignerValues, ...HardwareSignerValues])
 
 const SignerSchema = z.object({

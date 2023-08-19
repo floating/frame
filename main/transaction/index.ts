@@ -3,13 +3,13 @@ import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import { Common } from '@ethereumjs/common'
 
+import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
 import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
 import { isNonZeroHex } from '../../resources/utils'
-import chainConfig from '../chains/config'
 import { TransactionRequest, TxClassification } from '../accounts/types'
 
-import type { Gas } from '../store/state'
+import type { Gas } from '../store/state/types'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,

@@ -1,7 +1,8 @@
 import { v5 as uuid } from 'uuid'
+
 import store from '../store'
 
-import type { Permission } from '../store/state'
+import type { Permission } from '../store/state/types'
 
 const trustedOriginIds = ['frame-extension', 'frame-internal'].map((origin) => uuid(origin, uuid.DNS))
 const isTrustedOrigin = (originId: string) => trustedOriginIds.includes(originId)

@@ -197,12 +197,7 @@ class ChainSummaryComponent extends Component {
       return this.txEstimates(type, chainId, gasPrice, null, currentSymbol)
     }
 
-    const { nextBaseFee, maxPriorityFeePerGas } = this.store(
-      'main.networksMeta',
-      type,
-      chainId,
-      'gas.price.fees'
-    )
+    const { nextBaseFee, maxPriorityFeePerGas } = this.store('main.networksMeta', type, chainId, 'gas.fees')
     const calculatedFees = {
       actualBaseFee: roundGwei(weiToGwei(hexToInt(nextBaseFee))),
       priorityFee: levelDisplay(maxPriorityFeePerGas)

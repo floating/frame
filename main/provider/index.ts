@@ -61,7 +61,7 @@ import * as sigParser from '../signatures'
 import { hasAddress } from '../../resources/domain/account'
 import { mapRequest } from '../requests'
 
-import type { Origin, Token } from '../store/state'
+import type { Origin, Token } from '../store/state/types'
 
 interface RequiredApproval {
   type: ApprovalType

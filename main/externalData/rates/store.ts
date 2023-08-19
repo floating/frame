@@ -5,7 +5,7 @@ import { storeApi } from '../storeApi'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
-import type { Rate, WithTokenId } from '../../store/state'
+import type { Rate, WithTokenId } from '../../store/state/types'
 
 type RateUpdate = {
   id: AssetId

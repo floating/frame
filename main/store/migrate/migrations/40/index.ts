@@ -1,3 +1,6 @@
+// @ts-nocheck
+// TODO: finish converting this
+
 import log from 'electron-log'
 import { z } from 'zod'
 

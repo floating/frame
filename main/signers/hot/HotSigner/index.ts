@@ -10,7 +10,7 @@ import { stringToKey } from '../../../crypt'
 import Signer from '../../Signer'
 import store from '../../../store'
 
-import type { HotSignerType } from '../../../store/state'
+import type { HotSignerType } from '../../../store/state/types'
 import type { TransactionData } from '../../../../resources/domain/transaction'
 import type { TypedMessage } from '../../../accounts/types'
 import type {

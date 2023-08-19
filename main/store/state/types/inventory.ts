@@ -29,5 +29,6 @@ const latest = v40.catch({}).default({})
 
 export { v40InventoryCollection as v40, latest }
 
+export type Inventory = z.infer<typeof latest>
 export type InventoryAsset = z.infer<typeof latestCollectionSchema.shape.items.element>
 export type InventoryCollection = z.infer<typeof latestCollectionSchema>
