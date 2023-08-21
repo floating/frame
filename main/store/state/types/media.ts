@@ -14,5 +14,4 @@ const latest = v40
 
 export { v40, latest }
 
-// TODO: finish implementing this
-export type Media = any // z.infer<typeof MediaSchema>
+export type Media = z.infer<typeof latest>

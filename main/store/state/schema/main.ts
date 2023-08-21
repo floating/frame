@@ -19,6 +19,7 @@ import { latest as DappsSchema } from '../types/dapps'
 import { latest as DappSettingsSchema } from '../types/dappSettings'
 import { latest as FramesSchema } from '../types/frames'
 import { latest as BalancesSchema } from '../types/balances'
+import { latest as TokensSchema } from '../types/tokens'
 import { latest as InventorySchema } from '../types/inventory'
 import { latest as AssetPreferencesSchema } from '../types/assetPreferences'
 import { latest as RatesSchema } from '../types/rates'
@@ -59,6 +60,7 @@ const main = z.object({
   dapp: DappSettingsSchema,
   frames: FramesSchema,
   balances: BalancesSchema,
+  tokens: TokensSchema,
   inventory: InventorySchema,
   assetPreferences: AssetPreferencesSchema,
   rates: RatesSchema,
@@ -67,8 +69,6 @@ const main = z.object({
   trezor: TrezorSettingsSchema,
   ledger: LedgerSettingsSchema,
   latticeSettings: LatticeSettingsSchema,
-  // TODO: finish implementing this
-  tokens: z.any().catch({ custom: [], known: {} }).default({ custom: [], known: {} }),
   ...topLevelSettings,
   ...defaultNodes
 })

@@ -13,8 +13,7 @@ export type { Inventory, InventoryAsset, InventoryCollection } from './inventory
 export type { AssetPreferences } from './assetPreferences'
 export type { Media } from './media'
 export type { Rate } from './rate'
-// TODO: finish implementing this
-export type { WithTokenId, Token, TokenBalance } from './token'
+export type { WithTokenId, Token, TokenBalance } from './tokens'
 
 export type { Frame, ViewMetadata } from './frames'
 export type { Dapp } from './dapps'

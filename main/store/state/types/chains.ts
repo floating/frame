@@ -258,19 +258,17 @@ export const ChainIdSchema = z.object({
 
 const v37 = z.object({
   ethereum: z.record(
-    ChainIdSchema.merge(
-      z.object({
-        name: z.string(),
-        on: z.boolean().default(false),
-        connection: z.object({
-          primary: v37Connection,
-          secondary: v37Connection
-        }),
-        layer: z.enum(layerValues).optional().catch('other'),
-        isTestnet: z.boolean().default(false),
-        explorer: z.string().default('')
-      })
-    )
+    ChainIdSchema.extend({
+      name: z.string(),
+      on: z.boolean().default(false),
+      connection: z.object({
+        primary: v37Connection,
+        secondary: v37Connection
+      }),
+      layer: z.enum(layerValues).optional().catch('other'),
+      isTestnet: z.boolean().default(false),
+      explorer: z.string().default('')
+    })
   )
 })
 
@@ -334,7 +332,7 @@ const ChainsSchema = z.record(z.coerce.number(), z.unknown()).transform((chainsO
 const latest = z
   .object({ ethereum: ChainsSchema })
   .catch((ctx) => {
-    log.error('Could not parse chains, falling back to defaults', ctx.error)
+    log.warn('Could not parse chains, falling back to defaults', ctx.error)
     return { ethereum: chainDefaults }
   })
   .default({ ethereum: chainDefaults })
