@@ -1,11 +1,8 @@
-// TODO: finish converting this
-
-import log from 'electron-log'
 import { z } from 'zod'
 
 import { v39 as LegacyTokensSchema, v40 as NewTokensSchema } from '../../../state/types/tokens'
 
-const v39StateSchema = z
+const InputSchema = z
   .object({
     main: z
       .object({
@@ -31,56 +28,43 @@ interface WithLogoURI {
   logoURI?: string
 }
 
-const migrateToken = <T extends WithLogoURI>({ logoURI, ...token }: T) => ({
+const migrateToken = <T extends WithLogoURI>({ logoURI = '', ...token }: T) => ({
   ...token,
   media: {
-    source: logoURI || '',
+    source: logoURI,
     format: 'image' as const,
     cdn: {}
   },
   hideByDefault: false
 })
 
-const migrateKnownTokens = (knownTokens: Record<string, unknown[]>): Record<string, v40TokenBalance[]> =>
-  Object.entries(knownTokens).reduce((acc, [address, tokens]) => {
-    const migrated: v40TokenBalance[] = tokens
-      .map((token) => LegacyTokensSchema.shape.known.valueSchema.element.safeParse(token))
-      .filter(({ success }) => !!success)
-      .map((result) => migrateToken((result.success && result.data) as v39TokenBalance))
+const migrateKnownTokens = (knownTokens: Record<string, v39TokenBalance[]>) => {
+  const tokens: Record<string, v40TokenBalance[]> = {}
+  for (const address in knownTokens) {
+    tokens[address] = (knownTokens[address] || []).map(migrateToken)
+  }
 
-    return {
-      ...acc,
-      [address]: migrated
-    }
-  }, {} as Record<string, v40TokenBalance[]>)
+  return tokens
+}
 
-const migrateCustomTokens = (customTokens: unknown[]): v40Token[] =>
-  customTokens
-    .map((token) => LegacyTokensSchema.shape.custom.element.safeParse(token))
-    .filter(({ success }) => !!success)
-    .map((result) => migrateToken((result.success && result.data) as v39Token))
+const migrateCustomTokens = (customTokens: v39Token[]): v40Token[] => customTokens.map(migrateToken)
 
 const migrate = (initial: unknown) => {
-  try {
-    const v39State = v39StateSchema.parse(initial)
-    const { known: knownTokens, custom: customTokens } = v39State.main.tokens
+  const state = InputSchema.parse(initial)
+  const { known: knownTokens, custom: customTokens } = state.main.tokens
 
-    const v40State: OutputState = {
-      ...v39State,
-      main: {
-        ...v39State.main,
-        tokens: {
-          known: migrateKnownTokens(knownTokens),
-          custom: migrateCustomTokens(customTokens)
-        }
+  const updatedState: OutputState = {
+    ...state,
+    main: {
+      ...state.main,
+      tokens: {
+        known: migrateKnownTokens(knownTokens),
+        custom: migrateCustomTokens(customTokens)
       }
     }
-
-    return v40State
-  } catch (e) {
-    log.error('Migration 40: could not parse state', e)
-    return initial
   }
+
+  return updatedState
 }
 
 export default {
