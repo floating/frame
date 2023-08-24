@@ -136,7 +136,6 @@ export function handleBalanceUpdate(
   const withLocalData = mergeCustomAndNative(balances, chains)
 
   const changedBalances = getChangedBalances(address, withLocalData)
-
   if (changedBalances.length) {
     storeApi.setBalances(address, changedBalances)
     const { toAdd, toRemove } = splitTokenBalances(changedBalances)

@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { AddressSchema } from '../types/common'
 import { schemaWithEmptyDefaults } from './util'
 
 const modules = [

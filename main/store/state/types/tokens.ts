@@ -25,7 +25,7 @@ const v39TokenBalance = z.object({
   displayBalance: z.string().default('0')
 })
 
-const v40TokenBalance = v39TokenBalance.omit({ logoURI: true }).extend({
+export const v40TokenBalance = v39TokenBalance.omit({ logoURI: true }).extend({
   media: v40MediaSchema,
   hideByDefault: z.boolean().default(false)
 })

@@ -18,4 +18,6 @@ const State = z.object({
   keyboardLayout
 })
 
+export type State = z.infer<typeof State>
+
 export default State

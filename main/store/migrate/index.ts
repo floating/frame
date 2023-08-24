@@ -6,7 +6,7 @@ import migration39 from './migrations/39'
 import migration40 from './migrations/40'
 import migration41 from './migrations/41'
 
-import type { StateVersion } from '../state'
+import type { PersistedState } from '../state'
 
 export type Migration = {
   version: number
@@ -26,7 +26,7 @@ const latest = migrations[migrations.length - 1].version
 
 export default {
   // Apply migrations to current state
-  apply: (state: StateVersion, migrateToVersion = latest) => {
+  apply: (state: PersistedState, migrateToVersion = latest) => {
     state.main._version = state.main._version || 0
 
     migrations.forEach(({ version, migrate }) => {

@@ -4,10 +4,10 @@ import persist from '../persist'
 import migrations from '../migrate'
 import { queueError } from '../../errors/queue'
 
-import StateSchema from './schema'
+import StateSchema, { type State } from './schema'
 
 const currentVersion = 41
-const currentBaseState = { main: { _version: currentVersion } } as StateVersion
+const currentBaseState = { main: { _version: currentVersion } } as State
 
 // const StateSchema = z
 //   .object({
@@ -37,14 +37,14 @@ const currentBaseState = { main: { _version: currentVersion } } as StateVersion
 //   })
 //   .default({})
 
-type StateVersion = {
+type PersistedState = {
   main: {
     _version: number
   }
 }
 
 type VersionedState = {
-  __: Record<number, StateVersion>
+  __: Record<number, State>
 }
 
 function loadState() {
@@ -57,7 +57,7 @@ function loadState() {
 
   if (!state.__) {
     log.verbose('Persisted state: legacy state found, returning base state')
-    return state as StateVersion
+    return state as State
   }
 
   const versionedState = state as VersionedState
@@ -266,12 +266,13 @@ const mainState = {
 // }
 
 export { currentVersion }
-export type { StateVersion }
+export type { PersistedState }
 
 export default function () {
-  const persistedState = loadState()
+  // removed nodes that aren't persisted
+  const { main } = loadState()
 
-  const migratedState = migrations.apply(persistedState)
+  const migratedState = migrations.apply({ main })
   const result = StateSchema.safeParse(migratedState)
 
   if (!result.success) {
