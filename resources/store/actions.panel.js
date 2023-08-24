@@ -29,16 +29,10 @@ module.exports = {
     u('selected.minimized', () => false)
     u('selected.open', () => true)
   },
-  setSettingsView: (u, index, subindex = 0) => {
-    u('selected.settings.viewIndex', () => index)
-    u('selected.settings.subIndex', () => subindex)
-  },
   setAddress: (u, address) => u('address', () => address),
-  togglePanel: (u) => u('panel.show', (show) => !show),
   panelRequest: (u, request) => {
     request.host = request.host || new URL(request.url).host
     u('panel.request', () => request)
-    u('panel.show', () => true)
   },
   setBalance: (u, account, balance) => u('balances', account, () => balance),
   notify: (u, type, data = {}) => {
@@ -49,9 +43,6 @@ module.exports = {
   toggleAddAccount: (u) => u('view.addAccount', (show) => !show),
   toggleAddNetwork: (u) => u('view.addNetwork', (show) => !show),
   updateBadge: (u, type, version) => u('view.badge', () => ({ type, version })),
-  toggleSettings: (u) => {
-    u('panel.view', (view) => (view === 'settings' ? 'default' : 'settings'))
-  },
   setPanelView: (u, view) => u('panel.view', () => view),
   trayOpen: (u, open) => {
     u('tray.open', () => open)
@@ -66,9 +57,6 @@ module.exports = {
     u('selected.showAccounts', () => false)
     u('selected.view', () => view)
   },
-  accountPage: (u, page) => {
-    u('selected.accountPage', () => page)
-  },
   toggleShowAccounts: (u) => u('selected.showAccounts', (_) => !_),
   addProviderEvent: (u, payload) => {
     u('provider.events', (events) => {
@@ -76,7 +64,6 @@ module.exports = {
       return events
     })
   },
-  setView: (u, view) => u('selected.view', () => view),
   toggleDataView: (u, id) => {
     u('selected.requests', id, 'viewData', (view) => !view)
   },
