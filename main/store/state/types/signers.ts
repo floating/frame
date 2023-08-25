@@ -11,8 +11,8 @@ export const SignerTypes = z.enum([...HotSignerValues, ...HardwareSignerValues])
 
 const SignerSchema = z.object({
   id: z.string(),
-  name: z.string(),
-  model: z.string(),
+  name: z.string().default(''),
+  model: z.string().default(''),
   type: SignerTypes,
   addresses: z.array(z.string()),
   status: z.string(),

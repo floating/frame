@@ -57,7 +57,7 @@ function loadState() {
 
   if (!state.__) {
     log.verbose('Persisted state: legacy state found, returning base state')
-    return state as State
+    return { main: state } as State
   }
 
   const versionedState = state as VersionedState

@@ -17,12 +17,14 @@ jest.mock('../../main/store/persist', () => ({
 const testFiles = fs.readdirSync(__dirname).filter((file) => file.startsWith('version'))
 
 testFiles
-  .filter((file) => file.includes('41'))
+  // TODO: finish retrofitting config for 0.3.6
+  .filter((file) => !file.includes('0.3.6'))
   .forEach((file) => {
     const [_prefix, stateVersion, appVersion] = file.split('-')
 
     it(`migrates from state version ${stateVersion} (${appVersion})`, async () => {
       const { input, output } = await import(`./${file}`)
+
       persist.get.mockReturnValueOnce(input)
 
       const state = getState()

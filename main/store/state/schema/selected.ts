@@ -4,7 +4,7 @@ import { schemaWithEmptyDefaults } from './util'
 
 const selected = z
   .object({
-    minimized: z.boolean().default(false),
+    minimized: z.boolean().default(true),
     open: z.boolean().default(false),
     showAccounts: z.boolean().default(false),
     current: z.union([z.literal(''), AddressSchema]).default(''),

@@ -591,6 +591,54 @@ const output = {
       }
     }
   },
+  panel: {
+    nav: [],
+    view: 'default',
+    account: {
+      moduleOrder: ['requests', 'chains', 'balances', 'inventory', 'permissions', 'signer', 'settings'],
+      modules: {
+        requests: {
+          height: 0
+        },
+        activity: {
+          height: 0
+        },
+        balances: {
+          height: 0
+        },
+        inventory: {
+          height: 0
+        },
+        permissions: {
+          height: 0
+        },
+        verify: {
+          height: 0
+        },
+        gas: {
+          height: 100
+        }
+      }
+    }
+  },
+  selected: {
+    minimized: true,
+    open: false,
+    showAccounts: false,
+    current: '',
+    view: 'default',
+    position: {
+      scrollTop: 0,
+      initial: {
+        top: 5,
+        left: 5,
+        right: 5,
+        bottom: 5,
+        height: 5,
+        index: 0
+      }
+    }
+  },
   platform: 'linux'
 }
 

@@ -14,9 +14,11 @@ const AccountSchema = z.object({
   signer: z.string().optional(),
   ensName: z.string().optional(),
   created: z.string(),
-  balances: z.object({
-    lastUpdated: z.number().optional()
-  }),
+  balances: z
+    .object({
+      lastUpdated: z.number().optional()
+    })
+    .default({ lastUpdated: 0 }),
   requests: z.record(z.any()).default({})
 })
 

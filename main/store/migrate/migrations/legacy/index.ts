@@ -2,6 +2,7 @@
 // legacy migrations that were written in JS and have not been ported
 // to Typescript
 
+import log from 'electron-log'
 import { v5 as uuidv5 } from 'uuid'
 import { z } from 'zod'
 import log from 'electron-log'

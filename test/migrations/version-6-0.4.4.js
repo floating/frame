@@ -1,457 +1,455 @@
 const input = {
-  main: {
-    _version: 6,
-    mute: {
-      alphaWarning: false,
-      welcomeWarning: true,
-      externalLinkWarning: false,
-      explorerWarning: false,
-      signerRelockChange: false,
-      gasFeeWarning: false
-    },
-    shortcuts: {
-      altSlash: true
-    },
-    launch: true,
-    reveal: false,
-    nonceAdjust: false,
-    autohide: false,
-    accountCloseLock: false,
-    hardwareDerivation: 'mainnet',
-    menubarGasPrice: false,
-    ledger: {
-      derivation: 'live',
-      liveAccountLimit: 5
-    },
-    trezor: {
-      derivation: 'standard'
-    },
-    accounts: {
-      '3962313363386161636464323432666631363965386638393033343037656330': {
-        id: '3962313363386161636464323432666631363965386638393033343037656330',
-        index: 0,
-        network: '1',
-        name: 'Ring Account',
-        type: 'ring',
-        addresses: ['0xbad0fc6b8a20bee2daee7a1eeef448afb880cbf6'],
-        status: 'ok',
-        signer: {
-          id: '3962313363386161636464323432666631363965386638393033343037656330',
-          type: 'ring',
-          addresses: ['0xbad0fc6b8a20bee2daee7a1eeef448afb880cbf6'],
-          status: 'locked',
-          network: '1',
-          liveAddressesFound: 0
-        },
-        requests: {},
-        created: '0x1110b44'
-      }
-    },
-    addresses: {
-      '0xbad0fc6b8a20bee2daee7a1eeef448afb880cbf6': {
-        tokens: {}
-      }
-    },
-    signers: {
-      '3962313363386161636464323432666631363965386638393033343037656330': {
+  _version: 6,
+  mute: {
+    alphaWarning: false,
+    welcomeWarning: true,
+    externalLinkWarning: false,
+    explorerWarning: false,
+    signerRelockChange: false,
+    gasFeeWarning: false
+  },
+  shortcuts: {
+    altSlash: true
+  },
+  launch: true,
+  reveal: false,
+  nonceAdjust: false,
+  autohide: false,
+  accountCloseLock: false,
+  hardwareDerivation: 'mainnet',
+  menubarGasPrice: false,
+  ledger: {
+    derivation: 'live',
+    liveAccountLimit: 5
+  },
+  trezor: {
+    derivation: 'standard'
+  },
+  accounts: {
+    '3962313363386161636464323432666631363965386638393033343037656330': {
+      id: '3962313363386161636464323432666631363965386638393033343037656330',
+      index: 0,
+      network: '1',
+      name: 'Ring Account',
+      type: 'ring',
+      addresses: ['0xbad0fc6b8a20bee2daee7a1eeef448afb880cbf6'],
+      status: 'ok',
+      signer: {
         id: '3962313363386161636464323432666631363965386638393033343037656330',
         type: 'ring',
         addresses: ['0xbad0fc6b8a20bee2daee7a1eeef448afb880cbf6'],
         status: 'locked',
         network: '1',
         liveAddressesFound: 0
-      }
-    },
-    savedSigners: {},
-    updater: {
-      dontRemind: []
-    },
-    clients: {
-      ipfs: {
-        on: false,
-        installed: false,
-        latest: false,
-        version: null,
-        state: 'off'
       },
-      geth: {
-        on: false,
-        blockNumber: 0,
-        currentBlock: 0,
-        highestBlock: 0,
-        installed: false,
-        latest: false,
-        version: null,
-        state: 'off'
+      requests: {},
+      created: '0x1110b44'
+    }
+  },
+  addresses: {
+    '0xbad0fc6b8a20bee2daee7a1eeef448afb880cbf6': {
+      tokens: {}
+    }
+  },
+  signers: {
+    '3962313363386161636464323432666631363965386638393033343037656330': {
+      id: '3962313363386161636464323432666631363965386638393033343037656330',
+      type: 'ring',
+      addresses: ['0xbad0fc6b8a20bee2daee7a1eeef448afb880cbf6'],
+      status: 'locked',
+      network: '1',
+      liveAddressesFound: 0
+    }
+  },
+  savedSigners: {},
+  updater: {
+    dontRemind: []
+  },
+  clients: {
+    ipfs: {
+      on: false,
+      installed: false,
+      latest: false,
+      version: null,
+      state: 'off'
+    },
+    geth: {
+      on: false,
+      blockNumber: 0,
+      currentBlock: 0,
+      highestBlock: 0,
+      installed: false,
+      latest: false,
+      version: null,
+      state: 'off'
+    },
+    parity: {
+      on: false,
+      blockNumber: 0,
+      currentBlock: 0,
+      highestBlock: 0,
+      installed: false,
+      latest: false,
+      version: null,
+      state: 'off'
+    }
+  },
+  currentNetwork: {
+    type: 'ethereum',
+    id: '1'
+  },
+  networkPresets: {
+    ethereum: {
+      1: {
+        alchemy: [
+          'wss://eth-mainnet.ws.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0',
+          'https://eth-mainnet.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'
+        ],
+        infura: 'infura'
       },
-      parity: {
-        on: false,
-        blockNumber: 0,
-        currentBlock: 0,
-        highestBlock: 0,
-        installed: false,
-        latest: false,
-        version: null,
-        state: 'off'
+      3: {
+        infura: 'infuraRopsten'
+      },
+      4: {
+        infura: 'infuraRinkeby'
+      },
+      5: {
+        prylabs: 'https://goerli.prylabs.net',
+        mudit: 'https://rpc.goerli.mudit.blog',
+        slockit: 'https://rpc.slock.it/goerli',
+        infura: [
+          'wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b',
+          'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'
+        ]
+      },
+      42: {
+        infura: 'infuraKovan'
+      },
+      74: {
+        idchain: 'wss://idchain.one/ws/'
+      },
+      100: {
+        poa: 'https://dai.poa.network'
+      },
+      137: {
+        matic: 'https://rpc-mainnet.maticvigil.com'
+      },
+      default: {
+        local: 'direct'
       }
-    },
-    currentNetwork: {
-      type: 'ethereum',
-      id: '1'
-    },
-    networkPresets: {
-      ethereum: {
-        1: {
-          alchemy: [
-            'wss://eth-mainnet.ws.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0',
-            'https://eth-mainnet.alchemyapi.io/v2/NBms1eV9i16RFHpFqQxod56OLdlucIq0'
-          ],
-          infura: 'infura'
+    }
+  },
+  networks: {
+    ethereum: {
+      1: {
+        id: 1,
+        type: 'ethereum',
+        symbol: 'ETH',
+        name: 'Mainnet',
+        explorer: 'https://etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: {
+              slow: '',
+              standard: '',
+              fast: '',
+              asap: '',
+              custom: ''
+            }
+          }
         },
-        3: {
-          infura: 'infuraRopsten'
-        },
-        4: {
-          infura: 'infuraRinkeby'
-        },
-        5: {
-          prylabs: 'https://goerli.prylabs.net',
-          mudit: 'https://rpc.goerli.mudit.blog',
-          slockit: 'https://rpc.slock.it/goerli',
-          infura: [
-            'wss://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b',
-            'https://goerli.infura.io/ws/v3/786ade30f36244469480aa5c2bf0743b'
-          ]
-        },
-        42: {
-          infura: 'infuraKovan'
-        },
-        74: {
-          idchain: 'wss://idchain.one/ws/'
-        },
-        100: {
-          poa: 'https://dai.poa.network'
-        },
-        137: {
-          matic: 'https://rpc-mainnet.maticvigil.com'
-        },
-        default: {
-          local: 'direct'
+        connection: {
+          primary: {
+            on: true,
+            current: 'infura',
+            status: 'connected',
+            connected: true,
+            type: '',
+            network: '1',
+            custom: ''
+          },
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
         }
-      }
-    },
-    networks: {
-      ethereum: {
-        1: {
-          id: 1,
-          type: 'ethereum',
-          symbol: 'ETH',
-          name: 'Mainnet',
-          explorer: 'https://etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: {
-                slow: '',
-                standard: '',
-                fast: '',
-                asap: '',
-                custom: ''
-              }
-            }
-          },
-          connection: {
-            primary: {
-              on: true,
-              current: 'infura',
-              status: 'connected',
-              connected: true,
-              type: '',
-              network: '1',
-              custom: ''
-            },
-            secondary: {
-              on: false,
-              current: 'custom',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
+      },
+      3: {
+        id: 3,
+        type: 'ethereum',
+        symbol: 'ETH',
+        name: 'Ropsten',
+        explorer: 'https://ropsten.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: {
+              slow: '',
+              standard: '',
+              fast: '',
+              asap: '',
               custom: ''
             }
           }
         },
-        3: {
-          id: 3,
-          type: 'ethereum',
-          symbol: 'ETH',
-          name: 'Ropsten',
-          explorer: 'https://ropsten.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: {
-                slow: '',
-                standard: '',
-                fast: '',
-                asap: '',
-                custom: ''
-              }
-            }
+        connection: {
+          primary: {
+            on: true,
+            current: 'infura',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
           },
-          connection: {
-            primary: {
-              on: true,
-              current: 'infura',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
-              custom: ''
-            },
-            secondary: {
-              on: false,
-              current: 'custom',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        }
+      },
+      4: {
+        id: 4,
+        type: 'ethereum',
+        symbol: 'ETH',
+        name: 'Rinkeby',
+        explorer: 'https://rinkeby.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: {
+              slow: '',
+              standard: '',
+              fast: '',
+              asap: '',
               custom: ''
             }
           }
         },
-        4: {
-          id: 4,
-          type: 'ethereum',
-          symbol: 'ETH',
-          name: 'Rinkeby',
-          explorer: 'https://rinkeby.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: {
-                slow: '',
-                standard: '',
-                fast: '',
-                asap: '',
-                custom: ''
-              }
-            }
+        connection: {
+          primary: {
+            on: true,
+            current: 'infura',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
           },
-          connection: {
-            primary: {
-              on: true,
-              current: 'infura',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
-              custom: ''
-            },
-            secondary: {
-              on: false,
-              current: 'custom',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        }
+      },
+      5: {
+        id: 5,
+        type: 'ethereum',
+        symbol: 'ETH',
+        name: 'Görli',
+        explorer: 'https://goerli.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: {
+              slow: '',
+              standard: '',
+              fast: '',
+              asap: '',
               custom: ''
             }
           }
         },
-        5: {
-          id: 5,
-          type: 'ethereum',
-          symbol: 'ETH',
-          name: 'Görli',
-          explorer: 'https://goerli.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: {
-                slow: '',
-                standard: '',
-                fast: '',
-                asap: '',
-                custom: ''
-              }
-            }
+        connection: {
+          primary: {
+            on: true,
+            current: 'prylabs',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
           },
-          connection: {
-            primary: {
-              on: true,
-              current: 'prylabs',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
-              custom: ''
-            },
-            secondary: {
-              on: false,
-              current: 'custom',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        }
+      },
+      42: {
+        id: 42,
+        type: 'ethereum',
+        symbol: 'ETH',
+        name: 'Kovan',
+        explorer: 'https://kovan.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: {
+              slow: '',
+              standard: '',
+              fast: '',
+              asap: '',
               custom: ''
             }
           }
         },
-        42: {
-          id: 42,
-          type: 'ethereum',
-          symbol: 'ETH',
-          name: 'Kovan',
-          explorer: 'https://kovan.etherscan.io',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: {
-                slow: '',
-                standard: '',
-                fast: '',
-                asap: '',
-                custom: ''
-              }
-            }
+        connection: {
+          primary: {
+            on: true,
+            current: 'infura',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
           },
-          connection: {
-            primary: {
-              on: true,
-              current: 'infura',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
-              custom: ''
-            },
-            secondary: {
-              on: false,
-              current: 'custom',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        }
+      },
+      74: {
+        id: 74,
+        type: 'ethereum',
+        symbol: 'EIDI',
+        name: 'IDChain',
+        explorer: 'https://explorer.idchain.one',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: {
+              slow: '',
+              standard: '',
+              fast: '',
+              asap: '',
               custom: ''
             }
           }
         },
-        74: {
-          id: 74,
-          type: 'ethereum',
-          symbol: 'EIDI',
-          name: 'IDChain',
-          explorer: 'https://explorer.idchain.one',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: {
-                slow: '',
-                standard: '',
-                fast: '',
-                asap: '',
-                custom: ''
-              }
-            }
+        connection: {
+          primary: {
+            on: true,
+            current: 'idchain',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
           },
-          connection: {
-            primary: {
-              on: true,
-              current: 'idchain',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
-              custom: ''
-            },
-            secondary: {
-              on: false,
-              current: 'custom',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        }
+      },
+      100: {
+        id: 100,
+        type: 'ethereum',
+        symbol: 'xDAI',
+        name: 'xDai',
+        explorer: 'https://blockscout.com/poa/xdai',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: {
+              slow: '',
+              standard: '',
+              fast: '',
+              asap: '',
               custom: ''
             }
           }
         },
-        100: {
-          id: 100,
-          type: 'ethereum',
-          symbol: 'xDAI',
-          name: 'xDai',
-          explorer: 'https://blockscout.com/poa/xdai',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: {
-                slow: '',
-                standard: '',
-                fast: '',
-                asap: '',
-                custom: ''
-              }
-            }
+        connection: {
+          primary: {
+            on: true,
+            current: 'poa',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
           },
-          connection: {
-            primary: {
-              on: true,
-              current: 'poa',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
-              custom: ''
-            },
-            secondary: {
-              on: false,
-              current: 'custom',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        }
+      },
+      137: {
+        id: 137,
+        type: 'ethereum',
+        symbol: 'MATIC',
+        name: 'Polygon',
+        explorer: 'https://explorer.matic.network',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: {
+              slow: '',
+              standard: '',
+              fast: '',
+              asap: '',
               custom: ''
             }
           }
         },
-        137: {
-          id: 137,
-          type: 'ethereum',
-          symbol: 'MATIC',
-          name: 'Polygon',
-          explorer: 'https://explorer.matic.network',
-          gas: {
-            price: {
-              selected: 'standard',
-              levels: {
-                slow: '',
-                standard: '',
-                fast: '',
-                asap: '',
-                custom: ''
-              }
-            }
+        connection: {
+          primary: {
+            on: true,
+            current: 'matic',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
           },
-          connection: {
-            primary: {
-              on: true,
-              current: 'matic',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
-              custom: ''
-            },
-            secondary: {
-              on: false,
-              current: 'custom',
-              status: 'loading',
-              connected: false,
-              type: '',
-              network: '',
-              custom: ''
-            }
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
           }
         }
       }
@@ -614,6 +612,31 @@ const output = {
           layer: 'testnet',
           isTestnet: true,
           explorer: 'https://kovan.etherscan.io'
+        },
+        74: {
+          id: 74,
+          type: 'ethereum',
+          name: 'IDChain',
+          on: false,
+          connection: {
+            primary: {
+              on: true,
+              connected: false,
+              current: 'custom',
+              status: 'loading',
+              custom: ''
+            },
+            secondary: {
+              on: false,
+              connected: false,
+              current: 'custom',
+              status: 'loading',
+              custom: ''
+            }
+          },
+          layer: 'other',
+          isTestnet: false,
+          explorer: 'https://explorer.idchain.one'
         },
         100: {
           id: 100,
@@ -790,12 +813,68 @@ const output = {
               price: 0,
               change24hr: 0
             },
-            icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
+            icon: '',
             name: 'Ether',
             decimals: 18
           },
           icon: '',
           primaryColor: 'accent1'
+        },
+        3: {
+          blockHeight: 0,
+          gas: {
+            fees: null,
+            price: {
+              selected: 'standard',
+              levels: {
+                slow: '',
+                standard: '',
+                fast: '',
+                asap: '',
+                custom: ''
+              }
+            }
+          },
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            decimals: 18
+          },
+          icon: '',
+          primaryColor: 'accent2'
+        },
+        4: {
+          blockHeight: 0,
+          gas: {
+            fees: null,
+            price: {
+              selected: 'standard',
+              levels: {
+                slow: '',
+                standard: '',
+                fast: '',
+                asap: '',
+                custom: ''
+              }
+            }
+          },
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            decimals: 18
+          },
+          icon: '',
+          primaryColor: 'accent2'
         },
         5: {
           blockHeight: 0,
@@ -852,6 +931,62 @@ const output = {
           },
           icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
           primaryColor: 'accent4'
+        },
+        42: {
+          blockHeight: 0,
+          gas: {
+            fees: null,
+            price: {
+              selected: 'standard',
+              levels: {
+                slow: '',
+                standard: '',
+                fast: '',
+                asap: '',
+                custom: ''
+              }
+            }
+          },
+          nativeCurrency: {
+            symbol: 'ETH',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            decimals: 18
+          },
+          icon: '',
+          primaryColor: 'accent2'
+        },
+        74: {
+          blockHeight: 0,
+          gas: {
+            fees: null,
+            price: {
+              selected: 'standard',
+              levels: {
+                slow: '',
+                standard: '',
+                fast: '',
+                asap: '',
+                custom: ''
+              }
+            }
+          },
+          nativeCurrency: {
+            symbol: 'EIDI',
+            usd: {
+              price: 0,
+              change24hr: 0
+            },
+            icon: '',
+            name: '',
+            decimals: 18
+          },
+          icon: '',
+          primaryColor: 'accent3'
         },
         100: {
           blockHeight: 0,
@@ -1022,18 +1157,107 @@ const output = {
           }
         }
       }
+    },
+    colorway: 'dark',
+    mute: {
+      alphaWarning: false,
+      welcomeWarning: true,
+      externalLinkWarning: false,
+      explorerWarning: false,
+      signerRelockChange: false,
+      gasFeeWarning: false,
+      betaDisclosure: false,
+      onboardingWindow: false,
+      migrateToPylon: false,
+      signerCompatibilityWarning: false
+    },
+    shortcuts: {
+      summon: {
+        modifierKeys: ['Alt'],
+        shortcutKey: 'Slash',
+        enabled: true,
+        configuring: false
+      }
+    },
+    launch: true,
+    reveal: false,
+    showLocalNameWithENS: false,
+    autohide: false,
+    accountCloseLock: false,
+    menubarGasPrice: false,
+    lattice: {},
+    latticeSettings: {
+      accountLimit: 5,
+      derivation: 'standard',
+      endpointMode: 'default',
+      endpointCustom: ''
+    },
+    ledger: {
+      derivation: 'live',
+      liveAccountLimit: 5
+    },
+    trezor: {
+      derivation: 'standard'
+    },
+    origins: {},
+    openDapps: [],
+    dapps: {},
+
+    ipfs: {},
+    frames: {},
+    openDapps: [],
+    dapp: {
+      details: {},
+      map: {
+        added: [],
+        docked: []
+      },
+      storage: {},
+      removed: []
+    },
+    knownExtensions: {},
+    permissions: {},
+    accounts: {},
+    accountsMeta: {},
+    balances: {},
+    assetPreferences: {
+      tokens: {},
+      collections: {}
+    },
+    tokens: {
+      custom: [],
+      known: {}
+    },
+    rates: {},
+    inventory: {},
+    signers: {
+      '3962313363386161636464323432666631363965386638393033343037656330': {
+        id: '3962313363386161636464323432666631363965386638393033343037656330',
+        type: 'ring',
+        addresses: ['0xbad0fc6b8a20bee2daee7a1eeef448afb880cbf6'],
+        status: 'locked',
+        name: '',
+        model: '',
+        createdAt: 0
+      }
+    },
+    updater: {
+      dontRemind: []
+    },
+    privacy: {
+      errorReporting: true
     }
   },
   windows: {
     panel: {
-      show: false,
+      showing: false,
       nav: [],
       footer: {
         height: 40
       }
     },
     dash: {
-      show: false,
+      showing: false,
       nav: [],
       footer: {
         height: 40
@@ -1041,10 +1265,61 @@ const output = {
     },
     frames: []
   },
-  view: {},
-  selected: {},
-  panel: {},
-  tray: {},
+  panel: {
+    nav: [],
+    view: 'default',
+    account: {
+      moduleOrder: ['requests', 'chains', 'balances', 'inventory', 'permissions', 'signer', 'settings'],
+      modules: {
+        requests: {
+          height: 0
+        },
+        activity: {
+          height: 0
+        },
+        balances: {
+          height: 0
+        },
+        inventory: {
+          height: 0
+        },
+        permissions: {
+          height: 0
+        },
+        verify: {
+          height: 0
+        },
+        gas: {
+          height: 100
+        }
+      }
+    }
+  },
+  selected: {
+    minimized: true,
+    open: false,
+    showAccounts: false,
+    current: '',
+    view: 'default',
+    position: {
+      scrollTop: 0,
+      initial: {
+        top: 5,
+        left: 5,
+        right: 5,
+        bottom: 5,
+        height: 5,
+        index: 0
+      }
+    }
+  },
+  keyboardLayout: {
+    isUS: true
+  },
+  tray: {
+    initial: true,
+    open: false
+  },
   platform: 'linux'
 }
 
