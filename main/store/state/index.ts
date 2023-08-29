@@ -269,7 +269,7 @@ export { currentVersion }
 export type { PersistedState }
 
 export default function () {
-  // removed nodes that aren't persisted
+  // remove nodes that aren't persisted
   const { main } = loadState()
 
   const migratedState = migrations.apply({ main })
