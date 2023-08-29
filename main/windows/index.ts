@@ -526,8 +526,11 @@ class Notify {
     const cleanupHandler = () => windows.notify?.off('close', closeHandler)
 
     const closeHandler = () => {
-      store.mutePylonMigrationNotice()
-      store.migrateToPylonConnections()
+      if (!store('main.mute.migrateToPylon')) {
+        store.migrateToPylonConnections()
+        store.mutePylonMigrationNotice()
+      }
+
       if (!store('main.mute.onboardingWindow')) {
         store.setNotify({ showing: false })
         store.setOnboard({ showing: true })

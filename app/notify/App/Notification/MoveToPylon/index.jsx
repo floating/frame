@@ -28,8 +28,6 @@ const MoveToPylon = () => {
       <PylonConfirm>
         <PylonConfirmButton
           onClick={() => {
-            link.send('tray:action', 'migrateToPylonConnections')
-            link.send('tray:action', 'mutePylonMigrationNotice')
             link.send('frame:close')
           }}
         >

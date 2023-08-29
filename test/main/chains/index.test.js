@@ -7,6 +7,12 @@ import { gweiToHex } from '../../util'
 
 log.transports.console.level = false
 
+jest.mock('electron', () => ({
+  powerMonitor: {
+    on: jest.fn()
+  }
+}))
+
 class MockConnection extends EventEmitter {
   constructor(chainId) {
     super()
