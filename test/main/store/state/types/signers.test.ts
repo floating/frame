@@ -17,7 +17,7 @@ it('parses a valid signer', () => {
 it('removes an invalid signer from the state', () => {
   const invalidSigner = {
     ...validSigner,
-    name: undefined
+    type: 'bogus'
   }
 
   expect(SignersSchema.parse({ 'my-ledger': validSigner, 'your-ledger': invalidSigner })).toStrictEqual({
