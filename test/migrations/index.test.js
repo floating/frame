@@ -17,8 +17,7 @@ jest.mock('../../main/store/persist', () => ({
 const testFiles = fs.readdirSync(__dirname).filter((file) => file.startsWith('version'))
 
 testFiles
-  // TODO: finish retrofitting config for 0.3.6
-  .filter((file) => !file.includes('0.3.6'))
+  //.filter((file) => file.includes('0.3.6'))
   .forEach((file) => {
     const [_prefix, stateVersion, appVersion] = file.split('-')
 
