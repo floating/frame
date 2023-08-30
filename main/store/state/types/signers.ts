@@ -21,31 +21,16 @@ const SignerSchema = z.object({
 
 const v37 = z.record(SignerSchema)
 
-const latestSchema = v37
-const LatestSignerSchema = latestSchema.valueSchema
-
 const latest = z
-  .record(z.unknown())
+  .record(SignerSchema)
   .catch((ctx) => {
     log.error('Could not parse signers, falling back to defaults', ctx.error)
     return {}
   })
   .default({})
-  .transform((signersObject) => {
-    const signers = {} as Record<string, Signer>
-
-    for (const id in signersObject) {
-      const signer = signersObject[id]
-      const result = LatestSignerSchema.safeParse(signer)
-
-      if (!result.success) {
-        log.info(`Removing invalid signer ${id} from state`, result.error)
-      } else {
-        signers[id] = result.data
-      }
-    }
-
-    return signers
+  .transform(() => {
+    // signers aren't persisted in the state
+    return {} as Record<string, Signer>
   })
 
 export { v37, latest }
