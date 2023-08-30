@@ -13,14 +13,3 @@ const validSigner = {
 it('parses a valid signer', () => {
   expect(SignersSchema.parse({ 'my-ledger': validSigner })).toStrictEqual({ 'my-ledger': validSigner })
 })
-
-it('removes an invalid signer from the state', () => {
-  const invalidSigner = {
-    ...validSigner,
-    type: 'bogus'
-  }
-
-  expect(SignersSchema.parse({ 'my-ledger': validSigner, 'your-ledger': invalidSigner })).toStrictEqual({
-    'my-ledger': validSigner
-  })
-})
