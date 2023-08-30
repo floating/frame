@@ -1,4 +1,7 @@
-import { latest as SignersSchema } from '../../../../../main/store/state/types/signers'
+import {
+  v37 as SignersSchema,
+  latest as PersistedSignersSchema
+} from '../../../../../main/store/state/types/signers'
 
 const validSigner = {
   id: 'my-ledger',
@@ -12,4 +15,8 @@ const validSigner = {
 
 it('parses a valid signer', () => {
   expect(SignersSchema.parse({ 'my-ledger': validSigner })).toStrictEqual({ 'my-ledger': validSigner })
+})
+
+it('does not persist signer data', () => {
+  expect(PersistedSignersSchema.parse({ 'my-ledger': validSigner })).toStrictEqual({})
 })
