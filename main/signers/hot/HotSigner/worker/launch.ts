@@ -3,7 +3,7 @@ import SeedSignerWorker from '../../SeedSigner/worker'
 import launchController from './controller'
 
 import type { WorkerRPCMessage, WorkerTokenMessage } from '../types'
-import type { HotSignerType } from '../../../../store/state'
+import type { HotSignerType } from '../../../../store/state/types'
 
 const signerType = process.argv[2] as HotSignerType
 let worker

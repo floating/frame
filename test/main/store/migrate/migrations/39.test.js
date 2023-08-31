@@ -1,19 +1,16 @@
 import migration from '../../../../../main/store/migrate/migrations/39'
-import { createState } from '../setup'
+import { createState, initChainState } from '../setup'
 
 let state
 
 beforeEach(() => {
   state = createState(migration.version - 1)
 
-  state.main.networks.ethereum = {
-    100: {
-      id: 100,
-      connection: {
-        primary: { current: 'custom', custom: 'myrpc' },
-        secondary: { current: 'local', custom: '' }
-      }
-    }
+  initChainState(state, 100, 'Gnosis')
+
+  state.main.networks.ethereum[100].connection = {
+    primary: { current: 'custom', custom: 'myrpc' },
+    secondary: { current: 'local', custom: '' }
   }
 })
 

@@ -161,7 +161,7 @@ class ChainSummaryComponent extends Component {
       // Optimism specific calculations
       const price = calculatedFees?.actualFee || gasPrice
 
-      const feeMarket = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees') || {}
+      const feeMarket = this.store('main.networksMeta.ethereum', 1, 'gas.fees') || {}
       const { nextBaseFee: ethBaseFee } = feeMarket
 
       const optimismEstimate = (serializedTx, l2Limit) => {
@@ -197,12 +197,7 @@ class ChainSummaryComponent extends Component {
       return this.txEstimates(type, chainId, gasPrice, null, currentSymbol)
     }
 
-    const { nextBaseFee, maxPriorityFeePerGas } = this.store(
-      'main.networksMeta',
-      type,
-      chainId,
-      'gas.price.fees'
-    )
+    const { nextBaseFee, maxPriorityFeePerGas } = this.store('main.networksMeta', type, chainId, 'gas.fees')
     const calculatedFees = {
       actualBaseFee: roundGwei(weiToGwei(hexToInt(nextBaseFee))),
       priorityFee: levelDisplay(maxPriorityFeePerGas)
@@ -215,7 +210,7 @@ class ChainSummaryComponent extends Component {
     const { address, chainId } = this.props
     const type = 'ethereum'
     const currentChain = { type, id: chainId }
-    const fees = this.store('main.networksMeta', type, chainId, 'gas.price.fees')
+    const fees = this.store('main.networksMeta', type, chainId, 'gas.fees')
     const levels = this.store('main.networksMeta', type, chainId, 'gas.price.levels')
     const gasPrice = levelDisplay(levels.fast)
 

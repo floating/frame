@@ -1,5 +1,13 @@
 import { z } from 'zod'
 
+const emptyGasLevels = {
+  slow: '',
+  standard: '',
+  fast: '',
+  asap: '',
+  custom: ''
+} as const
+
 const GasLevelsSchema = z.object({
   slow: z.string().optional(),
   standard: z.string().optional(),
@@ -8,21 +16,45 @@ const GasLevelsSchema = z.object({
   custom: z.string().optional()
 })
 
-// TODO: validate these fields as hex amount values
-export const GasFeesSchema = z.object({
-  nextBaseFee: z.string(),
-  maxBaseFeePerGas: z.string(),
-  maxPriorityFeePerGas: z.string(),
-  maxFeePerGas: z.string()
-})
-
-export const GasSchema = z.object({
-  price: z.object({
-    selected: GasLevelsSchema.keyof(),
-    levels: GasLevelsSchema,
-    fees: GasFeesSchema.nullish()
+const GasFeesSchema = z
+  .object({
+    nextBaseFee: z.string(),
+    maxBaseFeePerGas: z.string(),
+    maxPriorityFeePerGas: z.string(),
+    maxFeePerGas: z.string()
   })
+  .nullish()
+  .default(null)
+  .catch(null)
+
+const GasPricesSchema = z
+  .object({
+    selected: GasLevelsSchema.keyof(),
+    levels: GasLevelsSchema
+  })
+  .catch({ selected: 'standard', levels: emptyGasLevels })
+  .default({ selected: 'standard', levels: emptyGasLevels })
+
+const v37 = z.object({
+  fees: GasFeesSchema,
+  price: GasPricesSchema
 })
 
-export type Gas = z.infer<typeof GasSchema>
+const latestSchema = v37
+
+const nullGasFees = null as z.infer<typeof GasFeesSchema>
+
+const latest = latestSchema.transform((gas) => {
+  // fees and prices arent persisted so always load them as null to begin with
+  gas.fees = nullGasFees
+  gas.price = {
+    selected: gas.price.selected,
+    levels: emptyGasLevels
+  }
+
+  return gas
+})
+
+export { v37, latest }
 export type GasFees = z.infer<typeof GasFeesSchema>
+export type Gas = z.infer<typeof latest>

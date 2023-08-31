@@ -1,6 +1,7 @@
-import log from 'electron-log'
+import { z } from 'zod'
 
-import { v38StateSchema } from '../38/schema'
+import { v38 as ChainsSchema } from '../../../state/types/chains'
+import { v37 as ChainMetaSchema } from '../../../state/types/chainMeta'
 
 function baseMainnet() {
   const chain = {
@@ -32,7 +33,7 @@ function baseMainnet() {
   const metadata = {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -55,23 +56,28 @@ function baseMainnet() {
   return { chain, metadata }
 }
 
+const StateSchema = z
+  .object({
+    main: z
+      .object({
+        networks: ChainsSchema,
+        networksMeta: ChainMetaSchema
+      })
+      .passthrough()
+  })
+  .passthrough()
+
 const migrate = (initial: unknown) => {
-  try {
-    const state = v38StateSchema.parse(initial)
-    const usingBase = '8453' in state.main.networks.ethereum
+  const state = StateSchema.parse(initial)
+  const usingBase = '8453' in state.main.networks.ethereum
 
-    if (!usingBase) {
-      const { chain, metadata } = baseMainnet()
-      state.main.networks.ethereum[8453] = chain
-      state.main.networksMeta.ethereum[8453] = metadata
-    }
-
-    return state
-  } catch (e) {
-    log.error('Migration 40: could not parse state', e)
+  if (!usingBase) {
+    const { chain, metadata } = baseMainnet()
+    state.main.networks.ethereum[8453] = chain
+    state.main.networksMeta.ethereum[8453] = metadata
   }
 
-  return initial
+  return state
 }
 
 export default {

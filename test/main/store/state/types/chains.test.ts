@@ -1,4 +1,4 @@
-import { EthereumChainsSchema } from '../../../../../main/store/state/types/chain'
+import { latest as EthereumChainsSchema } from '../../../../../main/store/state/types/chains'
 
 const validChain = {
   id: 5,
@@ -26,6 +26,24 @@ const validChain = {
   }
 }
 
+it('provides default chains for an empty state', () => {
+  const { ethereum: chains } = EthereumChainsSchema.parse(undefined)
+
+  expect(Object.keys(chains)).toEqual(['1', '5', '10', '100', '137', '8453', '42161', '84531', '11155111'])
+})
+
+it('handles a corrupted state with the wrong key', () => {
+  const { ethereum: chains } = EthereumChainsSchema.parse({ bogus: 'test' })
+
+  expect(Object.keys(chains)).toEqual(['1', '5', '10', '100', '137', '8453', '42161', '84531', '11155111'])
+})
+
+it('handles a corrupted state with the wrong structure of the ethereum object', () => {
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: 'test' })
+
+  expect(Object.keys(chains)).toEqual(['1', '5', '10', '100', '137', '8453', '42161', '84531', '11155111'])
+})
+
 it('parses a valid chain', () => {
   const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: validChain } })
 
@@ -36,6 +54,7 @@ it('sets the primary connection to disconnected to start', () => {
   const previouslyConnectedChain = {
     ...validChain,
     connection: {
+      ...validChain.connection,
       primary: {
         ...validChain.connection.primary,
         connected: true
@@ -104,9 +123,9 @@ it('removes an unknown corrupt chain from the state', () => {
     test: 'bogusvalue'
   }
 
-  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: chain } })
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 15: chain } })
 
-  expect(chains['5']).toBeUndefined()
+  expect(chains['15']).toBeUndefined()
 })
 
 it('adds mainnet if not present in the state', () => {

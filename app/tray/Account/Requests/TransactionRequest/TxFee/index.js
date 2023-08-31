@@ -83,7 +83,7 @@ class TxFee extends React.Component {
     const serializedTransaction = utils.serializeTransaction(tx)
 
     // Get current Ethereum gas price
-    const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
+    const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.fees.nextBaseFee')
     const l1DataFee = calculateOptimismL1DataFee(serializedTransaction, ethBaseFee)
 
     // Compute the L2 execution fee

@@ -10,8 +10,6 @@ import { updateOrigin, isTrusted, parseOrigin } from './origins'
 import validPayload from './validPayload'
 import protectedMethods from './protectedMethods'
 
-import type { Permission } from '../store/state'
-
 const logTraffic = process.env.LOG_TRAFFIC
 
 interface PendingRequest {

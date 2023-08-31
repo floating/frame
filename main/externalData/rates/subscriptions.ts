@@ -6,7 +6,7 @@ import { storeApi } from '../storeApi'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { AssetId } from '@framelabs/pylon-client/dist/assetId'
-import type { Chain, Rate, Token, WithTokenId } from '../../store/state'
+import type { Chain, Rate, Token, WithTokenId } from '../../store/state/types'
 
 const NO_RATE_DATA = {}
 const RATES_LOADED_TIMEOUT = 2000 // 2 seconds

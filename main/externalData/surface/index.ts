@@ -6,7 +6,13 @@ import Networks from './networks'
 import { handleBalanceUpdate } from '../balances/processor'
 import { updateCollections, updateItems } from '../inventory/processor'
 
-import type { Inventory, InventoryAsset, Media, TokenBalance } from '../../store/state'
+import type {
+  Inventory,
+  InventoryAsset,
+  InventoryCollection,
+  Media,
+  TokenBalance
+} from '../../store/state/types'
 
 type Subscription = Unsubscribable & { unsubscribables: Unsubscribable[]; collectionItems: CollectionItem[] }
 

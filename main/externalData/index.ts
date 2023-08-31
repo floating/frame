@@ -16,7 +16,7 @@ import {
   createTrayObserver
 } from './observers'
 
-import type { Token } from '../store/state'
+import type { Token } from '../store/state/types'
 
 export interface DataScanner {
   close: () => void

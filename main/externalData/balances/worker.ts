@@ -7,12 +7,12 @@ log.transports.file.level = ['development', 'test'].includes(process.env.NODE_EN
   ? false
   : 'verbose'
 
-import { supportsChain as chainSupportsScan } from '../../multicall'
-import balancesLoader, { BalanceLoader } from './scan'
 import TokenLoader from '../inventory/tokens'
+import balancesLoader, { BalanceLoader } from './scan'
+import { supportsChain as chainSupportsScan } from '../../multicall'
 import { toTokenId } from '../../../resources/domain/balance'
 
-import type { Token } from '../../store/state'
+import type { Token } from '../../store/state/types'
 
 interface ExternalDataWorkerMessage {
   command: string

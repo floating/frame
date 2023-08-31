@@ -116,6 +116,7 @@ const state = {
     networksMeta: {
       ethereum: {
         5: {
+          fees: {},
           gas: {
             price: {
               selected: 'standard',
@@ -125,6 +126,7 @@ const state = {
         },
         137: {
           gas: {
+            fees: {},
             price: {
               selected: 'standard',
               levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -234,15 +236,15 @@ Object.values(mockConnections).forEach((chain) => {
     const expectedPriorityFee = 32e9
 
     observer = store.observer(() => {
-      const gas = store(`main.networksMeta.ethereum.${chain.id}.gas.price`)
+      const { price, fees } = store(`main.networksMeta.ethereum.${chain.id}.gas`)
 
-      if (gas.fees.maxBaseFeePerGas) {
-        expect(gas.fees.maxBaseFeePerGas).toBe(intToHex(expectedBaseFee))
-        expect(gas.fees.maxPriorityFeePerGas).toBe(intToHex(expectedPriorityFee))
-        expect(gas.fees.maxFeePerGas).toBe(intToHex(expectedBaseFee + expectedPriorityFee))
+      if (fees.maxBaseFeePerGas) {
+        expect(fees.maxBaseFeePerGas).toBe(intToHex(expectedBaseFee))
+        expect(fees.maxPriorityFeePerGas).toBe(intToHex(expectedPriorityFee))
+        expect(fees.maxFeePerGas).toBe(intToHex(expectedBaseFee + expectedPriorityFee))
 
-        expect(gas.selected).toBe('fast')
-        expect(gas.levels.fast).toBe(intToHex(expectedBaseFee + expectedPriorityFee))
+        expect(price.selected).toBe('fast')
+        expect(price.levels.fast).toBe(intToHex(expectedBaseFee + expectedPriorityFee))
 
         done()
       }

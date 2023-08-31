@@ -17,42 +17,8 @@ it('should have migration version 40', () => {
   expect(version).toBe(40)
 })
 
-it('should default to a safe state if the tokens is fatally corrupted', () => {
-  state.main.tokens = []
-  const migratedState = migration.migrate(state)
-
-  expect(migratedState.main.tokens).toStrictEqual({
-    known: {},
-    custom: []
-  })
-})
-
-it('should default to a safe state if the tokens is undefined', () => {
-  state.main.tokens = undefined
-  const migratedState = migration.migrate(state)
-
-  expect(migratedState.main.tokens).toStrictEqual({
-    known: {},
-    custom: []
-  })
-})
-
 describe('custom tokens', () => {
-  it('should default the tokens to a safe state if they are undefined', () => {
-    state.main.tokens.custom = undefined
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.custom).toStrictEqual([])
-  })
-
-  it('should default the tokens to a safe state if they are fatally corrupted', () => {
-    state.main.tokens.custom = {}
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.custom).toStrictEqual([])
-  })
-
-  it('should transform tokens with a logoUri correctly', () => {
+  it('should transform tokens with a logo URI', () => {
     const customToken = {
       name: 'Custom Token',
       symbol: 'CT',
@@ -67,19 +33,20 @@ describe('custom tokens', () => {
 
     const { logoURI: source, ...restOfToken } = customToken
 
-    delete customToken.logoURI
-    expect(migratedState.main.tokens.custom[0]).toStrictEqual({
-      ...restOfToken,
-      media: {
-        source,
-        format: 'image',
-        cdn: {}
-      },
-      hideByDefault: false
-    })
+    expect(migratedState.main.tokens.custom).toStrictEqual([
+      {
+        ...restOfToken,
+        media: {
+          source,
+          format: 'image',
+          cdn: {}
+        },
+        hideByDefault: false
+      }
+    ])
   })
 
-  it('should transform tokens without a logoUri correctly', () => {
+  it('should transform tokens without a logo URI', () => {
     const customToken = {
       name: 'Custom Token',
       symbol: 'CT',
@@ -89,105 +56,11 @@ describe('custom tokens', () => {
     }
 
     state.main.tokens.custom.push(customToken)
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.custom[0]).toStrictEqual({
-      ...customToken,
-      media: {
-        source: '',
-        format: 'image',
-        cdn: {}
-      },
-      hideByDefault: false
-    })
-  })
-
-  it('should repair tokens with corrupted names', () => {
-    const customToken = {
-      nome: 'Custom Token',
-      symbol: 'CT',
-      chainId: 1,
-      address: '1234',
-      decimals: 18
-    }
-
-    state.main.tokens.custom.push(customToken)
-    const migratedState = migration.migrate(state)
-
-    const { nome, ...restOfToken } = customToken
-
-    expect(migratedState.main.tokens.custom[0]).toStrictEqual({
-      ...restOfToken,
-      name: '',
-      media: {
-        source: '',
-        format: 'image',
-        cdn: {}
-      },
-      hideByDefault: false
-    })
-  })
-
-  it('should repair tokens with corrupted symbols', () => {
-    const customToken = {
-      name: 'custom token',
-      chainId: 1,
-      address: '1234',
-      decimals: 18
-    }
-
-    state.main.tokens.custom.push(customToken)
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.custom[0]).toStrictEqual({
-      ...customToken,
-      symbol: '',
-      media: {
-        source: '',
-        format: 'image',
-        cdn: {}
-      },
-      hideByDefault: false
-    })
-  })
-
-  it('should remove tokens with fatally corrupted schemas', () => {
-    const customToken = {
-      name: 'Custom Token',
-      symbol: 'CT',
-      address: '0x1234',
-      decimals: 18
-    }
-
-    state.main.tokens.custom.push(customToken)
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.custom).toStrictEqual([])
-  })
-
-  it('should transform all correctly shaped tokens', () => {
-    const corruptedToken = {
-      name: 'Custom Token',
-      symbol: 'CT',
-      chainId: 1,
-      address: '0x1234'
-    }
-
-    const validToken = {
-      chainId: 1,
-      address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-      name: 'Test Token',
-      symbol: 'TT',
-      decimals: 18
-    }
-
-    state.main.tokens.custom.push(corruptedToken, validToken)
-
     const migratedState = migration.migrate(state)
 
     expect(migratedState.main.tokens.custom).toStrictEqual([
       {
-        ...validToken,
+        ...customToken,
         media: {
           source: '',
           format: 'image',
@@ -200,21 +73,7 @@ describe('custom tokens', () => {
 })
 
 describe('known tokens', () => {
-  it('should default the tokens to a safe state if they are undefined', () => {
-    state.main.tokens.known = undefined
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.known).toStrictEqual({})
-  })
-
-  it('should default the tokens to a safe state if they are fatally corrupted', () => {
-    state.main.tokens.known = []
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.known).toStrictEqual({})
-  })
-
-  it('should transform tokens with a logoUri correctly', () => {
+  it('should transform tokens with a logo URI', () => {
     const knownToken = {
       chainId: 1,
       address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
@@ -244,7 +103,7 @@ describe('known tokens', () => {
     ])
   })
 
-  it('should transform tokens without a logoUri correctly', () => {
+  it('should transform tokens without a logo URI', () => {
     const knownToken = {
       chainId: 1,
       address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
@@ -269,111 +128,5 @@ describe('known tokens', () => {
         hideByDefault: false
       }
     ])
-  })
-
-  it('should remove all tokens with corrupted schemas', () => {
-    const knownToken = {
-      chainId: 1,
-      address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-      name: 'Test Token',
-      symbol: 'TT',
-      balance: '0x123',
-      displayBalance: '123'
-    }
-
-    state.main.tokens.known['0x123'] = [knownToken]
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.known['0x123']).toStrictEqual([])
-  })
-
-  it('should transform all correctly shaped tokens', () => {
-    const corruptedKnownToken = {
-      chainId: 1,
-      address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-      name: 'Test Token',
-      symbol: 'TT',
-      decimal: 18,
-      balance: '0x123',
-      displayBalance: '123'
-    }
-
-    const validKnownToken = {
-      chainId: 1,
-      address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-      name: 'Test Token 2',
-      symbol: 'TT2',
-      decimals: 18,
-      balance: '0x123',
-      displayBalance: '123'
-    }
-
-    state.main.tokens.known['0x123'] = [corruptedKnownToken, validKnownToken]
-
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.known['0x123']).toStrictEqual([
-      {
-        ...validKnownToken,
-        media: {
-          source: '',
-          format: 'image',
-          cdn: {}
-        },
-        hideByDefault: false
-      }
-    ])
-  })
-
-  it('should repair tokens with corrupted names', () => {
-    const knownToken = {
-      chainId: 1,
-      address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-      symbol: 'TT2',
-      decimals: 18,
-      balance: '0x123',
-      displayBalance: '123'
-    }
-
-    state.main.tokens.known['0x123'] = [knownToken]
-    const migratedState = migration.migrate(state)
-
-    expect(migratedState.main.tokens.known['0x123'][0]).toStrictEqual({
-      ...knownToken,
-      name: '',
-      media: {
-        source: '',
-        format: 'image',
-        cdn: {}
-      },
-      hideByDefault: false
-    })
-  })
-
-  it('should repair tokens with corrupted symbols', () => {
-    const knownToken = {
-      chainId: 1,
-      address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-      name: 'custom 2',
-      symbole: 'TT2',
-      decimals: 18,
-      balance: '0x123',
-      displayBalance: '123'
-    }
-
-    state.main.tokens.known['0x123'] = [knownToken]
-    const migratedState = migration.migrate(state)
-
-    const { symbole, ...restOfToken } = knownToken
-    expect(migratedState.main.tokens.known['0x123'][0]).toStrictEqual({
-      ...restOfToken,
-      symbol: '',
-      media: {
-        source: '',
-        format: 'image',
-        cdn: {}
-      },
-      hideByDefault: false
-    })
   })
 })

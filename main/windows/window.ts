@@ -1,10 +1,9 @@
-import { BrowserWindow, BrowserView, BrowserWindowConstructorOptions, shell } from 'electron'
 import log from 'electron-log'
 import path from 'path'
+import { BrowserWindow, BrowserView, BrowserWindowConstructorOptions, shell } from 'electron'
 
 import store from '../store'
-
-import type { ChainId } from '../store/state'
+import { COLORWAY_SKINS } from '../../resources/constants'
 
 type OpenExplorer = {
   chain: {
@@ -30,7 +29,7 @@ export function createWindow(
     acceptFirstMouse: true,
     transparent: process.platform === 'darwin',
     show: false,
-    backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
+    backgroundColor: COLORWAY_SKINS[store('main.colorway') as keyof typeof COLORWAY_SKINS]['background'],
     skipTaskbar: process.platform !== 'linux',
     webPreferences: {
       ...webPreferences,

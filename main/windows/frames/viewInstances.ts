@@ -1,12 +1,12 @@
-import { URL } from 'url'
 import log from 'electron-log'
+import { URL } from 'url'
 
-import { FrameInstance } from './frameInstances'
 import store from '../../store'
 import server from '../../dapps/server'
 import { createViewInstance } from '../window'
 
-import type { ViewMetadata } from '../../store/state'
+import type { FrameInstance } from './frameInstances'
+import type { ViewMetadata } from '../../store/state/types'
 
 interface Extract {
   session: string

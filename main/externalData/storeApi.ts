@@ -1,7 +1,7 @@
 import store from '../store'
 import { NATIVE_CURRENCY } from '../../resources/constants'
 
-import type { Chain, Token, Rate, Inventory, InventoryAsset, TokenBalance } from '../store/state'
+import type { Chain, Token, Rate, InventoryAsset, Inventory, TokenBalance } from '../store/state/types'
 
 export const storeApi = {
   // Accounts

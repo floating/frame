@@ -35,7 +35,7 @@ import { accountNS } from '../../resources/domain/account'
 import { getMaxTotalFee } from '../../resources/gas'
 
 import type { Chain } from '../chains'
-import type { Account, AccountMetadata, Gas } from '../store/state'
+import type { Account, AccountMetadata, Gas } from '../store/state/types'
 
 function notify(title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -553,7 +553,7 @@ export class Accounts extends EventEmitter {
           const gas = store('main.networksMeta', chain.type, chain.id, 'gas') as Gas
 
           if (usesBaseFee(tx)) {
-            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.price.fees || {}
+            const { maxBaseFeePerGas, maxPriorityFeePerGas } = gas.fees || {}
 
             if (maxPriorityFeePerGas && maxBaseFeePerGas) {
               this.setPriorityFee(maxPriorityFeePerGas, id, false)

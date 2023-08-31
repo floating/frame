@@ -86,9 +86,22 @@ const ShortcutSchema = z.object({
   configuring: z.boolean().default(false)
 })
 
-export const ShortcutsSchema = z.object({
+const v37 = z.object({
   summon: ShortcutSchema
 })
+
+const defaultShortcuts = {
+  summon: {
+    modifierKeys: ['Alt' as const],
+    shortcutKey: 'Slash' as const,
+    enabled: true,
+    configuring: false
+  }
+}
+
+const latest = v37.catch(defaultShortcuts).default(defaultShortcuts)
+
+export { v37, latest }
 
 export type ModifierKey = z.infer<typeof supportedModifierKey>
 export type ShortcutKey = z.infer<typeof supportedShortcutKey>

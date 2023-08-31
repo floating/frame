@@ -6,7 +6,7 @@ import { EventEmitter } from 'stream'
 import { toTokenId } from '../../../resources/domain/balance'
 
 import type { CurrencyBalance } from './scan'
-import type { Token, TokenBalance } from '../../store/state'
+import type { Token, TokenBalance } from '../../store/state/types'
 
 const BOOTSTRAP_TIMEOUT_SECONDS = 20
 

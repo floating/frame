@@ -6,7 +6,7 @@ import store from '../../store'
 import frameInstances, { FrameInstance } from './frameInstances.js'
 import viewInstances from './viewInstances'
 
-import type { Frame } from '../../store/state'
+import type { Frame } from '../../store/state/types'
 
 function getFrames(): Record<string, Frame> {
   return store('main.frames')

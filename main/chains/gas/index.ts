@@ -1,7 +1,7 @@
 import { intToHex } from '@ethereumjs/util'
 import { chainUsesOptimismFees } from '../../../resources/utils/chains'
 
-import type { GasFees } from '../../store/state'
+import type { GasFees } from '../../store/state/types'
 
 interface GasCalculator {
   calculateGas: (blocks: Block[]) => GasFees

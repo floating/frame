@@ -2,7 +2,6 @@ import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
 import { Common } from '@ethereumjs/common'
 
 import {
-  maxFee,
   londonToLegacy,
   signerCompatibility,
   populate,
@@ -302,11 +301,9 @@ describe('#populate', () => {
 
     beforeEach(() => {
       gas = {
-        price: {
-          fees: {
-            maxPriorityFeePerGas: '',
-            maxBaseFeePerGas: ''
-          }
+        fees: {
+          maxPriorityFeePerGas: '',
+          maxBaseFeePerGas: ''
         }
       }
     })
@@ -318,8 +315,8 @@ describe('#populate', () => {
     })
 
     it('calculates maxFeePerGas when the dapp did not specify a value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      gas.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       const tx = populate(rawTx, chainConfig, gas)
 
       expect(tx.maxFeePerGas).toBe(addHexPrefix((7e9 + 3e9).toString(16)))
@@ -327,8 +324,8 @@ describe('#populate', () => {
     })
 
     it('calculates maxFeePerGas when the dapp specified an invalid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      gas.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       rawTx.maxFeePerGas = ''
       const tx = populate(rawTx, chainConfig, gas)
 
@@ -337,8 +334,8 @@ describe('#populate', () => {
     })
 
     it('calculates maxFeePerGas using a dapp-supplied value of maxPriorityFeePerGas', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      gas.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       rawTx.maxPriorityFeePerGas = addHexPrefix((4e9).toString(16))
       const tx = populate(rawTx, chainConfig, gas)
 
@@ -346,9 +343,9 @@ describe('#populate', () => {
       expect(tx.gasFeesSource).toBe(GasFeesSource.Dapp)
     })
 
-    it('uses dapp-supplied maxFeePerGas when the dapp specified a valid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+    it('ses dapp-supplied maxFeePerGas when the dapp specified a valid value', () => {
+      gas.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       rawTx.maxFeePerGas = (6e9).toString(16)
       const tx = populate(rawTx, chainConfig, gas)
 
@@ -357,25 +354,25 @@ describe('#populate', () => {
     })
 
     it('uses Frame-supplied maxPriorityFeePerGas when the dapp did not specify a value', () => {
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      gas.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       const tx = populate(rawTx, chainConfig, gas)
 
-      expect(tx.maxPriorityFeePerGas).toBe(gas.price.fees.maxPriorityFeePerGas)
+      expect(tx.maxPriorityFeePerGas).toBe(gas.fees.maxPriorityFeePerGas)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
     })
 
     it('uses Frame-supplied maxPriorityFeePerGas when the dapp specified an invalid value', () => {
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      gas.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       rawTx.maxFeePerGas = ''
       const tx = populate(rawTx, chainConfig, gas)
 
-      expect(tx.maxPriorityFeePerGas).toBe(gas.price.fees.maxPriorityFeePerGas)
+      expect(tx.maxPriorityFeePerGas).toBe(gas.fees.maxPriorityFeePerGas)
       expect(tx.gasFeesSource).toBe(GasFeesSource.Frame)
     })
 
     it('uses dapp-supplied maxPriorityFeePerGas when the dapp specified a valid value', () => {
-      gas.price.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
-      gas.price.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
+      gas.fees.maxBaseFeePerGas = addHexPrefix((7e9).toString(16))
+      gas.fees.maxPriorityFeePerGas = addHexPrefix((3e9).toString(16))
       rawTx.maxPriorityFeePerGas = (6e9).toString(16)
       const tx = populate(rawTx, chainConfig, gas)
 

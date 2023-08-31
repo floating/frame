@@ -1,12 +1,17 @@
-import { z } from 'zod'
 import log from 'electron-log'
+import { z } from 'zod'
 
-import { ConnectionSchema } from './connection'
+import {
+  v37 as v37Connection,
+  v38 as v38Connection,
+  v39 as v39Connection,
+  latest as latestConnection
+} from './connection'
 
-const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet'] as const
+const layerValues = ['mainnet', 'rollup', 'sidechain', 'testnet', 'other'] as const
 const type = 'ethereum' as const
 
-export const chainDefaults = {
+const chainDefaults = {
   1: {
     id: 1,
     type,
@@ -234,11 +239,12 @@ export const chainDefaults = {
   }
 }
 
-function getDefaultChain(chainId: keyof typeof chainDefaults) {
+function getReplacementChain(chainId: keyof typeof chainDefaults) {
   const defaultChain = chainDefaults[chainId]
 
   // ensure all chains that are replaced in state with a
-  // default value are not using any custom RPC presets
+  // default value are not using any custom RPC presets to prevent
+  // forcing users to use unwanted third party connections
   defaultChain.connection.primary.current = 'custom'
   defaultChain.connection.secondary.current = 'custom'
 
@@ -250,81 +256,87 @@ export const ChainIdSchema = z.object({
   type: z.literal('ethereum')
 })
 
-export const ChainSchema = ChainIdSchema.merge(
-  z.object({
-    name: z.string(),
-    on: z.boolean().default(false),
-    connection: z.object({
-      primary: ConnectionSchema,
-      secondary: ConnectionSchema
-    }),
-    layer: z.enum(layerValues).optional(),
-    isTestnet: z.boolean().default(false),
-    explorer: z.string().default('')
+const v37 = z.object({
+  ethereum: z.record(
+    ChainIdSchema.extend({
+      name: z.string(),
+      on: z.boolean().default(false),
+      connection: z.object({
+        primary: v37Connection,
+        secondary: v37Connection
+      }),
+      layer: z.enum(layerValues).optional().catch('other'),
+      isTestnet: z.boolean().default(false),
+      explorer: z.string().default('')
+    })
+  )
+})
+
+const v38 = v37.extend({
+  ethereum: z.record(
+    v37.shape.ethereum.valueSchema.extend({
+      connection: z.object({
+        primary: v38Connection,
+        secondary: v38Connection
+      })
+    })
+  )
+})
+
+const v39 = v38.extend({
+  ethereum: z.record(
+    v38.shape.ethereum.valueSchema.extend({
+      connection: z.object({
+        primary: v39Connection,
+        secondary: v39Connection
+      })
+    })
+  )
+})
+
+const latestSchema = v39
+
+const LatestChainSchema = latestSchema.shape.ethereum.valueSchema.extend({
+  connection: z.object({
+    primary: latestConnection,
+    secondary: latestConnection
   })
-)
+})
 
-// create a version of the schema that removes invalid chains, allowing them to
-// also be "false" so that we can filter them out later in a transform
-const ParsedChainSchema = z.union([ChainSchema, z.boolean()]).catch((ctx) => {
-  const { id: chainId } = (ctx.input || {}) as any
+const ChainsSchema = z.record(z.coerce.number(), z.unknown()).transform((chainsObject) => {
+  const chains = {} as Record<number, Chain>
 
-  if (chainId in chainDefaults) {
-    return getDefaultChain(chainId as keyof typeof chainDefaults)
+  for (const id in chainsObject) {
+    const chainId = parseInt(id)
+    const chain = chainsObject[chainId]
+    const result = LatestChainSchema.safeParse(chain)
+
+    if (!result.success) {
+      log.info(`Removing invalid chain ${id} from state`, result.error)
+
+      if (chainId in chainDefaults) {
+        chains[chainId] = getReplacementChain(chainId as keyof typeof chainDefaults)
+      }
+    } else {
+      chains[chainId] = result.data
+    }
   }
 
-  return false
+  // add mainnet if it's not already there
+  return {
+    ...chains,
+    1: chains['1'] || getReplacementChain(1)
+  } as Record<number, Chain>
 })
 
-const ChainsSchema = z
-  .record(z.coerce.number(), ParsedChainSchema)
-  .transform((parsedChains) => {
-    // remove any chains that failed to parse, which will now be set to "false"
-    const chains = Object.fromEntries(
-      Object.entries(parsedChains).filter(([id, chain]) => {
-        if (chain === false) {
-          log.info(`State parsing: removing invalid chain ${id} from state`)
-          return false
-        }
-
-        return true
-      })
-    ) as Record<string, Chain>
-
-    // add mainnet if it's not already there
-    return {
-      ...chains,
-      1: chains['1'] || getDefaultChain(1)
-    }
+const latest = z
+  .object({ ethereum: ChainsSchema })
+  .catch((ctx) => {
+    log.warn('Could not parse chains, falling back to defaults', ctx.error)
+    return { ethereum: chainDefaults }
   })
-  .transform((chains) => {
-    const disconnectedChains = Object.entries(chains).map(([id, chain]) => {
-      // all chains should start disconnected by default
-      return [
-        id,
-        {
-          ...chain,
-          connection: {
-            ...chain.connection,
-            primary: {
-              ...chain.connection.primary,
-              connected: false
-            },
-            secondary: {
-              ...chain.connection.secondary,
-              connected: false
-            }
-          }
-        }
-      ]
-    })
+  .default({ ethereum: chainDefaults })
 
-    return Object.fromEntries(disconnectedChains)
-  })
-
-export const EthereumChainsSchema = z.object({
-  ethereum: ChainsSchema
-})
-
+export { v37, v38, v39, latest }
 export type ChainId = z.infer<typeof ChainIdSchema>
-export type Chain = z.infer<typeof ChainSchema>
+export type Chain = z.infer<typeof LatestChainSchema>

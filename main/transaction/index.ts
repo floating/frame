@@ -3,13 +3,13 @@ import { addHexPrefix, intToHex } from '@ethereumjs/util'
 import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import { Common } from '@ethereumjs/common'
 
+import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
 import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
 import { isNonZeroHex } from '../../resources/utils'
-import chainConfig from '../chains/config'
 import { TransactionRequest, TxClassification } from '../accounts/types'
 
-import type { Gas } from '../store/state'
+import type { Gas } from '../store/state/types'
 
 const londonHardforkSigners: SignerCompatibilityByVersion = {
   seed: () => true,
@@ -83,7 +83,7 @@ function populate(rawTx: TransactionData, chainConfig: Common, gas: Gas): Transa
   const txData: TransactionData = { ...rawTx }
 
   // non-EIP-1559 case
-  if (!chainConfig.isActivatedEIP(1559) || !gas.price.fees) {
+  if (!chainConfig.isActivatedEIP(1559) || !gas.fees) {
     txData.type = intToHex(chainConfig.isActivatedEIP(2930) ? 1 : 0)
 
     const useFrameGasPrice = !rawTx.gasPrice || isNaN(parseInt(rawTx.gasPrice, 16))
@@ -115,14 +115,14 @@ function populate(rawTx: TransactionData, chainConfig: Common, gas: Gas): Transa
   }
 
   const maxPriorityFee =
-    useFrameMaxPriorityFeePerGas && gas.price.fees.maxPriorityFeePerGas
-      ? gas.price.fees.maxPriorityFeePerGas
+    useFrameMaxPriorityFeePerGas && gas.fees?.maxPriorityFeePerGas
+      ? gas.fees.maxPriorityFeePerGas
       : (rawTx.maxPriorityFeePerGas as string)
 
   // if no valid dapp-supplied value for maxFeePerGas we calculate it
   txData.maxFeePerGas =
-    useFrameMaxFeePerGas && gas.price.fees.maxBaseFeePerGas
-      ? calculateMaxFeePerGas(gas.price.fees.maxBaseFeePerGas, maxPriorityFee)
+    useFrameMaxFeePerGas && gas.fees?.maxBaseFeePerGas
+      ? calculateMaxFeePerGas(gas.fees.maxBaseFeePerGas, maxPriorityFee)
       : txData.maxFeePerGas
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
