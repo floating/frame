@@ -25,7 +25,10 @@ const v40InventoryCollection = z.object({
 const v40 = z.record(v40InventoryCollection)
 const latestCollectionSchema = v40InventoryCollection
 
-const latest = v40.catch({}).default({})
+const latest = v40
+  .catch({})
+  .default({})
+  .transform(() => ({} as Record<string, InventoryCollection>))
 
 export { v40InventoryCollection as v40, latest }
 
