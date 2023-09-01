@@ -189,15 +189,16 @@ class ChainSummaryComponent extends Component {
     }))
   }
 
-  feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }) {
+  feeEstimatesUSD({ chainId, gasPrice }) {
     const type = 'ethereum'
     const currentSymbol = this.store('main.networksMeta', type, chainId, 'nativeCurrency', 'symbol') || 'ETH'
+    const feeMarket = this.store('main.networksMeta', type, chainId, 'gas.fees')
 
-    if (!displayFeeMarket) {
+    if (!feeMarket) {
       return this.txEstimates(type, chainId, gasPrice, null, currentSymbol)
     }
 
-    const { nextBaseFee, maxPriorityFeePerGas } = this.store('main.networksMeta', type, chainId, 'gas.fees')
+    const { nextBaseFee, maxPriorityFeePerGas } = feeMarket
     const calculatedFees = {
       actualBaseFee: roundGwei(weiToGwei(hexToInt(nextBaseFee))),
       priorityFee: levelDisplay(maxPriorityFeePerGas)
@@ -278,7 +279,7 @@ class ChainSummaryComponent extends Component {
           </ClusterRow>
         )}
         <ClusterRow>
-          {this.feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }).map((estimate, i) => {
+          {this.feeEstimatesUSD({ chainId, gasPrice }).map((estimate, i) => {
             return (
               <ClusterValue key={i}>
                 <div className='gasEstimate'>
