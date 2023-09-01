@@ -20,7 +20,8 @@
     "./main/**/*.js",
     "./resources/**/*.ts",
     "./resources/**/*.js",
-    "./test/**/*.ts"
+    "./test/**/*.ts",
+    "resources/Hooks/*.ts*"
   ],
   "watchOptions": {
     "excludeFiles": ["./node_modules/**/*", "./package.json"]
