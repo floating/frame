@@ -1,33 +1,56 @@
-// Frames are the windows that run dapps and other functionality
-// They are rendered based on the state of `main.frames`
+// Workspaces are rendered based on the state of `windows.workspaces`
+// A workspace is a full-sized native window that behaves like a normal app window
+// Each workspace has a nav stack and each nav item fully describes the state of the workspace
+// A view is a browser view attached to a workspace, views can only run installed dapps
+// Workspace and View instances are created based solely on state
+// When Workspace and View instances are created, they update their status in the store within `workspacesMeta`
+
+import { app, Menu, MenuItemConstructorOptions } from 'electron'
+
 import log from 'electron-log'
 import store from '../../store'
 
 import frameInstances, { FrameInstance } from './frameInstances.js'
 import viewInstances from './viewInstances'
 
-import type { Frame } from '../../store/state'
+import { Workspace, Nav, View } from '../workspace/types'
 
-function getFrames(): Record<string, Frame> {
-  return store('main.frames')
+function getFrames(): Record<string, Workspace> {
+  return store('windows.workspaces') || {}
 }
 
-export default class FrameManager {
+// const showMenu = () => {
+//   const template: MenuItemConstructorOptions[] = [
+//     {
+//       label: 'File',
+//       submenu: [{ role: 'quit' }]
+//     }
+//   ]
+
+//   const menu = Menu.buildFromTemplate(template)
+//   Menu.setApplicationMenu(menu)
+// }
+
+// const hideMenu = () => {
+//   Menu.setApplicationMenu(null) // Removes the application menu
+// }
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+export default class WorkspaceManager {
   private frameInstances: Record<string, FrameInstance> = {}
 
   start() {
     store.observer(() => {
       const inFocus = store('main.focusedFrame')
-
       const frames = getFrames()
-
       this.manageFrames(frames, inFocus)
       this.manageViews(frames)
       // manageOverlays(frames)
     })
   }
 
-  manageFrames(frames: Record<string, Frame>, inFocus: string) {
+  manageFrames(frames: Record<string, Workspace>, inFocus: string) {
     const frameIds = Object.keys(frames)
     const instanceIds = Object.keys(this.frameInstances)
 
@@ -41,7 +64,7 @@ export default class FrameManager {
 
         frameInstance.on('closed', () => {
           this.removeFrameInstance(frameId)
-          store.removeFrame(frameId)
+          store.removeWorkspace(frameId)
         })
 
         frameInstance.on('maximize', () => {
@@ -64,7 +87,8 @@ export default class FrameManager {
               // Trigger views to reposition
               setTimeout(() => {
                 const frame = frames[frameId]
-                viewInstances.position(frameInstance, frame.currentView)
+                const currentNav = frame.nav[0]
+                if (currentNav.views[0].id) viewInstances.position(frameInstance, currentNav.views[0].id)
               }, 100)
               store.updateFrame(frameId, { maximized: true })
             } else {
@@ -77,10 +101,12 @@ export default class FrameManager {
 
         frameInstance.on('focus', () => {
           // Give focus to current view
-          const { currentView } = frames[frameId]
+          const frame = frames[frameId]
+          const currentNav = frame.nav[0]
+          const currentView = currentNav?.views[0]?.id
           if (currentView && frameInstance) {
             frameInstance.views = frameInstance.views || {}
-            frameInstance.views[currentView].webContents.focus()
+            frameInstance.views[currentView]?.webContents?.focus()
           }
         })
       })
@@ -89,11 +115,11 @@ export default class FrameManager {
     instanceIds
       .filter((instanceId) => !frameIds.includes(instanceId))
       .forEach((instanceId) => {
-        const frameInstance = this.removeFrameInstance(instanceId)
+        this.removeFrameInstance(instanceId)
 
-        if (frameInstance) {
-          frameInstance.destroy()
-        }
+        // if (frameInstance) {
+        //   frameInstance.destroy()
+        // }
       })
 
     if (inFocus) {
@@ -106,45 +132,58 @@ export default class FrameManager {
     }
   }
 
-  manageViews(frames: Record<string, Frame>) {
+  manageViews(frames: Record<string, Workspace>) {
     const frameIds = Object.keys(frames)
 
     frameIds.forEach((frameId) => {
       const frameInstance = this.frameInstances[frameId]
       if (!frameInstance) return log.error('Instance not found when managing views')
 
+      // Frame definition in the state
       const frame = frames[frameId]
+
+      // Current Nav
+      const currentNav = frame?.nav[0]
+      const currentNavViewIds = currentNav?.views?.map((view) => view.id) || []
+
+      // Get all views from the nav
+      const frameViewIds = frame.nav.flatMap((nav) => nav.views.map((view) => view.id))
       const frameInstanceViews = frameInstance.views || {}
-      const frameViewIds = Object.keys(frame.views)
       const instanceViewIds = Object.keys(frameInstanceViews)
 
+      // For any instance views that are no longer in the nav anywhere, destroy them
       instanceViewIds
         .filter((instanceViewId) => !frameViewIds.includes(instanceViewId))
         .forEach((instanceViewId) => viewInstances.destroy(frameInstance, instanceViewId))
 
-      // For each view in the store that belongs to this frame
-      frameViewIds.forEach((frameViewId) => {
-        const viewData = frame.views[frameViewId] || {}
-        const viewInstance = frameInstanceViews[frameViewId] || {}
+      // For each view in the current nav
+      currentNav?.views?.forEach((view) => {
+        if (view.id) {
+          // Create if needed
+          if (!instanceViewIds.includes(view.id)) viewInstances.create(frameInstance, view)
+          // Get the view instance
+          const viewInstance = frameInstance?.views && frameInstance?.views[view.id]
+          if (!viewInstance) return log.error('View instance not found when managing views')
 
-        // Create them
-        if (!instanceViewIds.includes(frameViewId)) viewInstances.create(frameInstance, viewData)
+          // Get view stats
+          const viewMeta = { ready: true } //TODO: store('workspacesMeta', frame.id, 'views', view.id)
+          // Show all in the current nav
+          if (viewMeta.ready && currentNavViewIds.includes(view.id)) {
+            frameInstance.addBrowserView(viewInstance)
+            viewInstances.position(frameInstance, view.id)
+            setTimeout(() => {
+              if (frameInstance.isFocused()) viewInstance.webContents.focus()
+            }, 100)
+          } else {
+            frameInstance.removeBrowserView(viewInstance)
+          }
+        }
+      })
 
-        // Show the correct one
-        if (
-          frame.currentView === frameViewId &&
-          viewData.ready &&
-          frameInstance.showingView !== frameViewId
-        ) {
-          frameInstance.addBrowserView(viewInstance)
-          frameInstance.showingView = frameViewId
-          viewInstances.position(frameInstance, frameViewId)
-          setTimeout(() => {
-            if (frameInstance.isFocused()) viewInstance.webContents.focus()
-          }, 100)
-        } else if (frame.currentView !== frameViewId && frameInstance.showingView === frameViewId) {
-          frameInstance.removeBrowserView(viewInstance)
-          frameInstance.showingView = ''
+      instanceViewIds.forEach((instanceViewId) => {
+        if (!currentNavViewIds.includes(instanceViewId)) {
+          const viewInstance = frameInstance?.views && frameInstance?.views[instanceViewId]
+          if (viewInstance) frameInstance.removeBrowserView(viewInstance)
         }
       })
     })
@@ -161,9 +200,12 @@ export default class FrameManager {
 
     if (frameInstance) {
       frameInstance.removeAllListeners('closed')
+      frameInstance.destroy()
     }
 
-    return frameInstance
+    if (Object.keys(this.frameInstances).length === 0) {
+      app.dock.hide()
+    }
   }
 
   private sendMessageToFrame(frameId: string, channel: string, ...args: any) {
@@ -171,7 +213,7 @@ export default class FrameManager {
 
     if (frameInstance && !frameInstance.isDestroyed()) {
       const webContents = frameInstance.webContents
-      webContents.send(channel, ...args)
+      if (webContents) webContents.send(channel, ...args)
     } else {
       log.error(
         new Error(

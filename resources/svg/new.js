@@ -17,9 +17,7 @@ const list = []
 const icons = {}
 
 iconsList.forEach((i) => {
-  console.log(i)
   const Icon = ({ size = 100 }) => {
-    console.log('size', size)
     return (
       <IconContainer size={size}>
         <StyledSvg viewBox={i.svg.viewBox.join(' ')}>

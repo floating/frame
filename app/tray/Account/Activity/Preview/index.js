@@ -18,12 +18,17 @@ const DappsPreview = ({ filter = '', moduleId, account }) => {
     .slice(0, 4)
 
   return (
-    <div className='balancesBlock' ref={moduleRef}>
+    <div className='balancesBlock' ref={moduleRef} style={{ fontSize: '14px' }}>
       <div className='moduleHeader'>
         <span>{svg.pulse(14)}</span>
         <span>{'Activity'}</span>
       </div>
-      <div style={{ padding: '20px' }}>{'activity body'}</div>
+      <div style={{ padding: '2px 20px' }}>{'received 20 eth'}</div>
+      <div style={{ padding: '2px 20px' }}>{'sent 2 USDC'}</div>
+      <div style={{ padding: '2px 20px' }}>{'approved permit'}</div>
+      <div style={{ padding: '2px 20px' }}>{'connected to app.aave.com'}</div>
+      <div style={{ padding: '2px 20px' }}>{'received 20 eth'}</div>
+      <div style={{ padding: '2px 20px 20px' }}>{'received 20 eth'}</div>
     </div>
   )
 }

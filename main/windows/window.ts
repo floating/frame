@@ -1,4 +1,11 @@
-import { BrowserWindow, BrowserView, BrowserWindowConstructorOptions, shell } from 'electron'
+import {
+  BrowserWindow,
+  BrowserView,
+  BrowserWindowConstructorOptions,
+  shell,
+  Menu,
+  MenuItemConstructorOptions
+} from 'electron'
 import log from 'electron-log'
 import path from 'path'
 
@@ -31,7 +38,6 @@ export function createWindow(
     transparent: process.platform === 'darwin',
     show: false,
     backgroundColor: store('main.colorwayPrimary', store('main.colorway'), 'background'),
-    skipTaskbar: process.platform !== 'linux',
     webPreferences: {
       ...webPreferences,
       preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js'),

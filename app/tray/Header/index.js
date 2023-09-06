@@ -12,8 +12,8 @@ export const HeaderWrap = styled.div`
   animation: cardShow 400ms linear both;
   left: 8px;
   right: 8px;
-  top: 58px;
-  height: 80px;
+  top: 48px;
+  height: 64px;
   box-sizing: border-box;
   display: flex;
   justify-content: space-between;
@@ -24,6 +24,12 @@ export const HeaderWrap = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  /* border-bottom: 2px solid var(--ghostY); */
+  /* background: var(--ghostZ05); */
+  /* backdrop-filter: blur(16px); */
+  background: var(--ghostAZ);
+  border-radius: 12px;
+  box-shadow: 2px 3px 9px 0px var(--ghostY);
 `
 
 export const Header = () => {
@@ -31,53 +37,43 @@ export const Header = () => {
   const accounts = useStore('main.accounts')
   const currentAccount = Object.values(accounts).find((acct) => acct.active) || {}
 
-  if (crumb.view === 'accountManager') {
-    return <HeaderWrap key={'accountManager'}>{'Accounts'}</HeaderWrap>
-  } else {
-    const { address, ensName } = currentAccount
-    return (
-      <HeaderWrap key={'accountInfo'}>
+  const { address, ensName } = currentAccount
+  return (
+    <HeaderWrap>
+      <div
+        style={{
+          position: 'absolute',
+          left: '8px',
+          top: '16px'
+          // width: '40px',
+          // height: '40px',
+          // marginRight: '16px',
+          // borderRadius: '12px',
+          // overflow: 'hidden',
+          // border: '2px solid var(--ghostZ)',
+          // boxShadow: '0px 1px 2px 0px var(--ghostZ)',
+          // display: 'flex',
+          // justifyContent: 'center',
+          // alignItems: 'center'
+          // borderRadius: '30px'
+        }}
+      >
         <div
           style={{
-            position: 'absolute',
-            left: '2px',
-            top: '12px'
-            // width: '40px',
-            // height: '40px',
-            // marginRight: '16px',
-            // borderRadius: '12px',
-            // overflow: 'hidden',
-            // border: '2px solid var(--ghostZ)',
-            // boxShadow: '0px 1px 2px 0px var(--ghostZ)',
-            // display: 'flex',
-            // justifyContent: 'center',
-            // alignItems: 'center'
-            // borderRadius: '30px'
+            width: '64px',
+            height: '32px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
         >
-          <Cluster>
-            <ClusterRow>
-              <ClusterValue>
-                <div
-                  style={{
-                    width: '50px',
-                    height: '40px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                >
-                  {list[Math.floor(Math.random() * list.length)].icon(21)}
-                </div>
-              </ClusterValue>
-            </ClusterRow>
-          </Cluster>
+          {list[Math.floor(Math.random() * list.length)].icon(21)}
         </div>
-        <div>
-          <div>{ensName}</div>
-          <div>{`${address.substr(0, 6)}...${address.substr(address.length - 4, address.length)}`}</div>
-        </div>
-      </HeaderWrap>
-    )
-  }
+      </div>
+      <div>
+        <div>{ensName}</div>
+        <div>{`${address.substr(0, 6)}...${address.substr(address.length - 4, address.length)}`}</div>
+      </div>
+    </HeaderWrap>
+  )
 }

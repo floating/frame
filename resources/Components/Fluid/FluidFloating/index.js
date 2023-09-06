@@ -6,7 +6,7 @@ import { useFluid } from '../FluidProvider'
 const AccountManagerFloat = styled.div`
   position: absolute;
   inset: 0px;
-  z-index: 10000000000;
+  z-index: 9999999;
   pointer-events: none !important;
   transition: none !important;
   animation: none !important;
@@ -31,26 +31,24 @@ export const FloatingValue = () => {
   if (!dragItem || !floatActive) {
     return null
   } else if (dragItemBounds) {
-    return (
-      <Wrap
-        style={{
-          left: dragItemBounds.left + movePosition.x,
-          top: dragItemBounds.top + movePosition.y,
-          width: dragItemBounds.width,
-          height: dragItemBounds.height,
-          position: 'relative',
-          pointerEvents: 'none'
-          // WebkitAppRegion: 'no-drag',
-          // transition: 'none',
-          // transform: 'translate3d(0, 0, 0)',
-          // fontFamily: 'MainFont',
-          // display: 'flow-root',
-          // padding: '0px',
-          // textAlign: 'center'
-        }}
-        dangerouslySetInnerHTML={{ __html: clone.outerHTML }}
-      />
-    )
+    const style = {
+      left: dragItemBounds.left + movePosition.x,
+      top: dragItemBounds.top + movePosition.y,
+      width: dragItemBounds.width,
+      height: dragItemBounds.height,
+      position: 'relative',
+      pointerEvents: 'none'
+      // WebkitAppRegion: 'no-drag',
+      // transition: 'none',
+      // transform: 'translate3d(0, 0, 0)',
+      // fontFamily: 'MainFont',
+      // display: 'flow-root',
+      // padding: '0px',
+      // textAlign: 'center'
+    }
+
+    console.log('style wrap', style)
+    return <Wrap style={style} dangerouslySetInnerHTML={{ __html: clone.outerHTML }} />
   } else {
     return null
   }

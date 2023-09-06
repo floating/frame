@@ -131,14 +131,6 @@ module.exports = {
       return dontRemind
     })
   },
-  // setAccount: (u, account) => {
-  //   // u('selected.current', () => account.id)
-  //   // u('selected.minimized', () => false)
-  //   // u('selected.open', () => true)
-  // },
-  // setAccountSignerStatusOpen: (u, value) => {
-  //   u('selected.signerStatusOpen', () => Boolean(value))
-  // },
   accountTokensUpdated: (u, address) => {
     u('main.accounts', address, (account) => {
       const balances = { ...account.balances, lastUpdated: new Date().getTime() }
@@ -896,6 +888,68 @@ module.exports = {
       return dapps || {}
     })
   },
+
+  // create a workspace
+  addWorkspace: (u, workspace) => {
+    u('windows.workspaces', workspace.id, () => workspace)
+  },
+  // add a nav to a workspace
+  navWorkspace: (u, workspaceId, nav) => {
+    u('windows.workspaces', workspaceId, (workspace) => {
+      workspace.nav.unshift(nav)
+      return workspace
+    })
+  },
+  // Merge this and navBack
+  navBackWorkspace: (u, windowId, numSteps = 1) => {
+    if (!windowId) return log.warn('Invalid nav back', windowId)
+    u('windows.workspaces', windowId, 'nav', (nav) => {
+      while (numSteps > 0 && nav.length > 0) {
+        nav.shift()
+        numSteps -= 1
+      }
+      return nav
+    })
+  },
+  traverseWorkspace: (u, windowId, direction, numSteps = 1) => {
+    if (!windowId) return log.warn('Invalid navigation', windowId)
+    u('windows.workspaces', windowId, (workspace) => {
+      // Initialize nav and navForward if they don't exist
+      if (!workspace.nav) workspace.nav = []
+      if (!workspace.navForward) workspace.navForward = []
+      let { nav, navForward } = workspace
+
+      if (direction === 'backward') {
+        while (numSteps > 0 && nav.length > 0) {
+          const shiftedItem = nav.shift()
+          navForward.push(shiftedItem)
+          numSteps -= 1
+        }
+      } else if (direction === 'forward') {
+        while (numSteps > 0 && navForward.length > 0) {
+          const poppedItem = navForward.pop()
+          nav.unshift(poppedItem)
+          numSteps -= 1
+        }
+      } else {
+        log.warn('Invalid direction', direction)
+      }
+
+      return workspace
+    })
+  },
+
+  // update a workspace
+  updateWorkspace: (u, workspaceId, update) => {
+    u('windows.workspaces', workspaceId, (workspace) => Object.assign({}, workspace, update))
+  },
+  // remove a workspace
+  removeWorkspace: (u, workspaceId) => {
+    u('windows.workspaces', (workspaces) => {
+      delete workspaces[workspaceId]
+      return workspaces
+    })
+  },
   addFrame: (u, frame) => {
     u('main.frames', frame.id, () => frame)
   },
@@ -959,27 +1013,11 @@ module.exports = {
       return views
     })
   },
-  // unsetAccount: (u) => {
-  //   // u('selected.open', () => false)
-  //   u('selected.minimized', () => true)
-  //   u('selected.view', () => 'default')
-  //   u('selected.showAccounts', () => false)
-  //   u('windows.panel.nav', () => [])
-  //   setTimeout(() => {
-  //     u('selected', (signer) => {
-  //       signer.last = signer.current
-  //       signer.current = ''
-  //       signer.requests = {}
-  //       signer.view = 'default'
-  //       return signer
-  //     })
-  //   }, 320)
-  // },
   setAccountFilter: (u, value) => {
     u('panel.accountFilter', () => value)
   },
   setFooterHeight: (u, win, height) => {
-    u('windows', win, 'footer.height', () => (height < 40 ? 40 : height))
+    u('windows', win, 'footer.height', () => height)
   },
   updateTypedDataRequest: (u, account, reqId, data) => {
     u('main.accounts', account, 'requests', (requests) => {

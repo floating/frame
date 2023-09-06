@@ -1,0 +1,50 @@
+@keyframes cardShow
+  0%
+    opacity 0
+
+  15.82%
+    opacity 0
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -9.026, 0, 0, 1)
+
+  21.02%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -19.292, 0, 0, 1)
+
+  35.34%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -3.681, 0, 0, 1)
+
+  49.55%
+    opacity 1
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2.594, 0, 0, 1)
+
+  78.18%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -0.018, 0, 0, 1)
+
+  100%
+    transform matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+
+
+// @keyframes cardHide
+//   0%
+//     opacity 1
+//     transform translateX(0px)
+
+//   50%
+//     opacity 0
+//     transform translateX(100px)
+
+//   100%
+//     opacity 0
+//     transform translateX(500px)
+
+.cardShow
+  animation cardShow 400ms linear both
+  animation-delay 0s
+
+.cardHide
+  // display none
+  // z-index 3000000
+  // animation cardHide 200ms cubic-bezier(.82,0,.12,1) both// 700ms linear both400s normal forwards cubic-bezier(.82,0,.12,1)
+  // transition var(--standardSlower)
+  opacity 0 // !important
+  // transform translateX(500px)
+  pointer-events none

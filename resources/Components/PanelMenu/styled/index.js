@@ -4,11 +4,10 @@ export const PanelMenu = styled.div`
   position: absolute;
   left: 8px;
   right: 8px;
-  top: 12px;
-  /* height: 63px; */
+  top: 0px;
   box-sizing: border-box;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   -webkit-app-region: no-drag;
   z-index: 1000000000;
   opacity: 1;
@@ -18,13 +17,14 @@ export const PanelMenu = styled.div`
 export const PanelMenuGroup = styled.div`
   display: flex;
   height: 100%;
-  justify-content: space-between;
-  align-items: center;
+  /* justify-content: space-between;
+  align-items: center; */
 `
 
 export const PanelMenuItem = styled.div`
   height: 38px;
-  width: 48px;
+  /* width: 48px; */
+  flex: 1;
   border-radius: 16px;
   display: flex;
   justify-content: center;

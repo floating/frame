@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 export const ClusterBox = styled.div`
   position: relative;
   z-index: 100001;
-  border-radius: 26px;
+  border-radius: 13px;
   overflow: hidden;
   box-shadow: 0px 4px 8px var(--ghostY), 0px 2px 8px var(--ghostY);
   border-bottom: 2px solid var(--ghostZ);
@@ -40,7 +40,7 @@ export const ClusterBoxLabel = styled.div`
 export const Cluster = styled.div`
   font-size: 17px;
   font-weight: 400;
-  border-radius: 20px;
+  border-radius: 10px;
   -webkit-app-region: no-drag;
   transition: none;
   transform: translate3d(0, 0, 0);
@@ -55,7 +55,7 @@ export const Cluster = styled.div`
 const ClusterScrollWrap = styled.div`
   position: absolute;
   inset: 0px;
-  border-radius: 20px;
+  border-radius: 10px;
   overflow-y: scroll;
   overflow-x: hidden;
   z-index: 1;
@@ -67,7 +67,7 @@ const ClusterScrollOverlay = styled.div`
   inset: 0px;
   box-shadow: inset 0px 0px 5px var(--ghostY);
   z-index: 2;
-  border-radius: 20px;
+  border-radius: 10px;
   pointer-events: none;
 `
 
@@ -105,13 +105,13 @@ export const ClusterValue = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 12px;
+
   margin-right: 3px;
   font-size: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 8px;
+  border-radius: 6px;
   -webkit-app-region: no-drag;
   transform: translate3d(0, 0, 0);
   font-family: 'MainFont';
@@ -202,23 +202,23 @@ export const ClusterColumn = styled.div`
   align-items: stretch;
 
   ${ClusterValue} {
-    border-radius: 8px;
+    border-radius: 6px;
   }
 
   &:first-child {
     > ${ClusterValue} {
-      border-radius: 8px;
+      border-radius: 6px;
     }
     > ${ClusterValue}:first-child {
-      border-top-left-radius: 18px;
+      border-top-left-radius: 10px;
     }
   }
   &:last-child {
     > ${ClusterValue} {
-      border-radius: 8px;
+      border-radius: 6px;
     }
     > ${ClusterValue}:first-child {
-      border-top-right-radius: 18px;
+      border-top-right-radius: 10px;
     }
   }
 `
@@ -234,53 +234,53 @@ export const ClusterRow = styled.div`
   max-height: ${(props) => props.height || 'auto'};
   &:first-child {
     > ${ClusterValue} {
-      border-radius: 8px;
+      border-radius: 6px;
     }
     > ${ClusterValue}:first-child {
-      border-top-left-radius: 18px;
+      border-top-left-radius: 10px;
     }
     > ${ClusterValue}:last-child {
-      border-top-right-radius: 18px;
+      border-top-right-radius: 10px;
     }
   }
   &:last-child {
     > ${ClusterValue} {
-      border-radius: 8px;
+      border-radius: 6px;
     }
     > ${ClusterValue}:first-child {
-      border-bottom-left-radius: 18px;
+      border-bottom-left-radius: 10px;
     }
     > ${ClusterValue}:last-child {
-      border-bottom-right-radius: 18px;
+      border-bottom-right-radius: 10px;
     }
     ${ClusterColumn}:first-child {
       > ${ClusterValue} {
-        border-radius: 8px;
+        border-radius: 6px;
       }
       > ${ClusterValue}:first-child {
-        border-top-left-radius: 18px;
+        border-top-left-radius: 10px;
       }
       > ${ClusterValue}:last-child {
-        border-bottom-left-radius: 18px;
+        border-bottom-left-radius: 10px;
       }
       > ${ClusterValue}:first-child:last-child {
-        border-top-left-radius: 18px;
-        border-bottom-left-radius: 18px;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
       }
     }
     ${ClusterColumn}:last-child {
       > ${ClusterValue} {
-        border-radius: 8px;
+        border-radius: 6px;
       }
       > ${ClusterValue}:first-child {
-        border-top-right-radius: 18px;
+        border-top-right-radius: 10px;
       }
       > ${ClusterValue}:last-child {
-        border-bottom-right-radius: 18px;
+        border-bottom-right-radius: 10px;
       }
       > ${ClusterValue}:first-child:last-child {
-        border-top-right-radius: 18px;
-        border-bottom-right-radius: 18px;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
       }
     }
   }
@@ -339,7 +339,7 @@ export const ClusterAddressRecipientFull = styled.div`
   align-items: center;
   cursor: pointer;
   z-index: 40000;
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: 500;
   background: var(--ghostB);
   opacity: 0;

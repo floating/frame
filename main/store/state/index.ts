@@ -94,11 +94,11 @@ const mainState = {
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {
     dark: {
-      background: 'rgb(26, 22, 28)',
+      background: 'rgba(16, 12, 18, 1)',
       text: 'rgb(241, 241, 255)'
     },
     light: {
-      background: 'rgb(240, 230, 243)',
+      background: 'rgba(224, 220, 233, 1)',
       text: 'rgb(20, 40, 60)'
     }
   },
@@ -217,8 +217,7 @@ const initial = {
         'inventory',
         'contacts',
         'permissions',
-        'signer',
-        'settings'
+        'signer'
       ],
       modules: {
         requests: {

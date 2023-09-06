@@ -149,7 +149,7 @@ const BalancesList = ({ balances, displayValue, footerButton, shouldShowTotalVal
                       grow={3}
                       onClick={() => {
                         setOpen(-1)
-                        link.send('*:addFrame', 'dappLauncher')
+                        link.send('workspace:run', 'dapp', {}, ['send.frame.eth'])
                       }}
                     >
                       <div className='signerBalanceDrawerItem'>{svg.send(14)}</div>

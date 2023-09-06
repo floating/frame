@@ -42,12 +42,7 @@ function getOriginsForChain(chain) {
   }
 }
 
-const OriginModule = styled.div`
-  width: 100%;
-`
-
 const OriginName = styled.div`
-  /* font-family: 'VCR'; */
   padding: 20px;
   font-weight: 400;
   font-size: 16px;
@@ -55,29 +50,6 @@ const OriginName = styled.div`
 
 const OriginPermissions = styled.div`
   width: 100%;
-`
-
-const OriginRequestss = styled.div`
-  font-family: 'VCR';
-  padding: 20px;
-  border-bottom: 2px solid var(--ghostZ);
-`
-
-const OriginPermission = styled.div`
-  font-family: 'VCR';
-  padding: 20px;
-  border-bottom: 2px solid var(--ghostZ);
-`
-
-const OriginDrawer = styled.div`
-  width: 100%;
-`
-
-const OriginDrawerFooter = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: space-between;
-  padding: 8px;
 `
 
 const OriginPermissionName = styled.div`
@@ -89,74 +61,12 @@ const OriginPermissionName = styled.div`
   font-size: 16px;
 `
 
-const OriginDrawerMenu = styled.div`
-  display: flex;
-`
-
 const OriginDrawerMenuItem = styled.div`
   width: 32px;
   height: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* background: var(--ghostA); */
-  /* padding-top: 1px;
-  box-sizing: border-box;
-  border-bottom: 1px solid var(--ghostZ);
-  box-shadow: 0px 1px 4px var(--ghostX); */
-  /* margin-right: 12px; */
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
-  /* border-radius: 12px; */
-  /* cursor: pointer;
-  * {
-    pointer-events: none;
-  } */
-  /* &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0px 2px 8px var(--ghostX);
-    background: var(--ghostB);
-    color: var(--outerspace);
-  }
-  &:active {
-    transform: translateY(0px);
-    box-shadow: 0px 1px 2px var(--ghostX);
-    background: var(--ghostB);
-    color: var(--outerspace);
-  } */
-`
-
-// .signerBalanceButton
-//   height 40px
-//   margin-left 13px
-//   background var(--ghostA)
-//   border-bottom 2px solid var(--ghostZ)
-//   box-shadow 0px 1px 4px var(--ghostX)
-//   border-radius 20px
-//   box-sizing border-box
-//   cursor pointer
-//   z-index 4000
-//   display flex
-//   justify-content center
-//   align-items center
-//   font-size 11px
-//   font-weight 500
-//   letter-spacing 1px
-//   text-transform uppercase
-//   padding 1px 20px 0px 21px
-
-//   *
-//     pointer-events none
-//     margin-left 2px
-
-// .signerBalanceButton:hover
-//   background var(--ghostB)
-//   color var(--outerspace)
-//   // color var(--good)
-
-const OriginPermissionList = styled.div`
-  /* background: blue; */
 `
 
 const OriginPermissionTitle = styled.div`
@@ -184,20 +94,10 @@ const OriginDrawerPermission = styled.div`
 
 const OriginRequests = ({ originId }) => {
   const [averageRequests, setRequests] = React.useState('0.0')
-  // console.log('origin', origin)
-
-  // const permission = useStore('main.permissions', account, originId) || {}
   const origin = useStore('main.origins', originId) || {}
   if (!origin || !origin.session) return null
-  const connected =
-    (origin.session.startedAt && !origin.session.endedAt) || origin.session.startedAt > origin.session.endedAt
 
   const updateRequestRate = () => {
-    const now = new Date().getTime()
-    const sessionLength = now - origin.session.startedAt
-    const sessionLengthSeconds = sessionLength / Math.min(sessionLength, 1000)
-    // console.log()
-    // console.log('origin', origin, (origin.session.requests / sessionLengthSeconds).toFixed(2))
     setRequests(origin.session.requests.toFixed(2))
   }
 
@@ -212,78 +112,20 @@ const OriginRequests = ({ originId }) => {
 
   return (
     <div>
-      <div
-        className='sliceOrigin'
-        // onClick={() => {
-        //   link.send('tray:action', 'navDash', { view: 'Origins', data: { OriginDetails: origin.id } })
-        // }}
-      >
-        {/* <Indicator key={origin.session.lastUpdatedAt} connected={connected} /> */}
-        {/* <div className='sliceOriginTitle'>{origin.name}</div> */}
+      <div className='sliceOrigin'>
         <div className='sliceOriginReqs'>
           <div className='sliceOriginReqsNumber'>{averageRequests}</div>
           <div className='sliceOriginReqsLabel'>{'reqs/min'}</div>
         </div>
       </div>
-      {/* {expanded ? <div>{'origin quick menu'}</div> : null} */}
     </div>
   )
 }
 
-// class _OriginModule extends React.Component {
-//   constructor(...args) {
-//     super(...args)
-
-//     this.state = {
-//       expanded: false,
-//       averageRequests: '0.0'
-//     }
-
-//     this.ref = createRef()
-//   }
-
-//   componentDidMount() {}
-
-//   componentWillUnmount() {}
-
-//   updateRequestRate() {
-//     const { origin } = this.props
-//     const now = new Date().getTime()
-//     const sessionLength = now - origin.session.startedAt
-//     const sessionLengthSeconds = sessionLength / Math.min(sessionLength, 1000)
-//     this.setState({ averageRequests: (origin.session.requests / sessionLengthSeconds).toFixed(2) })
-//   }
-
-//   render() {
-//     const { origin, connected } = this.props
-
-//     return (
-//       <div>
-//         <div
-//           className='sliceOrigin'
-//           onClick={() => {
-//             link.send('tray:action', 'navDash', { view: 'Origins', data: { OriginDetails: origin.id } })
-//           }}
-//         >
-//           <Indicator key={origin.session.lastUpdatedAt} connected={connected} />
-//           <div className='sliceOriginTitle'>{origin.name}</div>
-//           <div className='sliceOriginReqs'>
-//             <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
-//             <div className='sliceOriginReqsLabel'>{'reqs/min'}</div>
-//           </div>
-//         </div>
-//         {this.state.expanded ? <div>{'origin quick menu'}</div> : null}
-//       </div>
-//     )
-//   }
-// }
-
 const OriginItem = ({ moduleId, originId, account, toggleOpen, open, first, last }) => {
-  console.log({ originId })
   if (!originId) return null
   const permission = useStore('main.permissions', account, originId) || {}
   const origin = useStore('main.origins', originId) || {}
-  console.log({ origin, permission })
   return (
     <>
       {open && !first && <div style={{ height: '16px' }} />}
@@ -299,12 +141,10 @@ const OriginItem = ({ moduleId, originId, account, toggleOpen, open, first, last
                 title: 'Dapp Settings'
               }
             }
-            console.log('crumb', crumb)
             link.send('nav:forward', 'panel', crumb)
           }}
           active={open}
         >
-          {/* <OriginName>{origin.name}</OriginName> */}
           <OriginName>{permission.origin}</OriginName>
           <OriginRequests originId={originId} />
         </ClusterValue>
@@ -342,10 +182,6 @@ const OriginItem = ({ moduleId, originId, account, toggleOpen, open, first, last
   )
 }
 
-// {/* <ClusterRow key={origin}>
-//   <ClusterValue allowPointer={true}>{/* <OriginRequests /> */}</ClusterValue>
-// </ClusterRow> */}
-
 const OriginsList = ({ moduleId, permissionList, account }) => {
   const [open, setOpen] = useState(-1)
   return (
@@ -381,22 +217,3 @@ const OriginsList = ({ moduleId, permissionList, account }) => {
 }
 
 export default OriginsList
-
-// /* <OriginModule>
-
-// <div className='signerPermissionk'>
-//   <div className='signerPermissionControls'>
-//     <div className='signerPermissionOrigin'>{permission.origin}</div>
-//     <div
-//       className={
-//         permission.provider
-//           ? 'signerPermissionToggle signerPermissionToggleOn'
-//           : 'signerPermissionToggle'
-//       }
-//       onClick={() => link.send('tray:action', 'toggleAccess', account, o)}
-//     >
-//       <div className='signerPermissionToggleSwitch' />
-//     </div>
-//   </div>
-// </div>
-// </OriginModule> */

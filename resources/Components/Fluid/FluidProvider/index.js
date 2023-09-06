@@ -22,15 +22,13 @@ export const FluidWrap = styled.div`
 const FluidContext = createContext()
 
 // Fluid Dragging
-// Any item wrapped in this can register itself as draggable
-// Anything that is draggable is an entity
-// Enties can be dragged in relation to other entities of the same type
-// Entities define valid drop types
-// when an entity is dropped the item is is dropped on is notified
-// it is up to the item being dropped on to decide what to do with the item
-// a group accepting and item may decide to move the item inside of it
-// the entity will also arrive with a position array relative to the item it was dropped on
-// depending on what the entity wants to do it can see what the most valid position is
+
+// Anything that is draggable becomes an entity
+// Entities can be dragged relative to other entities
+// Entities define valid drop types, and if they are draggable themselves
+// When an entity is dropped, the item on which it is dropped is notified
+// The item being dropped on decides what to do with the entity
+// The entity arrives with a position relative to the item on which it was dropped
 
 // Provider Component
 let lastMovePosition = {}
@@ -61,7 +59,6 @@ export const Fluid = ({ children }) => {
   // Track when Fluid is scrolling
   const [scrollTrigger, _setScrollTrigger] = useState(null)
 
-  // TODO make this more comprehensive based on scroll direction to set over trigger
   const setScrollTrigger = (value) => {
     if (!floatActive) return
     _setScrollTrigger(value)
@@ -74,7 +71,7 @@ export const Fluid = ({ children }) => {
           y: dragCurrentMousePosition.y - dragInitialMousePosition.y
         }
       : { x: 0, y: 0 }
-
+  console.log('movePosition', movePosition)
   if (lastMovePosition.y !== movePosition.y) {
     direction = lastMovePosition.y > movePosition.y ? 'up' : 'down'
   }
