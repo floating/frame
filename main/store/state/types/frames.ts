@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const ViewSchema = z.object({
   id: z.string(),
-  ready: z.boolean(),
+  // ready: z.boolean(),
   dappId: z.string(),
   ens: z.string(),
   url: z.string()

@@ -27,7 +27,6 @@ module.exports = {
   setSigner: (u, signer) => {
     u('selected.current', () => signer.id)
     u('selected.minimized', () => false)
-    u('selected.open', () => true)
   },
   setAddress: (u, address) => u('address', () => address),
   panelRequest: (u, request) => {
@@ -74,7 +73,6 @@ module.exports = {
   },
   unsetSigner: (u) => {
     u('selected.minimized', () => true)
-    u('selected.open', () => false)
     this.resetSigner(u)
     setTimeout(() => {
       u('selected', (signer) => {

@@ -23,6 +23,7 @@
   font-weight 300
   src url('./fonts/FiraCode/FiraCode-Medium.ttf')
 
+
 @font-face
   font-family 'FiraCode'
   font-weight 400
@@ -35,23 +36,68 @@
 
 @font-face
   font-family 'MainFont'
+  font-weight 100
+  src url('./fonts/Inter/Inter-Thin.ttf')
+
+@font-face
+  font-family 'MainFont'
   font-weight 200
-  src url('./fonts/Ubuntu/Ubuntu-Light.ttf')
+  src url('./fonts/Inter/Inter-ExtraLight.ttf')
 
 @font-face
   font-family 'MainFont'
   font-weight 300
-  src url('./fonts/Ubuntu/Ubuntu-Regular.ttf')
+  src url('./fonts/Inter/Inter-Light.ttf')
 
 @font-face
   font-family 'MainFont'
   font-weight 400
-  src url('./fonts/Ubuntu/Ubuntu-Medium.ttf')
+  src url('./fonts/Inter/Inter-Regular.ttf')
 
 @font-face
   font-family 'MainFont'
   font-weight 500
-  src url('./fonts/Ubuntu/Ubuntu-Bold.ttf')
+  src url('./fonts/Inter/Inter-Medium.ttf')
+
+@font-face
+  font-family 'MainFont'
+  font-weight 600
+  src url('./fonts/Inter/Inter-SemiBold.ttf')
+
+@font-face
+  font-family 'MainFont'
+  font-weight 700
+  src url('./fonts/Inter/Inter-Bold.ttf')
+
+@font-face
+  font-family 'MainFont'
+  font-weight 800
+  src url('./fonts/Inter/Inter-ExtraBold.ttf')
+
+@font-face
+  font-family 'MainFont'
+  font-weight 900
+  src url('./fonts/Inter/Inter-Black.ttf')
+
+// @font-face
+//   font-family 'MainFont'
+//   font-weight 300
+//   src url('./fonts/Ubuntu/Ubuntu-Light.ttf')
+
+// @font-face
+//   font-family 'MainFont'
+//   font-weight 400
+//   src url('./fonts/Ubuntu/Ubuntu-Regular.ttf')
+
+// @font-face
+//   font-family 'MainFont'
+//   font-weight 500
+//   src url('./fonts/Ubuntu/Ubuntu-Medium.ttf')
+
+// @font-face
+//   font-family 'MainFont'
+//   font-weight 600
+//   src url('./fonts/Ubuntu/Ubuntu-Bold.ttf')
 
 @keyframes shake 
   0% 
@@ -184,7 +230,8 @@ body
 
   --cubic cubic-bezier(.82,0,.12,1)
 
-  font-feature-settings 'ss04', 'zero'
+  // font-feature-settings 'ss04', 'zero'
+  font-feature-settings 'cv11'
 
 .frameOverlay
   position absolute
@@ -337,27 +384,27 @@ body
   --outerspaceDark #0b1819
   --spacewhite rgba(247, 251, 255, 1)
   
-  --ghostX02 rgba(192, 183, 211, 0.2)
-  --ghostX04 rgba(192, 183, 211, 0.4)
-  --ghostX09 rgba(192, 183, 211, 0.9)
-  --ghostX rgba(192, 183, 211, 1)
-  --ghostY rgba(208, 201, 222, 1)
-  --ghostZ0 rgba(224, 219, 233, 0)
-  --ghostZ05 rgba(224, 219, 233, 0.5)
-  --ghostZ08 rgba(224, 219, 233, 0.8)
-  --ghostZ rgba(224, 219, 233, 1)
+  --ghostX02 rgba(190, 192, 211, 0.2)
+  --ghostX04 rgba(190, 192, 211, 0.4)
+  --ghostX09 rgba(190, 192, 211, 0.9)
+  --ghostX rgba(190, 192, 211, 1)
+  --ghostY rgba(206, 206, 222, 1)
+  --ghostZ0 rgba(222, 220, 233, 0)
+  --ghostZ05 rgba(222, 220, 233, 0.5)
+  --ghostZ08 rgba(222, 220, 233, 0.8)
+  --ghostZ rgba(222, 220, 233, 1)
 
-  --ghostAZ rgba(232, 225, 238, 1)
+  --ghostAZ rgba(230, 227, 238, 1)
 
-  --ghostA05 rgba(240, 232, 243, 0.5)
-  --ghostA rgba(240, 232, 243, 1)
+  --ghostA05 rgba(238, 234, 243, 0.5)
+  --ghostA rgba(238, 234, 243, 1)
 
-  --ghostB0 rgba(244, 240, 246, 0)
-  --ghostB05 rgba(244, 240, 246, 0.5)
-  --ghostB rgba(244, 240, 246, 1)
-  --ghostC0 rgba(248, 248, 249, 0)
-  --ghostC rgba(248, 248, 249, 1)
-  --ghostD rgba(252, 252, 252, 1)
+  --ghostB0 rgba(241, 240, 245, 0)
+  --ghostB05 rgba(241, 240, 245, 0.5)
+  --ghostB rgba(241, 240, 245, 1)
+  --ghostC0 rgba(244, 246, 247, 0)
+  --ghostC rgba(244, 246, 247, 1)
+  --ghostD rgba(247, 252, 249, 1)
 
 
   // --ghostE04 rgba(255, 253, 254, 0.4)
@@ -428,28 +475,29 @@ body
   --outerspaceDark #0b1819
   --spacewhite rgba(38, 42, 50, 1) 
 
-  --ghostX09 rgba(8, 4, 10, 0.9)
-  --ghostX04 rgba(8, 4, 10, 0.4)
-  --ghostX rgba(8, 4, 10, 1)
+  --ghostX09 rgba(12, 8, 14, 0.9)
+  --ghostX04 rgba(12, 8, 14, 0.4)
+  --ghostX rgba(12, 8, 14, 1)
 
-  --ghostY rgba(13, 9, 15, 1)
+  --ghostY rgba(17, 13, 19, 1)
 
-  --ghostZ0 rgba(18, 14, 20, 0)
-  --ghostZ05 rgba(18, 14, 20, 0.5)
-  --ghostZ08 rgba(18, 14, 20, 0.8)
-  --ghostZ rgba(18, 14, 20, 1) 
+  --ghostZ0 rgba(22, 18, 24, 0)
+  --ghostZ05 rgba(22, 18, 24, 0.5)
+  --ghostZ08 rgba(22, 18, 24, 0.8)
+  --ghostZ rgba(22, 18, 24, 1)
 
-  --ghostAZ rgba(22, 18, 24, 1)
+  --ghostAZ rgba(27, 23, 29, 1)
 
-  --ghostA05 rgba(26, 22, 28, 0.5)
-  --ghostA rgba(26, 22, 28, 1)
+  --ghostA05 rgba(30, 26, 33, 0.5)
+  --ghostA rgba(30, 26, 33, 1)
 
-  --ghostB0 rgba(30, 26, 34, 0)
-  --ghostB05 rgba(30, 26, 34, 0.2)
-  --ghostB rgba(30, 26, 34, 1)
-  --ghostC0 rgba(34, 30, 40, 0)
-  --ghostC rgba(34, 30, 40, 1)
-  --ghostD rgba(38, 34, 46, 1)
+  --ghostB0 rgba(33, 29, 37, 0)
+  --ghostB05 rgba(33, 29, 37, 0.2)
+  --ghostB rgba(33, 29, 37, 1)
+  --ghostC0 rgba(36, 32, 41, 0)
+  --ghostC rgba(36, 35, 41, 1)
+  --ghostD rgba(49, 38, 45, 1)
+
 
   --moon rgba(255, 165, 155, 1)
   --moonOver rgba(135, 25, 0, 1)

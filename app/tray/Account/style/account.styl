@@ -77,6 +77,7 @@
   pointer-events auto
   box-sizing border-box
   z-index 10000000
+  width 100%
 
   .signerContainer
     position relative
@@ -85,15 +86,16 @@
 
 .accountMain
   position absolute
-  top 140px
-  right 7px
-  bottom 40px
-  left 7px
+  top 110px
+  right 0px
+  bottom 0px
+  left 0px
+  // padding 0px 7px
   z-index 3
   display flex
   justify-content center
   align-items center
-  border-radius 26px
+  // border-radius 26px
   transition var(--standard)
   overflow hidden
 
@@ -112,6 +114,38 @@
     .accountModule
       position relative !important
 
+  .accountMainFade
+    position absolute
+    top 0
+    right 0
+    bottom 0
+    left 0
+    z-index 3000
+    pointer-events none
+    * {
+      pointer-events none
+    }
+
+  .accountMainFade::before
+    content: ''
+    position absolute
+    top 0
+    right 0
+    left 0
+    height 96px
+    // background linear-gradient(180deg, var(--ghostZ), var(--ghostZ0))
+    display none
+
+  .accountMainFade::after    
+    content: ''
+    position absolute
+    right 0
+    bottom 0
+    left 0
+    height 32px
+    opacity 0.8
+    background linear-gradient(0deg, var(--ghostZ), var(--ghostZ0))
+
   .accountMainScroll
     position absolute
     top 0
@@ -121,7 +155,8 @@
     overflow-y scroll
     overflow-x hidden
     transform translate3d(0, 0, 0)
-    border-radius 30px
+    padding-bottom 64px
+    // border-radius 30px
 
   .accountMainSlide
     position relative 
@@ -178,7 +213,7 @@
       opacity 1
       pointer-events none
       text-transform uppercase
-      font-weight 400
+      font-weight 500
       letter-spacing 1px
       font-family 'MainFont'
       color var(--outerspace08)
@@ -197,7 +232,7 @@
       justify-content center
       align-items center
       font-size 13.5px
-      font-weight 300
+      font-weight 400
       pointer-events none
       z-index 8
       cursor pointer
@@ -553,14 +588,15 @@
     width 100%
 
 .accountModule
-  position absolute
-  top 0
-  left 2px
-  right 2px
+  // position absolute
+  // top 0
+  // left 2px
+  // right 2px
+  position relative
   transform translate3d(0, 0, 0)
-  transition var(--standardFast)
+  transition var(--standard)
   pointer-events auto
-  padding-bottom 7px
+  padding 8px
 
 .moduleExpanded
   min-height 100%
@@ -580,7 +616,7 @@
   text-transform uppercase
   letter-spacing 2px
   font-family 'MainFont'
-  font-weight 500
+  font-weight 600
   box-sizing border-box
   border-radius 26px
   cursor pointer
@@ -668,21 +704,20 @@
     pointer-events none
 
 .accountModuleInner
-  position absolute
-  top 0
-  left 0px
-  right 0px
-  bottom 7px
+  // position absolute
+  // top 0
+  // left 0px
+  // right 0px
+  // bottom 7px
   transform translate3d(0, 0, 0)
-  padding 0px 6px
-  border-radius 26px
+  padding 0px 8px
 
   .accountModuleCard
     position relative
-    border-radius 26px
+    border-radius 16px
     background var(--ghostAZ)
-    box-shadow 0px 4px 8px var(--ghostY), 0px 2px 8px var(--ghostY)
-    border-bottom 2px solid var(--ghostY)
+    box-shadow 2px 2px 12px 0px var(--ghostY),  -4px -4px 12px -4px var(--ghostB)
+    // border-bottom 2px solid var(--ghostY)
 
   .moduleHeader:before
     content ''
@@ -701,16 +736,14 @@
     font-size 11px
     text-transform uppercase
     letter-spacing 2px
-    padding 16px 90px 10px 20px
+    padding 16px
     height 42px
     font-family 'MainFont'
-    font-weight 500
+    font-weight 600
     box-sizing border-box
     display flex
     align-items center
-
-    span
-      margin-right 8px
+    // justify-content space-between
 
     .moduleHeaderClose
       background var(--moon)
@@ -766,7 +799,7 @@
     display flex
     justify-content center
     color var(--ghostZ)
-    font-weight 300
+    font-weight 400
     font-size 24px
 
   //.moduleButtonBad:hover
@@ -782,7 +815,7 @@
   .moduleMainSettings
     font-size 11px
     text-transform uppercase
-    font-weight 400
+    font-weight 500
 
   // .moduleMid
   //   padding-bottom 42px
@@ -797,7 +830,7 @@
     text-transform uppercase
     border-top 1px solid var(--ghostA)
     box-sizing border-box
-    font-weight 300
+    font-weight 400
     letter-spacing 1px
     padding 12px 
     height 42px
@@ -849,7 +882,7 @@
   display flex
   justify-content center
   align-items center
-  font-weight 400
+  font-weight 500
   font-size 13px
   box-sizing border-box
   text-transform uppercase

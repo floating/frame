@@ -5,8 +5,8 @@ import store from '../../store'
 import server from '../../dapps/server'
 import { createViewInstance } from '../window'
 
-import type { FrameInstance } from './frameInstances'
-import type { ViewMetadata } from '../../store/state/types'
+import type { ViewMetadata } from '../../store/state'
+import type { Nav, View } from '../../windows/workspace/types'
 
 interface Extract {
   session: string
@@ -22,7 +22,7 @@ const extract = (l: string): Extract => {
 
 export default {
   // Create a view instance on a frame
-  create: (frameInstance: FrameInstance, view: ViewMetadata) => {
+  create: (frameInstance: FrameInstance, view: View) => {
     const viewInstance = createViewInstance(view.ens)
     const { session } = extract(view.url)
 
@@ -59,7 +59,7 @@ export default {
       }
     })
 
-    const { fullscreen } = store('main.frames', frameInstance.frameId)
+    const { fullscreen } = store('windows.workspaces', frameInstance.frameId)
 
     const { width, height } = frameInstance.getBounds()
 
@@ -67,15 +67,6 @@ export default {
 
     const dappBackground = store('main.dapps', view.dappId, 'colors', 'background')
     if (dappBackground) frameInstance.setBackgroundColor(dappBackground)
-
-    viewInstance.setBounds({
-      x: 0,
-      y: fullscreen ? 0 : 32,
-      width: width,
-      height: fullscreen ? height : height - 32
-    })
-
-    viewInstance.setAutoResize({ width: true, height: true })
 
     viewInstance.webContents.setVisualZoomLevelLimits(1, 3)
 
@@ -96,9 +87,10 @@ export default {
         (error) => log.error(error)
       )
 
-    viewInstance.webContents.on('did-finish-load', () => {
-      store.updateFrameView(frameInstance.frameId, view.id, { ready: true })
-    })
+    // TODO: Metadata avout a view needs a home in the store
+    // viewInstance.webContents.on('did-finish-load', () => {
+    //   store.updateFrameView(frameInstance.frameId, view.id, { ready: true })
+    // })
 
     // Keep reference to view on frame instance
     frameInstance.views = { ...(frameInstance.views || {}), [view.id]: viewInstance }
@@ -108,9 +100,14 @@ export default {
     const views = frameInstance.views || {}
     const { frameId } = frameInstance
 
-    const { url } = store('main.frames', frameId, 'views', viewId)
-    const { ens, session } = extract(url)
-    server.sessions.remove(ens, session)
+    const workspace = store('windows.workspaces', frameId)
+    workspace.nav.forEach((nav: Nav) => {
+      nav.views.forEach((view: View) => {
+        const { ens, session } = extract(view.url)
+        server.sessions.remove(ens, session)
+        //TODO: Ensure session is removed for all views
+      })
+    })
 
     if (frameInstance && !frameInstance.isDestroyed()) frameInstance.removeBrowserView(views[viewId])
 
@@ -121,15 +118,22 @@ export default {
   },
   position: (frameInstance: FrameInstance, viewId: string) => {
     const { frameId } = frameInstance
-    const { fullscreen } = store('main.frames', frameId)
+    const { fullscreen } = store('windows.workspaces', frameId)
     const viewInstance = (frameInstance.views || {})[viewId]
+
     if (viewInstance) {
       const { width, height } = frameInstance.getBounds()
+      // viewInstance.setBounds({
+      //   x: 0,
+      //   y: fullscreen ? 0 : 32,
+      //   width: width,
+      //   height: fullscreen ? height : height - 32
+      // })
       viewInstance.setBounds({
-        x: 0,
-        y: fullscreen ? 0 : 32,
-        width: width,
-        height: fullscreen ? height : height - 32
+        x: 316,
+        y: 24,
+        width: width - 316 - 8,
+        height: height - 16 - 16 - 16
       })
       // viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
       viewInstance.setAutoResize({ width: true, height: true })

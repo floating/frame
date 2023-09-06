@@ -147,44 +147,40 @@ class Signer extends React.Component {
         </div>
         <Cluster>
           <ClusterRow>
-            <ClusterColumn>
-              <ClusterValue
-                onClick={() => {
-                  const getUnavailableSigner = () => {
-                    const signers = Object.values(this.store('main.signers'))
-                    const unavailableSigners = findUnavailableSigners(activeAccount.lastSignerType, signers)
-                    return unavailableSigners.length === 1 && unavailableSigners[0]
-                  }
-                  const signer = activeSigner || getUnavailableSigner()
-                  if (!signer) {
-                    this.setState({
-                      notifySuccess: false,
-                      notifyText: 'Signer Unavailable'
-                    })
-                    setTimeout(() => {
-                      this.setState({ notifySuccess: false, notifyText: '' })
-                    }, 5000)
-                  }
-                  const crumb = signer ? signerPanelCrumb(signer) : accountPanelCrumb()
-                  link.send('tray:action', 'navDash', crumb)
+            <ClusterValue
+              onClick={() => {
+                const getUnavailableSigner = () => {
+                  const signers = Object.values(this.store('main.signers'))
+                  const unavailableSigners = findUnavailableSigners(activeAccount.lastSignerType, signers)
+                  return unavailableSigners.length === 1 && unavailableSigners[0]
+                }
+                const signer = activeSigner || getUnavailableSigner()
+                if (!signer) {
+                  this.setState({
+                    notifySuccess: false,
+                    notifyText: 'Signer Unavailable'
+                  })
+                  setTimeout(() => {
+                    this.setState({ notifySuccess: false, notifyText: '' })
+                  }, 5000)
+                }
+                const crumb = signer ? signerPanelCrumb(signer) : accountPanelCrumb()
+                link.send('tray:action', 'navDash', crumb)
+              }}
+            >
+              <div
+                style={{
+                  padding: '20px'
                 }}
               >
-                <div
-                  style={{
-                    padding: '20px'
-                  }}
-                >
-                  {this.renderSignerType(activeAccount.lastSignerType)}
-                </div>
-              </ClusterValue>
-              <ClusterValue>{this.getCurrentStatus(activeSigner, hardwareSigner)}</ClusterValue>
-            </ClusterColumn>
+                {this.renderSignerType(activeAccount.lastSignerType)}
+              </div>
+            </ClusterValue>
+
             {!watchOnly && (
-              <ClusterColumn width={'80px'}>
-                <ClusterValue onClick={() => this.verifyAddress(hardwareSigner)}>
-                  {svg.doubleCheck(20)}
-                </ClusterValue>
-              </ClusterColumn>
+              <ClusterValue width={90} onClick={() => this.verifyAddress(hardwareSigner)}>
+                {svg.doubleCheck(20)}
+              </ClusterValue>
             )}
           </ClusterRow>
           {this.state.notifyText && (
@@ -201,6 +197,9 @@ class Signer extends React.Component {
               </ClusterValue>
             </ClusterRow>
           )}
+          <ClusterRow>
+            <ClusterValue>{this.getCurrentStatus(activeSigner, hardwareSigner)}</ClusterValue>
+          </ClusterRow>
         </Cluster>
       </div>
     )

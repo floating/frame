@@ -1,11 +1,23 @@
 import store from '../store'
 import { NATIVE_CURRENCY } from '../../resources/constants'
 
-import type { Chain, Token, Rate, InventoryAsset, Inventory, TokenBalance } from '../store/state/types'
+import type {
+  Chain,
+  Token,
+  Rate,
+  InventoryAsset,
+  Inventory,
+  TokenBalance,
+  Account
+} from '../store/state/types'
 
 export const storeApi = {
   // Accounts
-  getActiveAddress: () => (store('selected.current') || '') as Address,
+  getActiveAddress: () => {
+    const accounts = Object.values(store('main.accounts')) as Account[]
+    const currentAccount: Account | undefined = accounts.find((acct: Account) => acct.active)
+    return (currentAccount?.id || '') as Address
+  },
   getAccounts: () => Object.keys(store('main.accounts') || {}) as Address[],
   getAddresses: () => {
     const addresses = Object.keys(store('main.accounts') || {})
