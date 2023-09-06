@@ -7,11 +7,13 @@ import Conf, { Options } from 'conf'
 import migrations from '../migrate'
 
 function backupConfig(path: string, data: any) {
+  log.verbose(`Backing up config file to ${path}`)
+
   fs.writeFile(path, JSON.stringify(data), (err) => {
     if (err) {
       log.error(`Failed to backup config file: ${err.message}`)
     } else {
-      log.verbose(`Backed up config file to ${path}`)
+      log.verbose(`Successfully backed up config file to ${path}`)
     }
   })
 }
