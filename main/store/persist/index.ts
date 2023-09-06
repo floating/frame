@@ -1,16 +1,26 @@
 import path from 'path'
+import fs from 'fs'
 import electron from 'electron'
+import log from 'electron-log'
 import Conf, { Options } from 'conf'
 
 import migrations from '../migrate'
 
-type PersistOpts<T extends Record<string, any>> = Options<T>
+function backupConfig(path: string, data: any) {
+  fs.writeFile(path, JSON.stringify(data), (err) => {
+    if (err) {
+      log.error(`Failed to backup config file: ${err.message}`)
+    } else {
+      log.verbose(`Backed up config file to ${path}`)
+    }
+  })
+}
 
 class PersistStore extends Conf {
   private blockUpdates = false
   private updates: Record<string, any> | null = {}
 
-  constructor(options?: PersistOpts<any>) {
+  constructor(options?: Options<any>) {
     options = { configFileMode: 0o600, configName: 'config', ...options }
     let defaultCwd = __dirname
     if (electron && electron.app) defaultCwd = electron.app.getPath('userData')
@@ -50,5 +60,9 @@ class PersistStore extends Conf {
     super.clear()
   }
 }
+
+const persist = new PersistStore()
+
+backupConfig(persist.path + '.backup', persist.store)
 
 export default new PersistStore()
