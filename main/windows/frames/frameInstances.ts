@@ -1,10 +1,9 @@
 import electron, { BrowserView, BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron'
 import path from 'path'
 
-import topRight from './topRight'
 import { createWindow } from '../window'
+import topRight from './topRight'
 
-import type { Frame } from '../../store/state'
 import { Workspace, Nav, View } from '../workspace/types'
 
 const isDev = process.env.NODE_ENV === 'development'
