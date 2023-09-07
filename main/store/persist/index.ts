@@ -1,22 +1,8 @@
 import path from 'path'
-import fs from 'fs'
 import electron from 'electron'
-import log from 'electron-log'
 import Conf, { Options } from 'conf'
 
 import migrations from '../migrate'
-
-function backupConfig(path: string, data: any) {
-  log.verbose(`Backing up config file to ${path}`)
-
-  fs.writeFile(path, JSON.stringify(data), (err) => {
-    if (err) {
-      log.error(`Failed to backup config file: ${err.message}`)
-    } else {
-      log.verbose(`Successfully backed up config file to ${path}`)
-    }
-  })
-}
 
 class PersistStore extends Conf {
   private blockUpdates = false
@@ -62,9 +48,5 @@ class PersistStore extends Conf {
     super.clear()
   }
 }
-
-const persist = new PersistStore()
-
-backupConfig(persist.path + '.backup', persist.store)
 
 export default new PersistStore()

@@ -4,6 +4,7 @@ import persist from '../persist'
 import migrations from '../migrate'
 import StateSchema, { type State } from './schema'
 import { queueError } from '../../errors/queue'
+import { backupConfig } from '../persist/backup'
 
 const currentVersion = 41
 const currentBaseState = { main: { _version: currentVersion } } as State
@@ -31,7 +32,11 @@ function loadState() {
 
   if (!state.__) {
     log.verbose('Persisted state: legacy state found, returning base state')
-    return { main: state } as State
+    const loadedState = { main: state } as State
+
+    backupConfig(loadedState.main._version, loadedState)
+
+    return loadedState
   }
 
   const versionedState = state as VersionedState
@@ -48,6 +53,9 @@ function loadState() {
 
   const latest = versions[versions.length - 1]
   log.verbose('Persisted state: returning latest state', { version: latest })
+
+  backupConfig(latest, { main: state })
+
   return versionedState.__[latest]
 }
 
