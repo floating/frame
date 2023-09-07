@@ -15,6 +15,7 @@ export const storeApi = {
   // Accounts
   getActiveAddress: () => {
     const accounts = Object.values(store('main.accounts')) as Account[]
+    return accounts.find((acct: Account) => acct.active)?.id || ''
     const currentAccount: Account | undefined = accounts.find((acct: Account) => acct.active)
     return (currentAccount?.id || '') as Address
   },
