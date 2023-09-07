@@ -46,8 +46,6 @@ export const FloatingValue = () => {
       // padding: '0px',
       // textAlign: 'center'
     }
-
-    console.log('style wrap', style)
     return <Wrap style={style} dangerouslySetInnerHTML={{ __html: clone.outerHTML }} />
   } else {
     return null

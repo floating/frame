@@ -41,7 +41,7 @@ export default {
       icon: path.join(__dirname, './AppIcon.png')
     })
 
-    // frameInstance.webContents.openDevTools({ mode: 'detach' })
+    frameInstance.webContents.openDevTools({ mode: 'detach' })
 
     frameInstance.loadURL(
       isDev

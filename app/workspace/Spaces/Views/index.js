@@ -70,13 +70,10 @@ const App = ({ id }) => {
   }
 
   const frame = useStore('windows.workspaces', window.frameId)
-  console.log('frame!!!: ', frame)
   // TODO: allow multiple views, this also needs to use meta area
   // const { ready } = frame?.nav[0].views ? frame?.nav[0].views[0] : {}
 
   const ready = true
-
-  console.log('VIEW READY? ', ready)
 
   // Hard code send dapp status for now
   const sendDapp =
@@ -89,11 +86,12 @@ const App = ({ id }) => {
   const shouldDisplayError =
     (sendDapp.status !== 'ready' && !isMainnetConnected) || sendDapp.status === 'failed'
 
-  const bg = sendDapp.colors.background || null
+  // TODO: sendDapp no longer has colors property after merge
+  // const bg = sendDapp.colors.background || null
 
   return (
     <>
-      <ViewWrap style={bg ? { background: bg } : {}} />
+      <ViewWrap style={{ background: 'var(--ghostA)' }} />
       {/* <div className='mainTop' />
       <div className='mainDappLoading'>
         {shouldDisplayError ? (
