@@ -132,10 +132,6 @@ async function checkStatus(dappId: string) {
     }
     // Sets status to 'ready' when done
     store.updateDapp(dappId, { status: 'ready', openWhenReady: false })
-
-    // TODO: review if this needs to be
-    // The frame id 'dappLauncher' needs to refrence target frame
-    // if (openWhenReady) surface.open('dappLauncher', dapp.ens)
   } catch (e) {
     log.error('Check status error', e)
     const retry = checkStatusRetryCount || 0

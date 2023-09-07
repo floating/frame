@@ -7,7 +7,7 @@ export type View = {
   url: string
 }
 
-// In the state every workpsace window instace shas ane entry with the following shape:
+// In the state, every workspace window instance has an entry with the following shape:
 export type Nav = {
   space: string
   data: any

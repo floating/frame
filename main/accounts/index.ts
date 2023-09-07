@@ -516,8 +516,6 @@ export class Accounts extends EventEmitter {
       previouslyActiveAccount.update()
     }
 
-    // store.setAccount(summary)
-
     if (currentAccount.status === 'ok')
       this.verifyAddress(false, (err, verified) => {
         if (!err && !verified) {
