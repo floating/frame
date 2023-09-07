@@ -57,7 +57,7 @@ class Balances extends React.Component {
     return { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains }
   }
 
-  getBalances(filter, tokenPreferences, returnHidden = false) {
+  getBalances(filter, tokenPreferences = {}, returnHidden = false) {
     const { rawBalances, rates, ethereumNetworks, networksMeta, populatedChains } = this.getStoreValues()
     const shouldShowBalance = shouldShow(ethereumNetworks, tokenPreferences, populatedChains, returnHidden)
     const createBalance = toBalance(networksMeta, rates, ethereumNetworks)

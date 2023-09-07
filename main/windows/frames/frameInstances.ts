@@ -1,10 +1,10 @@
+import electron, { BrowserView, BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron'
 import path from 'path'
-import electron, { BrowserView, BrowserWindow } from 'electron'
 
-import topRight from './topRight'
 import { createWindow } from '../window'
+import topRight from './topRight'
 
-import type { Frame } from '../../store/state/types'
+import { Workspace, Nav, View } from '../workspace/types'
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -30,19 +30,23 @@ export default {
   reposition: (frameInstance: FrameInstance) => {
     place(frameInstance)
   },
-  create: (frame: Frame) => {
+  create: (frame: Workspace) => {
     const frameInstance: FrameInstance = createWindow('frameInstance', {
       x: 0,
       y: 0,
       width: 0,
       height: 0,
       titleBarStyle: 'hidden',
-      trafficLightPosition: { x: 10, y: 9 },
+      trafficLightPosition: { x: 20, y: 23 },
       icon: path.join(__dirname, './AppIcon.png')
     })
 
+    frameInstance.webContents.openDevTools({ mode: 'detach' })
+
     frameInstance.loadURL(
-      isDev ? 'http://localhost:1234/dapp/index.dev.html' : `file://${process.env.BUNDLE_LOCATION}/dapp.html`
+      isDev
+        ? 'http://localhost:1234/workspace/index.dev.html'
+        : `file://${process.env.BUNDLE_LOCATION}/workspace.html`
     )
 
     frameInstance.on('ready-to-show', () => {
@@ -52,6 +56,24 @@ export default {
     frameInstance.showingView = ''
     frameInstance.frameId = frame.id
     frameInstance.views = {}
+
+    // const template: MenuItemConstructorOptions[] = [
+    //   {
+    //     label: 'File',
+    //     submenu: [{ role: 'quit' }]
+    //   }
+    // ]
+
+    // const menu = Menu.buildFromTemplate(template)
+
+    // frameInstance.on('blur', () => {
+    //   // Menu.setApplicationMenu(null)
+    //   // Menu.setApplicationMenu(emptyMenu)
+    // })
+
+    // frameInstance.on('focus', () => {
+    //    Show menu on macOS
+    // })
 
     place(frameInstance)
 

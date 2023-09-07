@@ -1,0 +1,158 @@
+.nativeControls
+  position absolute 
+  top 0
+  left 0
+  right 0
+  height 32px
+  z-index 20000000000000000
+
+  .macGrab
+    position absolute 
+    top 0
+    left 0
+    bottom 0
+    right 0
+    -webkit-app-region drag
+
+  .macControls
+    position absolute 
+    top 0
+    left 0
+    bottom 0
+    width 74px
+
+  .linuxGrab
+    position absolute 
+    top 0
+    right 104px
+    bottom 0
+    left 0
+    -webkit-app-region drag
+
+  .linuxControls
+    position absolute 
+    top 0px
+    right 8px
+    bottom 0
+    display flex
+
+    .linuxControlsButton
+      width 21px
+      height 21px
+      margin 6px 0px 8px 13px
+      display flex
+      justify-content center
+      align-items center
+      color white
+      border-radius 11px
+      background rgba(255, 255, 255, 0.05)
+      flex 1
+      flex-shrink 0
+
+      .linuxControlsClose
+        height 13px
+        width 13px
+
+      .linuxControlsMax
+        height 13px
+        width 13px
+
+      .linuxControlsMin
+        margin-top 5px
+        height 13px
+        width 13px
+
+      svg
+        position relative
+        fill currentColor
+        transform scale(0.7)
+        
+      *
+        pointer-events none
+
+    .linuxControlsButton:hover
+      background rgba(255, 255, 255, 0.1)
+
+  .windowsGrab
+    position absolute 
+    top 0
+    left 0px
+    bottom 0
+    right 136px
+    -webkit-app-region drag
+
+  .windowsControls
+    position absolute 
+    top 1px
+    right 1px
+    bottom 0
+    display flex
+
+    .windowsControlsButton
+      width 45px
+      height 32px
+      display flex
+      justify-content center
+      align-items center
+      color white
+      border-radius 4px
+
+      svg
+        position relative
+        fill currentColor
+        
+      *
+        pointer-events none
+
+    .windowsControlsButton:hover
+      background rgba(255, 255, 255, 0.02)
+
+.macTitle
+  height 30px
+  position absolute
+  top 0
+  left 0
+  padding 0px 5px 0px 5px
+  z-index 50000
+  display flex
+  justify-content center
+  align-items center
+
+  &:hover
+    .titleClose
+      background #fc615d
+
+    .titleMin
+      background #fdbd41
+
+    .titleFull
+      background #34c84a
+
+  .macTitleButton
+    height 30px
+    width 30px
+    position relative
+    display flex
+    justify-content center
+    align-items center
+
+  .titleClose
+    width 12px
+    height 12px
+    background rgba(0, 0, 50, 0.15)
+    border-radius 50%
+    pointer-events none
+
+  .titleMin
+    width 12px
+    height 12px
+    background rgba(0, 0, 50, 0.15)
+    border-radius 50%
+    pointer-events none
+
+  .titleFull
+    width 12px
+    height 12px
+    background rgba(0, 0, 50, 0.15)
+    border-radius 50%
+    pointer-events none

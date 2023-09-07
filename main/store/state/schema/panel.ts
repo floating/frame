@@ -4,14 +4,12 @@ import { schemaWithEmptyDefaults } from './util'
 const modules = [
   'requests',
   'chains',
+  'activity',
   'balances',
   'inventory',
+  'contacts',
   'permissions',
-  'signer',
-  'settings',
-  'activity',
-  'gas',
-  'verify'
+  'signer'
 ] as const
 
 const enabledModules = z.enum(modules)
@@ -23,7 +21,17 @@ const ModuleSchema = z.object({
 const AccountSchema = z.object({
   moduleOrder: z
     .array(enabledModules)
-    .default(['requests', 'chains', 'balances', 'inventory', 'permissions', 'signer', 'settings']),
+    .default([
+      'requests',
+      'chains',
+      'activity',
+      'balances',
+      'inventory',
+      'contacts',
+      'permissions',
+      'signer'
+    ]),
+
   modules: z.record(ModuleSchema).default({
     requests: { height: 0 },
     activity: { height: 0 },

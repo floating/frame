@@ -14,6 +14,7 @@ export default {
   },
   remove: (app: string, session: string) => {
     app = app.replaceAll('.', '-')
+    sessions[app] = sessions[app] || []
     sessions[app].splice(sessions[app].indexOf(session), 1)
     if (sessions[app].length === 0) delete sessions[app]
   }

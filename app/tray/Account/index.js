@@ -13,14 +13,9 @@ class Main extends React.Component {
 
   render() {
     const accounts = this.store('main.accounts')
-    const current = this.store('selected.current')
-    const open = this.store('selected.open')
-    if (!open) return
-
-    const currentAccount = accounts[current]
-    if (!currentAccount) return null
-
-    return <Account key={current} {...currentAccount} index={1} />
+    const currentAccount = Object.values(accounts).find((acct) => acct.active) || {}
+    if (!currentAccount.id) return null
+    return <Account key={currentAccount.id} {...currentAccount} index={1} />
   }
 }
 
