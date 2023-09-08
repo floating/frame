@@ -64,7 +64,6 @@ const systemTrayEventHandlers: SystemTrayEventHandlers = {
   clickShow: () => app.show()
 }
 const systemTray = new SystemTray(systemTrayEventHandlers)
-const getDisplaySummonShortcut = () => store('main.shortcuts.altSlash')
 
 const topRight = (window: BrowserWindow) => {
   const area = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
@@ -143,19 +142,6 @@ function initTrayWindow() {
   const { width, height, x, y } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea
   windows.tray.setPosition(width + x, height + y)
 
-  windows.tray.on('show', () => {
-    if (process.platform === 'win32') {
-      systemTray.closeContextMenu()
-    }
-    systemTray.setContextMenu('hide', { displaySummonShortcut: getDisplaySummonShortcut() })
-  })
-  windows.tray.on('hide', () => {
-    if (process.platform === 'win32') {
-      systemTray.closeContextMenu()
-    }
-    systemTray.setContextMenu('show', { displaySummonShortcut: getDisplaySummonShortcut() })
-  })
-
   setTimeout(() => {
     windows.tray.on('focus', () => {
       Menu.setApplicationMenu(null)
@@ -217,7 +203,6 @@ export class Tray {
     this.readyHandler = () => {
       this.ready = true
       systemTray.init(windows.tray)
-      systemTray.setContextMenu('hide', { displaySummonShortcut: getDisplaySummonShortcut() })
       if (showOnReady) {
         store.trayOpen(true)
       }
@@ -571,24 +556,26 @@ const init = () => {
   }, 'windows:notify')
 
   store.observer(() => broadcast('permissions', JSON.stringify(store('permissions'))))
+
   store.observer(() => {
-    let summonShortcut: Shortcut = store('main.shortcuts.summon')
-    const summonHandler = (accelerator: string) => {
+    const summonShortcut: Shortcut = store('main.shortcuts.summon')
+    const summonHandler = () => {
       app.toggle()
       if (store('windows.onboard.showing')) {
         send('onboard', 'main:flex', 'shortcutActivated')
       }
-      if (tray?.isReady()) {
-        systemTray.setContextMenu(tray.isVisible() ? 'hide' : 'show', {
-          displaySummonShortcut: summonShortcut.enabled,
-          accelerator
-        })
-      }
     }
+    systemTray.setSummonShortcut(summonShortcut)
 
     registerShortcut(summonShortcut, summonHandler)
   })
 }
+
+store.observer(() => {
+  // Update system tray menu whenever accounts change
+  systemTray.setAccounts(Object.values(store('main.accounts')))
+  systemTray.setCurrentAccountId(store('selected.current'))
+})
 
 const send = (id: string, channel: string, ...args: string[]) => {
   if (windows[id] && !windows[id].isDestroyed()) {

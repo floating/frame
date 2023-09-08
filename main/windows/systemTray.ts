@@ -1,6 +1,9 @@
-import { app, screen, BrowserWindow, Menu, KeyboardEvent, Rectangle, Tray as ElectronTray } from 'electron'
+import { app, BrowserWindow, Menu, Tray as ElectronTray } from 'electron'
 import path from 'path'
-import { capitalize } from '../../resources/utils'
+import Accounts from '../accounts'
+import { accountSort as byCreation } from '../../resources/domain/account'
+import { Shortcut } from '../store/state/types'
+import { stringifyShortcut } from '../keyboardShortcuts/index'
 
 const isMacOS = process.platform === 'darwin'
 
@@ -13,69 +16,112 @@ export type SystemTrayEventHandlers = {
 export class SystemTray {
   private clickHandlers: SystemTrayEventHandlers
   private electronTray?: ElectronTray
+  private mainWindow?: BrowserWindow
+  private accounts: Account[] = []
+  private currentAccountId?: string
+  private summonShortcut?: Shortcut
 
   constructor(clickHandlers: SystemTrayEventHandlers) {
     this.clickHandlers = clickHandlers
   }
 
   init(mainWindow: BrowserWindow) {
+    this.mainWindow = mainWindow
+    this.mainWindow.on('show', () => {
+      // Auto-hide context menu whenever the main window shows
+      this.closeContextMenu()
+      this.updateContextMenu()
+    })
+    this.mainWindow.on('hide', () => this.updateContextMenu())
+
     // Electron Tray can only be instantiated when the app is ready
     this.electronTray = new ElectronTray(path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png'))
-    this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle) => {
-      const mainWindowBounds = mainWindow.getBounds()
-      const currentDisplay = screen.getDisplayMatching(bounds)
-      const trayClickDisplay = screen.getDisplayMatching(mainWindowBounds)
-      if (trayClickDisplay.id !== currentDisplay.id) {
-        this.setContextMenu('show', { switchScreen: true })
-      }
-      this.clickHandlers.click()
-    })
+    this.electronTray.on('click', this.clickHandlers.click)
+    this.updateContextMenu()
   }
 
-  setContextMenu(
-    type: string,
-    { displaySummonShortcut = false, accelerator = 'Alt+/', switchScreen = false }
-  ) {
+  private updateContextMenu() {
+    if (!this.mainWindow) {
+      // Not initialized yet
+      return
+    }
+
     const separatorMenuItem = {
       label: 'Frame',
       click: () => {},
       type: 'separator'
     }
-    const menuItemLabelMap = {
-      hide: 'Dismiss',
-      show: 'Summon'
-    }
-    const label = menuItemLabelMap[type as keyof typeof menuItemLabelMap]
-    const eventName = `click${capitalize(type)}`
-    const actionMenuItem: Electron.MenuItemConstructorOptions = {
+
+    const [label, eventName]: [string, keyof SystemTrayEventHandlers] = this.mainWindow.isVisible()
+      ? ['Dismiss', 'clickHide']
+      : ['Summon', 'clickShow']
+    const showHideMenuItem: Electron.MenuItemConstructorOptions = {
       label,
-      click: () => this.clickHandlers[eventName as keyof typeof this.clickHandlers](),
+      click: this.clickHandlers[eventName],
       toolTip: `${label} Frame`
     }
+
     const quitMenuItem = {
       label: 'Quit',
       click: () => app.quit()
     }
 
-    if (displaySummonShortcut) {
-      actionMenuItem.accelerator = accelerator
-      actionMenuItem.registerAccelerator = false
+    if (this.summonShortcut?.enabled) {
+      const { accelerator } = stringifyShortcut(this.summonShortcut)
+      showHideMenuItem.accelerator = accelerator
+      showHideMenuItem.registerAccelerator = false
     }
 
-    const menu = Menu.buildFromTemplate([actionMenuItem, separatorMenuItem, quitMenuItem])
+    const menu = Menu.buildFromTemplate([
+      showHideMenuItem,
+      separatorMenuItem,
+      this.buildAccountsSubMenu(),
+      separatorMenuItem,
+      quitMenuItem
+    ])
 
-    if (switchScreen) {
-      this.electronTray?.setContextMenu(menu)
-    } else {
-      setTimeout(() => this.electronTray?.setContextMenu(menu), isMacOS ? 0 : 200)
+    this.electronTray?.setContextMenu(menu)
+  }
+
+  private buildAccountsSubMenu(): Electron.MenuItemConstructorOptions {
+    const accounts = this.accounts.sort(byCreation)
+
+    const accountMenuItems: Electron.MenuItemConstructorOptions[] = accounts.map((account) => ({
+      label: account.name,
+      click: () => {
+        Accounts.setSigner(account.id, () => {})
+      },
+      type: 'checkbox',
+      checked: account.id === this.currentAccountId
+    }))
+
+    return {
+      label: 'Account',
+      type: 'submenu',
+      submenu: accountMenuItems
     }
   }
 
-  closeContextMenu() {
+  private closeContextMenu() {
     this.electronTray?.closeContextMenu()
   }
 
   setTitle(title: string) {
     this.electronTray?.setTitle(title)
+  }
+
+  setAccounts(accounts: Account[]) {
+    this.accounts = accounts
+    this.updateContextMenu()
+  }
+
+  setCurrentAccountId(currentAccountId: string) {
+    this.currentAccountId = currentAccountId
+    this.updateContextMenu()
+  }
+
+  setSummonShortcut(shortcut: Shortcut) {
+    this.summonShortcut = shortcut
+    this.updateContextMenu()
   }
 }
