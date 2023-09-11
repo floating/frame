@@ -1,38 +1,8 @@
 import styled, { css } from 'styled-components'
 
 export const NativeControls = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 37px;
-  /* border-bottom: 1px solid var(--ghostZ); */
-`
-
-export const MacGrab = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  -webkit-app-region: drag;
-`
-
-export const MacControls = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 74px;
-`
-
-export const LinuxGrab = styled.div`
-  position: absolute;
-  top: 0;
-  right: 104px;
-  bottom: 0;
-  left: 0;
-  -webkit-app-region: drag;
+  height: 40px;
+  width: 80px;
 `
 
 export const LinuxControls = styled.div`
@@ -69,6 +39,12 @@ export const LinuxControlsButton = styled.div`
   &:hover {
     background: rgba(255, 255, 255, 0.1);
   }
+
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+  * {
+    pointer-events: none;
+  }
 `
 
 export const WindowsGrab = styled.div`
@@ -86,6 +62,8 @@ export const WindowsControls = styled.div`
   right: 1px;
   bottom: 0;
   display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 export const WindowsControlsButton = styled.div`
@@ -96,6 +74,11 @@ export const WindowsControlsButton = styled.div`
   align-items: center;
   color: white;
   border-radius: 4px;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+  * {
+    pointer-events: none;
+  }
 
   svg {
     position: relative;
@@ -111,61 +94,76 @@ export const WindowsControlsButton = styled.div`
   }
 `
 
-export const MacTitle = styled.div`
-  height: 30px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 0px 5px 0px 5px;
-  z-index: 50000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:hover {
-    .titleClose {
-      background: #fc615d;
-    }
-
-    .titleMin {
-      background: #fdbd41;
-    }
-
-    .titleFull {
-      background: #34c84a;
-    }
-  }
-`
-
 export const MacTitleButton = styled.div`
-  height: 30px;
-  width: 30px;
+  height: 24px;
+  width: 24px;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
 `
 
-export const TitleClose = styled.div`
+export const MacTitleClose = styled.div`
   width: 12px;
   height: 12px;
-  background: rgba(0, 0, 50, 0.15);
+  background: rgba(124, 124, 124, 0.24);
   border-radius: 50%;
-  pointer-events: none;
+  cursor: pointer;
 `
 
-export const TitleMin = styled.div`
+export const MacTitleMin = styled.div`
   width: 12px;
   height: 12px;
-  background: rgba(0, 0, 50, 0.15);
+  background: rgba(124, 124, 124, 0.24);
   border-radius: 50%;
-  pointer-events: none;
+  cursor: pointer;
 `
 
-export const TitleFull = styled.div`
+export const MacTitleFull = styled.div`
   width: 12px;
   height: 12px;
-  background: rgba(0, 0, 50, 0.15);
+  background: rgba(124, 124, 124, 0.24);
   border-radius: 50%;
-  pointer-events: none;
+  cursor: pointer;
+
+  /* &:hover {
+    background: #34c84a;
+  } */
+`
+export const MacControls = styled.div`
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-app-region: no-drag;
+
+  &:hover {
+    ${MacTitleClose} {
+      background: #fc615d;
+    }
+
+    ${MacTitleMin} {
+      background: #fdbd41;
+    }
+
+    ${MacTitleFull} {
+      background: #34c84a;
+    }
+  }
+
+  ${({ focused }) =>
+    focused &&
+    `
+    ${MacTitleClose} {
+      background: #fc615d;
+    }
+
+    ${MacTitleMin} {
+      background: #fdbd41;
+    }
+
+    ${MacTitleFull} {
+      background: #34c84a;
+    }
+  `}
 `

@@ -44,8 +44,8 @@ const Error = ({ isMainnetConnected }) => {
 
 const ViewWrap = styled.div`
   position: absolute;
-  top: 8px;
-  left: 0px;
+  top: 80px;
+  left: 8px;
   right: 8px;
   bottom: 8px;
   z-index: 99999999;
@@ -91,7 +91,7 @@ const App = ({ id }) => {
 
   return (
     <>
-      <ViewWrap style={{ background: 'var(--ghostA)' }} />
+      <ViewWrap style={{ background: 'var(--ghostB)' }} />
       {/* <div className='mainTop' />
       <div className='mainDappLoading'>
         {shouldDisplayError ? (

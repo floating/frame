@@ -37,8 +37,6 @@ export const cardDown = keyframes`
 `
 
 export const AccountManagerWrap = styled.div`
-  position: absolute;
-  inset: 8px;
   z-index: 99999999999;
   pointer-events: none;
   /* animation: cardShow 400ms linear both; */

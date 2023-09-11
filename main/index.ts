@@ -274,6 +274,14 @@ ipcMain.on('frame:unmax', (e) => {
   windows.unmax(e)
 })
 
+ipcMain.on('frame:full', (e) => {
+  windows.full(e)
+})
+
+ipcMain.on('frame:unfull', (e) => {
+  windows.unfull(e)
+})
+
 dapps.add({
   ens: 'send.frame.eth',
   checkStatusRetryCount: 0,

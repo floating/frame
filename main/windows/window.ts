@@ -36,7 +36,7 @@ export function createWindow(
     acceptFirstMouse: true,
     transparent: process.platform === 'darwin',
     show: false,
-    backgroundColor: COLORWAYS[store('main.colorway') as keyof typeof COLORWAYS]['background'],
+    // backgroundColor: COLORWAYS[store('main.colorway') as keyof typeof COLORWAYS]['background'],
     skipTaskbar: process.platform !== 'linux',
     webPreferences: {
       ...webPreferences,

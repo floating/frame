@@ -66,7 +66,7 @@ export default {
     frameInstance.addBrowserView(viewInstance)
 
     const dappBackground = store('main.dapps', view.dappId, 'colors', 'background')
-    if (dappBackground) frameInstance.setBackgroundColor(dappBackground)
+    // if (dappBackground) frameInstance.setBackgroundColor(dappBackground)
 
     viewInstance.webContents.setVisualZoomLevelLimits(1, 3)
 
@@ -130,13 +130,13 @@ export default {
       //   height: fullscreen ? height : height - 32
       // })
       viewInstance.setBounds({
-        x: 316,
-        y: 24,
-        width: width - 316 - 8,
-        height: height - 16 - 16 - 16
+        x: 8,
+        y: 80 + 24,
+        width: width - 16,
+        height: height - 80 - 32 - 16
       })
       // viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
-      viewInstance.setAutoResize({ width: true, height: true })
+      // viewInstance.setAutoResize({ width: true, height: true })
     }
   }
 }

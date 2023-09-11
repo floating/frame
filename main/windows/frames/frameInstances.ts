@@ -3,6 +3,7 @@ import path from 'path'
 
 import { createWindow } from '../window'
 import topRight from './topRight'
+import store from '../../store'
 
 import { Workspace, Nav, View } from '../workspace/types'
 
@@ -36,8 +37,8 @@ export default {
       y: 0,
       width: 0,
       height: 0,
-      titleBarStyle: 'hidden',
-      trafficLightPosition: { x: 20, y: 23 },
+      // titleBarStyle: 'hidden',
+      // trafficLightPosition: { x: 20, y: 23 },
       icon: path.join(__dirname, './AppIcon.png')
     })
 
@@ -74,6 +75,20 @@ export default {
     // frameInstance.on('focus', () => {
     //    Show menu on macOS
     // })
+
+    frameInstance.on('resize', () => {
+      Object.values(frameInstance.views || {}).forEach((viewInstance) => {
+        const { frameId } = frameInstance
+        // const { fullscreen } = store('windows.workspaces', frameId)
+        const { width, height } = frameInstance.getBounds()
+        viewInstance.setBounds({
+          x: 8,
+          y: 80 + 24,
+          width: width - 16,
+          height: height - 80 - 32 - 16
+        })
+      })
+    })
 
     place(frameInstance)
 
