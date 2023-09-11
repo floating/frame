@@ -3,6 +3,7 @@ import EventEmitter from 'events'
 import log from 'electron-log'
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util'
 import { isAddress } from '@ethersproject/address'
+import { JsonRpcProvider } from '@ethersproject/providers'
 import crypto from 'crypto'
 import { addHexPrefix, intToHex, isHexString, isHexPrefixed, fromUtf8 } from '@ethereumjs/util'
 
@@ -91,6 +92,8 @@ export class Provider extends EventEmitter {
     networkChanged: []
   }
 
+  ethersProvider: JsonRpcProvider
+
   constructor() {
     super()
 
@@ -140,6 +143,8 @@ export class Provider extends EventEmitter {
     })
 
     this.getNonce = this.getNonce.bind(this)
+
+    this.ethersProvider = new JsonRpcProvider('http://127.0.0.1:1248', 'homestead')
   }
 
   accountsChanged(accounts: string[]) {
@@ -1065,6 +1070,10 @@ export class Provider extends EventEmitter {
 
   emit(type: string | symbol, ...args: any[]) {
     return super.emit(type, ...args)
+  }
+
+  resolveName(name: string | Promise<string>): Promise<string | null> {
+    return this.ethersProvider.resolveName(name)
   }
 }
 

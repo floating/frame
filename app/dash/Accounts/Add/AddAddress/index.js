@@ -3,8 +3,7 @@ import Restore from 'react-restore'
 
 import link from '../../../../../resources/link'
 import RingIcon from '../../../../../resources/Components/RingIcon'
-
-const isEnsName = (input) => input.toLowerCase().includes('.eth')
+import { isAddress } from '@ethersproject/address'
 
 class AddAddress extends React.Component {
   constructor(...args) {
@@ -97,7 +96,7 @@ class AddAddress extends React.Component {
       return this.createFromAddress(address)
     }
 
-    if (!isEnsName(input)) {
+    if (isAddress(input)) {
       return create(input)
     }
 
