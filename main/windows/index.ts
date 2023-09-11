@@ -620,6 +620,12 @@ export default {
   close(e: IpcMainEvent) {
     windowFromWebContents(e.sender).close()
   },
+  full(e: IpcMainEvent) {
+    windowFromWebContents(e.sender).setFullScreen(true)
+  },
+  unfull(e: IpcMainEvent) {
+    windowFromWebContents(e.sender).setFullScreen(false)
+  },
   max(e: IpcMainEvent) {
     windowFromWebContents(e.sender).maximize()
   },

@@ -6,13 +6,12 @@ import React from 'react'
 import { Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
 
 const Container = styled.div`
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  /* background: var(--ghostA); */
+  flex-direction: row;
+  margin: auto auto;
+  width: 900px;
+  padding-left: 64px;
 `
 
 const MainButton = styled.div`
@@ -41,7 +40,7 @@ const DappRow = styled.div`
 const DappIcon = styled.div`
   width: 42px;
   height: 42px;
-  margin: 8px;
+  margin: 0px 0px 16px 0px;
   background: var(--ghostAZ);
   border-radius: 16px;
   display: flex;
@@ -141,10 +140,60 @@ class Settings extends React.Component {
   }
 }
 
+const HomeLeft = styled.div`
+  position: absolute;
+  height: 100%;
+  width: 32px;
+  left: 0;
+`
+const HomeCenter = styled.div`
+  height: 400px;
+  width: 65%;
+  min-height: 100%;
+  border-radius: 16px;
+`
+const HomeRight = styled.div`
+  width: 35%;
+  min-height: 550px;
+  border-radius: 16px;
+  background: var(--ghostAZ);
+  margin-left: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+const CommandBar = styled.div`
+  height: 64px;
+  width: 100%;
+  border-radius: 16px;
+  background: var(--ghostAZ);
+  margin-bottom: 16px;
+`
+const Portfolio = styled.div`
+  height: 200px;
+  width: 100%;
+  border-radius: 16px;
+  background: var(--ghostAZ);
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const AssetList = styled.div`
+  height: 200px;
+  width: 100%;
+  border-radius: 16px;
+  background: var(--ghostAZ);
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
 const Home = ({ data }) => (
   <Container>
-    {/* <MainButton>{'current account'}</MainButton> */}
-    <DappRow>
+    <HomeLeft>
       <DappIcon
         onClick={() => {
           link.send('workspace:run', 'dapp', {}, ['send.frame.eth'])
@@ -155,14 +204,20 @@ const Home = ({ data }) => (
       <DappIcon />
       <DappIcon />
       <DappIcon />
-    </DappRow>
-    <DappRow>
-      <DappIcon></DappIcon>
       <DappIcon />
       <DappIcon />
       <DappIcon />
-    </DappRow>
-    <Settings />
+      <DappIcon />
+    </HomeLeft>
+    <HomeCenter>
+      <CommandBar />
+      <Portfolio>Value</Portfolio>
+      <AssetList>Assets</AssetList>
+      <AssetList>Inventory</AssetList>
+    </HomeCenter>
+    <HomeRight>
+      <div>{'Account activity'}</div>
+    </HomeRight>
   </Container>
 )
 

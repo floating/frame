@@ -46,8 +46,12 @@ export default class WorkspaceManager {
       const frames = getFrames()
       this.manageFrames(frames, inFocus)
       this.manageViews(frames)
-      // manageOverlays(frames)
+      // this.manageOverlays(frames)
     })
+  }
+
+  manageOverlays(frames: Record<string, Workspace>, inFocus: string) {
+    // If there is an overlay, create a frame instance for it
   }
 
   manageFrames(frames: Record<string, Workspace>, inFocus: string) {
@@ -108,6 +112,11 @@ export default class WorkspaceManager {
             frameInstance.views = frameInstance.views || {}
             frameInstance.views[currentView]?.webContents?.focus()
           }
+          store.updateFrame(frameId, { focused: true })
+        })
+
+        frameInstance.on('blur', () => {
+          store.updateFrame(frameId, { focused: false })
         })
       })
 
