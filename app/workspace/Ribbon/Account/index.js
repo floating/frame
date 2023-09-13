@@ -24,7 +24,7 @@ const AccountWrap = styled.div`
     pointer-events: none;
   }
   &:hover {
-    background: var(--ghostA);
+    background: var(--ghostC);
   }
 `
 
@@ -57,7 +57,7 @@ const Account = () => {
   return (
     <AccountWrap
       onClick={() => {
-        link.send('workspace:nav', window.frameId, 'command')
+        link.send('workspace:nav', window.frameId, 'command', { station: 'command' })
       }}
     >
       <div>

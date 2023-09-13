@@ -82,10 +82,10 @@ export default {
         // const { fullscreen } = store('windows.workspaces', frameId)
         const { width, height } = frameInstance.getBounds()
         viewInstance.setBounds({
-          x: 8,
-          y: 80 + 24,
-          width: width - 16,
-          height: height - 80 - 32 - 16
+          x: 0,
+          y: 64,
+          width: width,
+          height: height - 96
         })
       })
     })

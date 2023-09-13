@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import Native from './Native'
 import Account from './Account'
@@ -12,25 +12,26 @@ const Ribbon = styled.div`
   top: 12px;
   right: 12px;
   left: 12px;
-  height: 36px;
+  height: 42px;
   z-index: 999999;
   pointer-events: auto;
   align-items: center;
   text-align: center;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   transform: translate3d(0, 0, 0);
+  flex-direction: ${(props) => (props.platform === 'darwin' ? 'row-reverse' : 'row')};
 `
 
 const RibbonSection = styled.div`
-  height: 32px;
-  border-radius: 12px;
+  height: 42px;
+  border-radius: 16px;
   overflow: hidden;
   z-index: 999999;
-  background: var(--ghostAZ);
+  background: var(--ghostA);
   opacity: 1;
-  border-bottom: 1px solid var(--ghostZ);
-  box-shadow: 0px 2px 8px -2px var(--ghostY), 0px -3px 6px -2px var(--ghostB);
+  /* border-bottom: 2px solid var(--ghostAZ); */
+  /* box-shadow: 0px 2px 8px -2px var(--ghostY), 0px -3px 6px -2px var(--ghostB); */
   display: flex;
 `
 
@@ -41,9 +42,9 @@ const Options = styled.div`
   height: 100%;
 `
 const OptionButton = styled.div`
-  width: 64px;
+  width: 48px;
   height: 100%;
-  border-left: 1px solid var(--ghostZ);
+  border-left: 1px solid var(--ghostAZ);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -53,7 +54,7 @@ const OptionButton = styled.div`
     pointer-events: none;
   }
   &:hover {
-    background: var(--ghostA);
+    background: var(--ghostC);
   }
 `
 
@@ -69,6 +70,7 @@ export const TopBackdrop = styled.div`
   pointer-events: none;
   mask-image: linear-gradient(to bottom, black 32px, transparent);
   -webkit-mask-image: linear-gradient(to bottom, black 32px, transparent);
+  display: none;
 
   &:after {
     content: '';
@@ -78,7 +80,13 @@ export const TopBackdrop = styled.div`
     bottom: 0px;
     left: 0px;
     z-index: 1;
-    background: linear-gradient(90deg, var(--ghostZ) 5%, transparent 10%, transparent 90%, var(--ghostZ) 95%);
+    background: linear-gradient(
+      90deg,
+      var(--ghostAZ) 5%,
+      transparent 10%,
+      transparent 90%,
+      var(--ghostAZ) 95%
+    );
   }
 `
 
@@ -93,14 +101,14 @@ export const TopFade = styled.div`
   pointer-events: none;
 
   /* background: red; */
-  background: linear-gradient(-180deg, var(--ghostY) 0%, transparent 100%);
+  background: linear-gradient(-180deg, var(--ghostAZ) 0%, transparent 100%);
 
   &:after {
     content: '';
     position: absolute;
     inset: 0px;
     opacity: 0.8;
-    background: linear-gradient(-180deg, var(--ghostZ) 25%, transparent 100%);
+    background: linear-gradient(-180deg, var(--ghostAZ) 25%, transparent 100%);
   }
 `
 
@@ -131,9 +139,9 @@ const NavBack = styled.div`
 
 const RibbonCenter = styled.div`
   display: flex;
-  margin: 4px 0px 0px 0px;
+  margin: 2px 0px 0px 0px;
   > * {
-    margin: 0 4px;
+    margin: 0 8px;
   }
 `
 
@@ -158,6 +166,26 @@ const Navigation = () => {
   )
 }
 
+const fadeIn = keyframes`
+  0% {
+    transform: translate3d(0, 0px, 0);
+  }
+  100% {
+    transform: translate3d(0, -90px, 0);
+  }
+`
+
+const RibbonContainer = styled.div`
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  transform: translate3d(0, 0, 0);
+  animation-delay: 0.5s;
+  /* animation: ${fadeIn} 2s ease-in-out alternate infinite; */
+  z-index: 9999999;
+`
+
 export default () => {
   const frameState = useStore('windows.workspaces', frameId)
   const nav = frameState?.nav[0] || { space: 'command', data: {} }
@@ -168,21 +196,12 @@ export default () => {
   const platform = useStore('platform')
 
   return (
-    <>
-      <Ribbon>
-        <Navigation platform={platform} />
+    <RibbonContainer>
+      <Ribbon platform={platform}>
+        {/* <Navigation platform={platform} /> */}
         <RibbonCenter>
           <RibbonSection>
             <Account />
-            <OptionButton
-              onClick={() => {
-                link.send('workspace:nav', window.frameId, 'accounts')
-              }}
-            >
-              <span style={{ transform: 'rotate(180deg)' }}>{svg.chevron(24)}</span>
-            </OptionButton>
-          </RibbonSection>
-          <RibbonSection>
             <Options>
               <OptionButton
                 onClick={() => {
@@ -203,7 +222,7 @@ export default () => {
                   link.send('workspace:nav', window.frameId, 'dapps')
                 }}
               >
-                {svg.window(13)}
+                {svg.route(14)}
               </OptionButton>
               <OptionButton
                 onClick={() => {
@@ -215,10 +234,10 @@ export default () => {
             </Options>
           </RibbonSection>
         </RibbonCenter>
-        <Native />
+        <Native platform={platform} />
       </Ribbon>
       <TopBackdrop />
       <TopFade />
-    </>
+    </RibbonContainer>
   )
 }

@@ -1,6 +1,11 @@
 import styled, { css } from 'styled-components'
 
 export const NativeControls = styled.div`
+  position: absolute;
+  left: ${(props) => (props.platform === 'darwin' ? '0' : 'unset')};
+  right: ${(props) => (props.platform !== 'darwin' ? '0' : 'unset')};
+  top: 0px;
+  bottom: 0;
   height: 40px;
   width: 80px;
 `
@@ -95,8 +100,8 @@ export const WindowsControlsButton = styled.div`
 `
 
 export const MacTitleButton = styled.div`
-  height: 24px;
-  width: 24px;
+  height: 20px;
+  width: 20px;
   position: relative;
   display: flex;
   justify-content: center;
@@ -104,24 +109,24 @@ export const MacTitleButton = styled.div`
 `
 
 export const MacTitleClose = styled.div`
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   background: rgba(124, 124, 124, 0.24);
   border-radius: 50%;
   cursor: pointer;
 `
 
 export const MacTitleMin = styled.div`
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   background: rgba(124, 124, 124, 0.24);
   border-radius: 50%;
   cursor: pointer;
 `
 
 export const MacTitleFull = styled.div`
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   background: rgba(124, 124, 124, 0.24);
   border-radius: 50%;
   cursor: pointer;

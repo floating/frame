@@ -23,7 +23,7 @@ const Splash = styled.div`
   right: 0px;
   bottom: 0px;
   z-index: 0;
-  background: var(--ghostZ);
+  background: var(--ghostAZ);
 `
 
 const Main = styled.div`
