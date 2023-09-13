@@ -71,7 +71,7 @@ const Title = () => {
   const { fullscreen, maximized, focused } = useStore('windows.workspaces', window.frameId)
 
   return (
-    <NativeControls>
+    <NativeControls platform={platform}>
       {/* <Navigation platform={platform} /> */}
       {platform === 'darwin' ? (
         <MacControls focused={focused}>

@@ -348,6 +348,10 @@ const createWorkspaceNav = (space: string, data: {} = {}, loadViews: string[] = 
   return { space, data, views }
 }
 
+ipcMain.on('workspace:nav:update:data', (e, workspaceId, data) => {
+  store.updateNavData(workspaceId, data)
+})
+
 ipcMain.on('workspace:nav', (e, workspaceId, space, data, views) => {
   navWorkspace(workspaceId, space, data, views)
 })

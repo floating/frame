@@ -130,10 +130,10 @@ export default {
       //   height: fullscreen ? height : height - 32
       // })
       viewInstance.setBounds({
-        x: 8,
-        y: 80 + 24,
-        width: width - 16,
-        height: height - 80 - 32 - 16
+        x: 0,
+        y: 64,
+        width: width,
+        height: height - 96
       })
       // viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
       // viewInstance.setAutoResize({ width: true, height: true })

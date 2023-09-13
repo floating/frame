@@ -891,6 +891,13 @@ module.exports = {
   addWorkspace: (u, workspace) => {
     u('windows.workspaces', workspace.id, () => workspace)
   },
+
+  updateNavData: (u, workspaceId, data) => {
+    u('windows.workspaces', workspaceId, (workspace) => {
+      workspace.nav[0].data = Object.assign({}, workspace.nav[0].data, data)
+      return workspace
+    })
+  },
   // add a nav to a workspace
   navWorkspace: (u, workspaceId, nav) => {
     u('windows.workspaces', workspaceId, (workspace) => {

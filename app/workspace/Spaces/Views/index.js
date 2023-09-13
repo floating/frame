@@ -91,7 +91,7 @@ const App = ({ id }) => {
 
   return (
     <>
-      <ViewWrap style={{ background: 'var(--ghostB)' }} />
+      {/* <ViewWrap style={{ background: 'var(--ghostB)' }} /> */}
       {/* <div className='mainTop' />
       <div className='mainDappLoading'>
         {shouldDisplayError ? (

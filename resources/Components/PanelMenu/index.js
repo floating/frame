@@ -59,7 +59,7 @@ const MenuButton = ({ space = 'command', svg, data = {}, views = [] }) => {
     <MenuButtonWrap
       onClick={() => {
         setGlitchOnSidebar(false)
-        link.send('workspace:run', space, data, views)
+        link.send('workspace:run', space, { station: 'command' }, views)
       }}
       onMouseEnter={() => setGlitchOnSidebar(true)}
       onMouseOver={() => setGlitchOnSidebar(true)}

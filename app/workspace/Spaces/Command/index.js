@@ -5,6 +5,8 @@ import React from 'react'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
 
+import Dock from './Dock'
+
 const Container = styled.div`
   position: relative;
   display: flex;
@@ -26,34 +28,6 @@ const MainButton = styled.div`
   /* box-shadow: 4px 4px 6px var(--ghostA), -4px -4px 6px var(--ghostC); */
   /* box-shadow: -6px 6px 12px var(--ghostA), 5px -5px 12px #ffffff, inset -6px 6px 12px var(--ghostC),
     inset -5px -5px 14px rgba(255, 255, 255, 0.15); */
-  &:hover {
-    background: var(--ghostA);
-  }
-`
-
-const DappRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const DappIcon = styled.div`
-  width: 42px;
-  height: 42px;
-  margin: 0px 0px 16px 0px;
-  background: var(--ghostAZ);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: var(--ghostAZ);
-  border-radius: 8px;
-  box-shadow: 2px 2px 4px var(--ghostY), -2px -2px 4px var(--ghostA);
-
-  * {
-    pointer-events: none;
-  }
   &:hover {
     background: var(--ghostA);
   }
@@ -140,12 +114,6 @@ class Settings extends React.Component {
   }
 }
 
-const HomeLeft = styled.div`
-  position: absolute;
-  height: 100%;
-  width: 32px;
-  left: 0;
-`
 const HomeCenter = styled.div`
   height: 400px;
   width: 65%;
@@ -156,7 +124,7 @@ const HomeRight = styled.div`
   width: 35%;
   min-height: 550px;
   border-radius: 16px;
-  background: var(--ghostAZ);
+  background: var(--ghostA);
   margin-left: 16px;
   display: flex;
   justify-content: center;
@@ -166,14 +134,14 @@ const CommandBar = styled.div`
   height: 64px;
   width: 100%;
   border-radius: 16px;
-  background: var(--ghostAZ);
+  background: var(--ghostA);
   margin-bottom: 16px;
 `
 const Portfolio = styled.div`
   height: 200px;
   width: 100%;
   border-radius: 16px;
-  background: var(--ghostAZ);
+  background: var(--ghostA);
   margin-bottom: 16px;
   display: flex;
   justify-content: center;
@@ -184,7 +152,7 @@ const AssetList = styled.div`
   height: 200px;
   width: 100%;
   border-radius: 16px;
-  background: var(--ghostAZ);
+  background: var(--ghostA);
   margin-bottom: 16px;
   display: flex;
   justify-content: center;
@@ -192,33 +160,27 @@ const AssetList = styled.div`
 `
 
 const Home = ({ data }) => (
-  <Container>
-    <HomeLeft>
-      <DappIcon
-        onClick={() => {
-          link.send('workspace:run', 'dapp', {}, ['send.frame.eth'])
-        }}
-      >
-        {svg.send(15)}
-      </DappIcon>
-      <DappIcon />
-      <DappIcon />
-      <DappIcon />
-      <DappIcon />
-      <DappIcon />
-      <DappIcon />
-      <DappIcon />
-    </HomeLeft>
-    <HomeCenter>
-      <CommandBar />
-      <Portfolio>Value</Portfolio>
-      <AssetList>Assets</AssetList>
-      <AssetList>Inventory</AssetList>
-    </HomeCenter>
-    <HomeRight>
-      <div>{'Account activity'}</div>
-    </HomeRight>
-  </Container>
+  <>
+    <Container>
+      {data.station === 'command' ? (
+        <CommandBar />
+      ) : data.station === 'dashboard' ? (
+        <>
+          <HomeCenter>
+            <Portfolio>Value</Portfolio>
+            <AssetList>Assets</AssetList>
+            <AssetList>Inventory</AssetList>
+          </HomeCenter>
+          <HomeRight>
+            <div>{'Account activity'}</div>
+          </HomeRight>
+        </>
+      ) : (
+        <pre>{JSON.stringify(data, null, 4)}</pre>
+      )}
+    </Container>
+    <Dock />
+  </>
 )
 
 export default Home
