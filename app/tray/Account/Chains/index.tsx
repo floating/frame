@@ -1,5 +1,4 @@
 import React from 'react'
-import Restore from 'react-restore'
 
 import ChainsPreview from './ChainsPreview'
 
