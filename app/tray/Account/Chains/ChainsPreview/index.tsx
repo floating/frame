@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import useStore from '../../../../../resources/Hooks/useStore'
 import useAccountModule from '../../../../../resources/Hooks/useAccountModule'
 

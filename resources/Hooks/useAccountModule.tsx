@@ -13,9 +13,9 @@ const appLink = link as Link
 const useAccountModule = (moduleId: number) => {
   const moduleRef = useRef<HTMLDivElement>(null)
 
-  let resizeTimer: ReturnType<typeof setTimeout> | undefined
-
   useEffect(() => {
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined
+
     const resizeObserver = new ResizeObserver(() => {
       clearTimeout(resizeTimer)
       resizeTimer = setTimeout(() => {
