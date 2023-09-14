@@ -3,7 +3,6 @@ name: Update application version after release has been published
 on:
   release:
     types: [published]
-  workflow_dispatch:
 
 jobs:
   bump_release:
@@ -15,3 +14,10 @@ jobs:
         id: update-version
         shell: bash
         run: ./scripts/update-version.sh
+      - name: Commit & Push new version
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git commit -am "chore: update version"
+          git push
