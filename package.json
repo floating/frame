@@ -12,10 +12,11 @@
     "setup:scripts": "allow-scripts",
     "setup": "npm run setup:deps && husky install",
     "start": "npm run launch",
-    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:workspace && npm run bundle:onboard && npm run bundle:notify && npm run bundle:workspace:inject",
+    "bundle": "npm run bundle:bridge && npm run bundle:tray && npm run bundle:workspace && npm run bundle:workspaceDock && npm run bundle:onboard && npm run bundle:notify && npm run bundle:workspace:inject",
     "bundle:bridge": "parcel build resources/bridge/index.js --target bridge --public-url .",
     "bundle:tray": "parcel build app/tray/index.html --target tray --public-url .",
     "bundle:workspace": "parcel build app/workspace/index.html --target workspace --public-url .",
+    "bundle:workspaceDock": "parcel build app/workspaceDock/index.html --target workspaceDock --public-url .",
     "bundle:onboard": "parcel build app/onboard/index.html --target onboard --public-url .",
     "bundle:notify": "parcel build app/notify/index.html --target notify --public-url .",
     "bundle:workspace:inject": "parcel build main/dapps/server/inject/index.js --target inject --public-url .",
@@ -209,6 +210,7 @@
   "inject": "./bundle/inject.js",
   "tray": "./bundle/tray.html",
   "workspace": "./bundle/workspace.html",
+  "workspaceDock": "./bundle/workspaceDock.html",
   "onboard": "./bundle/onboard.html",
   "notify": "./bundle/notify.html",
   "targets": {
@@ -221,6 +223,9 @@
       }
     },
     "workspace": {
+      "context": "browser"
+    },
+    "workspaceDock": {
       "context": "browser"
     },
     "onboard": {

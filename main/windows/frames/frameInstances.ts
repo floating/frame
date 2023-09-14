@@ -12,6 +12,8 @@ const isDev = process.env.NODE_ENV === 'development'
 export interface FrameInstance extends BrowserWindow {
   frameId?: string
   views?: Record<string, BrowserView>
+  overlays?: Record<string, BrowserView>
+  overlay?: BrowserView
   showingView?: string
 }
 
@@ -77,6 +79,18 @@ export default {
     // })
 
     frameInstance.on('resize', () => {
+      // TODO: reflect correct state of dock
+      if (frameInstance.overlay) {
+        const { width, height } = frameInstance.getBounds()
+
+        frameInstance.overlay.setBounds({
+          y: height - 96,
+          x: 0,
+          width: width,
+          height: 96
+        })
+      }
+
       Object.values(frameInstance.views || {}).forEach((viewInstance) => {
         const { frameId } = frameInstance
         // const { fullscreen } = store('windows.workspaces', frameId)

@@ -5,8 +5,6 @@ import React from 'react'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
 
-import Dock from './Dock'
-
 const Container = styled.div`
   position: relative;
   display: flex;
@@ -160,27 +158,24 @@ const AssetList = styled.div`
 `
 
 const Home = ({ data }) => (
-  <>
-    <Container>
-      {data.station === 'command' ? (
-        <CommandBar />
-      ) : data.station === 'dashboard' ? (
-        <>
-          <HomeCenter>
-            <Portfolio>Value</Portfolio>
-            <AssetList>Assets</AssetList>
-            <AssetList>Inventory</AssetList>
-          </HomeCenter>
-          <HomeRight>
-            <div>{'Account activity'}</div>
-          </HomeRight>
-        </>
-      ) : (
-        <pre>{JSON.stringify(data, null, 4)}</pre>
-      )}
-    </Container>
-    <Dock />
-  </>
+  <Container>
+    {data.station === 'command' ? (
+      <CommandBar />
+    ) : data.station === 'dashboard' ? (
+      <>
+        <HomeCenter>
+          <Portfolio>Value</Portfolio>
+          <AssetList>Assets</AssetList>
+          <AssetList>Inventory</AssetList>
+        </HomeCenter>
+        <HomeRight>
+          <div>{'Account activity'}</div>
+        </HomeRight>
+      </>
+    ) : (
+      <pre>{JSON.stringify(data, null, 4)}</pre>
+    )}
+  </Container>
 )
 
 export default Home

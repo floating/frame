@@ -12,6 +12,7 @@ import store from '../../store'
 
 import frameInstances, { FrameInstance } from './frameInstances.js'
 import viewInstances from './viewInstances'
+import overlayInstances from './overlayInstances'
 
 import { Workspace, Nav, View } from '../workspace/types'
 
@@ -46,12 +47,47 @@ export default class WorkspaceManager {
       const frames = getFrames()
       this.manageFrames(frames, inFocus)
       this.manageViews(frames)
-      // this.manageOverlays(frames)
+      this.manageOverlays(frames)
     })
   }
 
-  manageOverlays(frames: Record<string, Workspace>, inFocus: string) {
-    // If there is an overlay, create a frame instance for it
+  manageOverlays(frames: Record<string, Workspace>) {
+    const frameIds = Object.keys(frames)
+
+    frameIds.forEach((frameId) => {
+      const frameInstance = this.frameInstances[frameId]
+      if (!frameInstance) return log.error('Instance not found when managing views')
+
+      // Frame definition in the state
+      const frame = frames[frameId]
+
+      // Current Nav
+      const currentNav = frame?.nav[0]
+
+      if (!frameInstance.overlay) {
+        frameInstance.overlay = overlayInstances.create(frameInstance)
+      }
+      const { width, height } = frameInstance.getBounds()
+      if (currentNav?.space === 'dapp' && currentNav?.data.hidden === true) {
+        frameInstance.overlay.setBounds({
+          y: height - 13,
+          x: 0,
+          width: width,
+          height: 13
+        })
+      } else {
+        frameInstance.overlay.setBounds({
+          y: height - 96,
+          x: 0,
+          width: width,
+          height: 96
+        })
+      }
+
+      // We could track this on the instance to add it only when necessary
+      frameInstance.addBrowserView(frameInstance.overlay)
+      frameInstance.setTopBrowserView(frameInstance.overlay)
+    })
   }
 
   manageFrames(frames: Record<string, Workspace>, inFocus: string) {
@@ -175,7 +211,7 @@ export default class WorkspaceManager {
           if (!viewInstance) return log.error('View instance not found when managing views')
 
           // Get view stats
-          const viewMeta = { ready: true } //TODO: store('workspacesMeta', frame.id, 'views', view.id)
+          const viewMeta = { ready: true } // TODO: store('workspacesMeta', frame.id, 'views', view.id)
           // Show all in the current nav
           if (viewMeta.ready && currentNavViewIds.includes(view.id)) {
             frameInstance.addBrowserView(viewInstance)
@@ -223,6 +259,8 @@ export default class WorkspaceManager {
     if (frameInstance && !frameInstance.isDestroyed()) {
       const webContents = frameInstance.webContents
       if (webContents) webContents.send(channel, ...args)
+      const overlayWebContents = frameInstance.overlay?.webContents
+      if (overlayWebContents) overlayWebContents.send(channel, ...args)
     } else {
       log.error(
         new Error(
