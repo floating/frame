@@ -10,6 +10,7 @@ const bundler = new Parcel({
   entries: [
     'app/tray/index.dev.html',
     'app/workspace/index.dev.html',
+    'app/workspaceDock/index.dev.html',
     'app/onboard/index.dev.html',
     'app/notify/index.dev.html'
   ],

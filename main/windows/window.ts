@@ -90,6 +90,32 @@ export function createViewInstance(
   return viewInstance
 }
 
+export function createOverlayInstance(
+  url = '',
+  webPreferences: BrowserWindowConstructorOptions['webPreferences'] = {}
+) {
+  const overlayInstance = new BrowserView({
+    webPreferences: {
+      ...webPreferences,
+      contextIsolation: true,
+      webviewTag: false,
+      sandbox: true,
+      defaultEncoding: 'utf-8',
+      nodeIntegration: false,
+      scrollBounce: true,
+      navigateOnDragDrop: false,
+      disableBlinkFeatures: 'Auxclick',
+      preload: path.resolve(process.env.BUNDLE_LOCATION, 'bridge.js')
+    }
+  })
+
+  overlayInstance.webContents.on('will-navigate', (e) => e.preventDefault())
+  overlayInstance.webContents.on('will-attach-webview', (e) => e.preventDefault())
+  overlayInstance.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+
+  return overlayInstance
+}
+
 const externalWhitelist = [
   'https://frame.sh',
   'https://chrome.google.com/webstore/detail/frame-alpha/ldcoohedfbjoobcadoglnnmmfbdlmmhf',
