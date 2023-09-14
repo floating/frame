@@ -52,7 +52,10 @@ export const HeaderWrap = styled.div`
 const Account = () => {
   const accounts = useStore('main.accounts')
   const currentAccount = Object.values(accounts).find((acct) => acct.active) || {}
+
   const { address, ensName } = currentAccount
+  const clippedAddress =
+    address && `${address.substr(0, 6)}...${address.substr(address.length - 4, address.length)}`
 
   return (
     <AccountWrap
@@ -75,7 +78,7 @@ const Account = () => {
       </div>
       <div>
         {/* <div>{ensName}</div> */}
-        <div>{`${address.substr(0, 6)}...${address.substr(address.length - 4, address.length)}`}</div>
+        <div>{clippedAddress}</div>
       </div>
     </AccountWrap>
   )

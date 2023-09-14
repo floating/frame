@@ -38,6 +38,9 @@ export const Header = () => {
   const currentAccount = Object.values(accounts).find((acct) => acct.active) || {}
 
   const { address, ensName } = currentAccount
+  const clippedAddress =
+    address && `${address.substr(0, 6)}...${address.substr(address.length - 4, address.length)}`
+
   return (
     <HeaderWrap>
       <div
@@ -72,7 +75,7 @@ export const Header = () => {
       </div>
       <div>
         <div>{ensName}</div>
-        <div>{`${address.substr(0, 6)}...${address.substr(address.length - 4, address.length)}`}</div>
+        <div>{clippedAddress}</div>
       </div>
     </HeaderWrap>
   )
