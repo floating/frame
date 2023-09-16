@@ -35,6 +35,10 @@ class SignerStatus extends React.Component {
   unlockSubmit() {
     link.rpc('unlockSigner', this.props.signer.id, this.state.unlockInput, (err) => {
       if (err) this.shake()
+      else {
+        if (this.props.exportCb) this.props.exportCb()
+        this.setState({ unlockInput: '' })
+      }
     })
   }
 
@@ -84,7 +88,7 @@ class SignerStatus extends React.Component {
 
     const signer = this.props.signer || {}
 
-    return !isHardwareSigner(signer) && signer.id && signer.status === 'locked' ? (
+    return !isHardwareSigner(signer) && signer.id && (signer.status === 'locked' || this.props.exportCb) ? (
       <div className={shake ? 'signerStatus headShake' : 'signerStatus'} ref={this.statusRef}>
         <div className='signerStatusWrap'>
           <div className='signerStatusMain'>
@@ -103,9 +107,11 @@ class SignerStatus extends React.Component {
                   }
                 }}
               />
-              <div className='signerUnlockInputLabel'>{'Enter password to unlock'}</div>
+              <div className='signerUnlockInputLabel'>
+                {'Enter password to ' + (this.props.exportCb ? 'export' : 'unlock')}
+              </div>
               <div className='signerUnlockSubmit' onClick={this.unlockSubmit.bind(this)}>
-                {'Unlock'}
+                {this.props.exportCb ? 'Export' : 'Unlock'}
               </div>
             </div>
           </div>

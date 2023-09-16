@@ -9,6 +9,7 @@ const WORKER_PATH = path.resolve(__dirname, 'worker.js')
 class SeedSigner extends HotSigner {
   constructor(signer) {
     super(signer, WORKER_PATH)
+    this.encryptedPhrase = signer && signer.encryptedPhrase
     this.encryptedSeed = signer && signer.encryptedSeed
     this.type = 'seed'
     this.model = 'phrase'
@@ -42,18 +43,29 @@ class SeedSigner extends HotSigner {
   async addPhrase(phrase, password, cb) {
     // Validate phrase
     if (!bip39.validateMnemonic(phrase)) return cb(new Error('Invalid mnemonic phrase'))
-    // Get seed
-    const seed = await bip39.mnemonicToSeed(phrase)
-    // Add seed to signer
-    this.addSeed(seed.toString('hex'), password, cb)
+    // Add phrase to signer
+    this._callWorker(
+      { method: 'encryptPhrase', params: { phrase, password } },
+      async (err, encryptedPhrase) => {
+        if (err) return cb(err)
+
+        // Update signer
+        this.encryptedPhrase = encryptedPhrase
+
+        // Get seed
+        const seed = await bip39.mnemonicToSeed(phrase)
+        // Add seed to signer
+        this.addSeed(seed.toString('hex'), password, cb)
+      }
+    )
   }
 
   save() {
-    super.save({ encryptedSeed: this.encryptedSeed })
+    super.save({ encryptedPhrase: this.encryptedPhrase, encryptedSeed: this.encryptedSeed })
   }
 
   unlock(password, cb) {
-    super.unlock(password, { encryptedSeed: this.encryptedSeed }, cb)
+    super.unlock(password, { encryptedPhrase: this.encryptedPhrase, encryptedSeed: this.encryptedSeed }, cb)
   }
 }
 

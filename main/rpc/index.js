@@ -223,6 +223,9 @@ const rpc = {
   addKeystore(id, keystore, keystorePassword, password, cb) {
     signers.addKeystore(id, keystore, keystorePassword, password, cb)
   },
+  getSecret(id, index, cb) {
+    signers.getSecret(id, index, cb)
+  },
   unlockSigner(id, password, cb) {
     signers.unlock(id, password, cb)
   },
