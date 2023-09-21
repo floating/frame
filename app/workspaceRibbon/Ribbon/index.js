@@ -219,7 +219,6 @@ export default () => {
   }
 
   const setShow = () => {
-    console.log('setShow: ')
     // clearTimeout(hideTimeout)
     setHideDockWrap(false)
     // link.send('workspace:nav:update:data', window.frameId, { hidden: false })
@@ -230,8 +229,6 @@ export default () => {
   const { space } = nav
 
   const platform = useStore('platform')
-
-  console.log(' hideDockWrap', hideDockWrap)
 
   return (
     <>

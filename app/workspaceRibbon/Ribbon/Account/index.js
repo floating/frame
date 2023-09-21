@@ -78,8 +78,6 @@ const Account = () => {
 
   const ribbon = useStore('windows.workspaces', window.frameId, 'ribbon') || {}
 
-  console.log('ribbon.expanded', ribbon.expanded)
-
   return (
     <AccountWrap
       expanded={ribbon.expanded}
