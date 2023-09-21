@@ -12,12 +12,12 @@ const isDev = process.env.NODE_ENV === 'development'
 
 export default {
   hide: (frameInstance: FrameInstance) => {
-    const overlayInstance = frameInstance.overlay
+    const overlayInstance = frameInstance?.overlays?.dock
     if (frameInstance && !frameInstance.isDestroyed() && overlayInstance)
       frameInstance.removeBrowserView(overlayInstance)
   },
   show: (frameInstance: FrameInstance) => {
-    const overlayInstance = frameInstance.overlay
+    const overlayInstance = frameInstance?.overlays?.dock
     if (frameInstance && !frameInstance.isDestroyed() && overlayInstance) {
       frameInstance.addBrowserView(overlayInstance)
       frameInstance.setTopBrowserView(overlayInstance)
@@ -25,31 +25,28 @@ export default {
   },
   // Create a view instance on a frame
   create: (frameInstance: FrameInstance) => {
-    const overlayInstance = createOverlayInstance()
-    frameInstance.addBrowserView(overlayInstance)
-    overlayInstance.webContents.setVisualZoomLevelLimits(1, 1)
+    const ribbonInstance = createOverlayInstance()
+    frameInstance.addBrowserView(ribbonInstance)
+    ribbonInstance.webContents.setVisualZoomLevelLimits(1, 1)
+    ribbonInstance.webContents.loadURL(
+      isDev
+        ? 'http://localhost:1234/workspaceRibbon/index.dev.html'
+        : `file://${process.env.BUNDLE_LOCATION}/workspaceRibbon.html`
+    )
 
-    overlayInstance.webContents.loadURL(
+    // ribbonInstance.webContents.openDevTools({ mode: 'detach' })
+
+    const dockInstance = createOverlayInstance()
+    frameInstance.addBrowserView(dockInstance)
+    dockInstance.webContents.setVisualZoomLevelLimits(1, 1)
+    dockInstance.webContents.loadURL(
       isDev
         ? 'http://localhost:1234/workspaceDock/index.dev.html'
         : `file://${process.env.BUNDLE_LOCATION}/workspaceDock.html`
     )
 
-    const { width, height } = frameInstance.getBounds()
-    overlayInstance.setBounds({
-      y: height - 72,
-      x: 0,
-      width: width,
-      height: 72
-    })
-
-    return overlayInstance
-
-    // frameInstance.removeBrowserView(viewInstance)
-    // viewInstance.webContents.openDevTools({ mode: 'detach' })
-
-    // Keep reference to view on frame instance
-    // frameInstance.overlays = { ...(frameInstance.overlays || {}), [overlay.id]: overlayInstance }
+    // Keep reference to overlays on frame instance
+    return { dock: dockInstance, ribbon: ribbonInstance }
   },
   // Destroy a view instance on a frame
   destroy: (frameInstance: FrameInstance, viewId: string) => {
@@ -71,10 +68,10 @@ export default {
     if (viewInstance) {
       const { width, height } = frameInstance.getBounds()
       viewInstance.setBounds({
-        x: 0,
-        y: 64,
-        width: width,
-        height: height - 96
+        y: 42,
+        x: 4,
+        width: width - 4 - 4,
+        height: height - 42 - 16
       })
       // viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
       // viewInstance.setAutoResize({ width: true, height: true })

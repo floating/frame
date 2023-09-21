@@ -14,8 +14,6 @@ import Dapps from './Spaces/Dapps'
 import Views from './Spaces/Views'
 import Onboard from '../onboard/App'
 
-import Ribbon from './Ribbon'
-
 const Splash = styled.div`
   position: fixed;
   top: 0px;
@@ -23,7 +21,7 @@ const Splash = styled.div`
   right: 0px;
   bottom: 0px;
   z-index: 0;
-  background: var(--ghostAZ);
+  background: var(--ghostZ);
 `
 
 const Main = styled.div`
@@ -39,7 +37,7 @@ const Main = styled.div`
   -webkit-user-select: none;
   user-select: none;
   z-index: 9999;
-  /* border-top: 1px solid var(--ghostZ); */
+  padding-top: 64px;
 `
 
 const Space = ({ space, data }) => {
@@ -105,15 +103,108 @@ const SpaceWrap = styled.div`
   max-width: 900px;
 `
 
-const TopHandle = styled.div`
+const ColorSwatches = styled.div`
+  margin: 200px;
+  display: flex;
+`
+
+const Swatch = styled.div`
+  height: 80px;
+  width: 80px;
+`
+
+export const TopBackdrop = styled.div`
   position: fixed;
   top: 0px;
-  left: 0px;
   right: 0px;
-  height: 64px;
-  z-index: 999999999; // Top z-index
-  -webkit-app-region: drag;
+  left: 0px;
+  height: 60px;
+  z-index: 99999;
+  backdrop-filter: blur(8px);
   pointer-events: none;
+  mask-image: linear-gradient(to bottom, black 32px, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black 32px, transparent);
+  display: none;
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    z-index: 1;
+    background: linear-gradient(
+      90deg,
+      var(--ghostAZ) 5%,
+      transparent 10%,
+      transparent 90%,
+      var(--ghostAZ) 95%
+    );
+  }
+`
+
+export const TopFade = styled.div`
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  height: 60px;
+  z-index: 199999;
+  pointer-events: none;
+  background: linear-gradient(-180deg, var(--ghostZ) 0%, transparent 100%);
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    opacity: 0.8;
+    background: linear-gradient(-180deg, var(--ghostZ) 25%, transparent 100%);
+  }
+`
+
+export const BotBackdrop = styled.div`
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  height: 60px;
+  z-index: 99999;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  mask-image: linear-gradient(to top, black 32px, transparent);
+  -webkit-mask-image: linear-gradient(to top, black 32px, transparent);
+  display: none;
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    z-index: 1;
+    background: linear-gradient(
+      90deg,
+      var(--ghostAZ) 5%,
+      transparent 10%,
+      transparent 90%,
+      var(--ghostAZ) 95%
+    );
+  }
+`
+
+export const BotFade = styled.div`
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  height: 60px;
+  z-index: 199999;
+  pointer-events: none;
+  background: linear-gradient(0deg, var(--ghostZ) 0%, transparent 100%);
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    opacity: 0.8;
+    background: linear-gradient(0deg, var(--ghostZ) 25%, transparent 100%);
+  }
 `
 
 const Workspace = (props) => {
@@ -122,10 +213,21 @@ const Workspace = (props) => {
   if (!nav || !nav.space) return null
   return (
     <Splash>
-      <TopHandle />
-      <Overlay />
+      <TopBackdrop />
+      <BotBackdrop />
+      <TopFade />
+      <BotFade />
       <Fluid>
-        <Ribbon />
+        {/* <ColorSwatches>
+          <Swatch style={{ background: 'var(--ghostX)' }} />
+          <Swatch style={{ background: 'var(--ghostY)' }} />
+          <Swatch style={{ background: 'var(--ghostZ)' }} />
+          <Swatch style={{ background: 'var(--ghostAZ)' }} />
+          <Swatch style={{ background: 'var(--ghostA)' }} />
+          <Swatch style={{ background: 'var(--ghostB)' }} />
+          <Swatch style={{ background: 'var(--ghostC)' }} />
+          <Swatch style={{ background: 'var(--ghostD)' }} />
+        </ColorSwatches> */}
         <Main>
           <Space space={nav.space} data={nav.data} />
         </Main>

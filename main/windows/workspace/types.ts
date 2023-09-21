@@ -14,9 +14,14 @@ export type Nav = {
   views: View[]
 }
 
+export type Ribbon = {
+  expanded: boolean
+}
+
 export type Workspace = {
   id: string
   fullscreen: boolean
   nav: Nav[]
   navForward: Nav[]
+  ribbon: Ribbon
 }

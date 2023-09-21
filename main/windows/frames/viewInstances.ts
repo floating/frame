@@ -26,38 +26,123 @@ export default {
     const viewInstance = createViewInstance(view.ens)
     const { session } = extract(view.url)
 
-    viewInstance.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
-      if (!details || !details.frame) return cb({ cancel: true }) // Reject the request\
+    if (!viewInstance) return
 
-      const appUrl = details.frame.url
+    // const animationSpeed = 8 // Pixels per frame
 
-      if (
-        // Initial request for app
-        details.resourceType === 'mainFrame' &&
-        details.url === view.url &&
-        !appUrl
-      ) {
-        return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
-      } else if (
-        // devtools:// request
-        details.url.startsWith('devtools://')
-      ) {
-        return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
-      } else if (
-        // Reqest from app
-        appUrl === view.url
-      ) {
-        const { ens, session } = extract(appUrl)
-        if (ens !== view.ens || !server.sessions.verify(ens, session)) {
-          return cb({ cancel: true })
-        } else {
-          details.requestHeaders['Origin'] = view.ens
-          return cb({ requestHeaders: details.requestHeaders })
-        }
-      } else {
-        return cb({ cancel: true }) // Reject the request
-      }
-    })
+    // let intervalId: any // To keep a reference to the interval so we can clear it
+
+    // function animateToBounds(targetBounds: { x: number; y: number; width: number; height: number }) {
+    //   // Function to animate the position and size
+    //   const animatePosition = () => {
+    //     const currentBounds = viewInstance.getBounds()
+
+    //     const deltaX = Math.sign(targetBounds.x - currentBounds.x) * animationSpeed
+    //     const deltaY = Math.sign(targetBounds.y - currentBounds.y) * animationSpeed
+    //     const deltaWidth = Math.sign(targetBounds.width - currentBounds.width) * animationSpeed
+    //     const deltaHeight = Math.sign(targetBounds.height - currentBounds.height) * animationSpeed
+
+    //     const newX = currentBounds.x + deltaX
+    //     const newY = currentBounds.y + deltaY
+    //     const newWidth = currentBounds.width + deltaWidth
+    //     const newHeight = currentBounds.height + deltaHeight
+
+    //     viewInstance.setBounds({
+    //       x: newX,
+    //       y: newY,
+    //       width: currentBounds.width,
+    //       height: currentBounds.height
+    //     })
+    //     // setTimeout(() => {
+    //     //   viewInstance.setBounds({
+    //     //     x: newX,
+    //     //     y: newY,
+    //     //     width: newWidth,
+    //     //     height: newHeight
+    //     //   })
+    //     // }, 0)
+
+    //     // Check if we're close enough to the target to finalize the move
+    //     if (
+    //       Math.abs(targetBounds.x - newX) <= animationSpeed &&
+    //       Math.abs(targetBounds.y - newY) <= animationSpeed // &&
+    //       // Math.abs(targetBounds.width - newWidth) <= animationSpeed &&
+    //       // Math.abs(targetBounds.height - newHeight) <= animationSpeed
+    //     ) {
+    //       clearInterval(intervalId)
+    //       viewInstance.setBounds(targetBounds) // Set the final bounds to ensure precision
+    //     }
+    //   }
+
+    //   // Start the position animation
+    //   intervalId = setInterval(animatePosition, 8)
+    // }
+
+    // let testInterval: any
+    // let count = 0
+    // testInterval = setInterval(function () {
+    //   if (!frameInstance) return clearInterval(testInterval)
+    //   count++
+    //   if (count % 3 === 0) {
+    //     const { x, y, width, height } = frameInstance.getBounds()
+    //     animateToBounds({
+    //       y: 16,
+    //       x: 4,
+    //       width: width - 4 - 4,
+    //       height: height - 16 - 16
+    //     })
+    //   } else if (count % 2 === 0) {
+    //     const { x, y, width, height } = frameInstance.getBounds()
+    //     animateToBounds({
+    //       y: 16 - 64,
+    //       x: 4,
+    //       width: width - 4 - 4,
+    //       height: height - 16 - 16
+    //     })
+    //   } else {
+    //     const { width, height } = frameInstance.getBounds()
+    //     animateToBounds({
+    //       y: 64,
+    //       x: 4,
+    //       width: width - 4 - 4,
+    //       height: height - 16 - 16
+    //     })
+    //   }
+    // }, 5000)
+
+    // TODO: Add this back to enforce ens origin and make sure requests are coming from the app
+    // viewInstance.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
+    //   if (!details || !details.frame) return cb({ cancel: true }) // Reject the request\
+
+    //   const appUrl = details.frame.url
+
+    //   if (
+    //     // Initial request for app
+    //     details.resourceType === 'mainFrame' &&
+    //     details.url === view.url &&
+    //     !appUrl
+    //   ) {
+    //     return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
+    //   } else if (
+    //     // devtools:// request
+    //     details.url.startsWith('devtools://')
+    //   ) {
+    //     return cb({ requestHeaders: details.requestHeaders }) // Leave untouched
+    //   } else if (
+    //     // Reqest from app
+    //     appUrl === view.url
+    //   ) {
+    //     const { ens, session } = extract(appUrl)
+    //     if (ens !== view.ens || !server.sessions.verify(ens, session)) {
+    //       return cb({ cancel: true })
+    //     } else {
+    //       details.requestHeaders['Origin'] = view.ens
+    //       return cb({ requestHeaders: details.requestHeaders })
+    //     }
+    //   } else {
+    //     return cb({ cancel: true }) // Reject the request
+    //   }
+    // })
 
     const { fullscreen } = store('windows.workspaces', frameInstance.frameId)
 
@@ -74,6 +159,15 @@ export default {
 
     // viewInstance.webContents.openDevTools({ mode: 'detach' })
 
+    const testDapps = [
+      'https://app.aave.com',
+      'https://app.uniswap.org/swap',
+      'https://curve.fi/#/ethereum/swap',
+      'https://app.ens.domains',
+      'https://swap.cow.fi/#/1/swap/ETH',
+      'https://app.safe.global'
+    ]
+
     viewInstance.webContents.session.cookies
       .set({
         url: view.url,
@@ -82,15 +176,13 @@ export default {
       })
       .then(
         () => {
-          viewInstance.webContents.loadURL(view.url)
+          viewInstance.webContents.loadURL(testDapps[Math.round(Math.random() * 5)]) // view.url
         },
         (error) => log.error(error)
       )
 
     // TODO: Metadata avout a view needs a home in the store
-    // viewInstance.webContents.on('did-finish-load', () => {
-    //   store.updateFrameView(frameInstance.frameId, view.id, { ready: true })
-    // })
+    viewInstance.webContents.on('did-finish-load', () => {})
 
     // Keep reference to view on frame instance
     frameInstance.views = { ...(frameInstance.views || {}), [view.id]: viewInstance }
@@ -123,20 +215,12 @@ export default {
 
     if (viewInstance) {
       const { width, height } = frameInstance.getBounds()
-      // viewInstance.setBounds({
-      //   x: 0,
-      //   y: fullscreen ? 0 : 32,
-      //   width: width,
-      //   height: fullscreen ? height : height - 32
-      // })
       viewInstance.setBounds({
-        x: 8,
-        y: 8,
-        width: width - 16,
-        height: height - 16
+        y: 56,
+        x: 4,
+        width: width - 4 - 4,
+        height: height - 128 - 16
       })
-      // viewInstance.setBounds({ x: 73, y: 16, width: width - 73, height: height - 16 })
-      // viewInstance.setAutoResize({ width: true, height: true })
     }
   }
 }

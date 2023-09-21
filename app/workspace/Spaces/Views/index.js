@@ -43,17 +43,14 @@ const Error = ({ isMainnetConnected }) => {
 }
 
 const ViewWrap = styled.div`
-  position: absolute;
-  top: 80px;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
+  position: fixed;
+  top: 0px;
+  left: 4px;
+  right: 4px;
+  bottom: 0px;
   z-index: 99999999;
-  /* background: linear-gradient(135deg, var(--ghostA), var(--ghostAZ)); */
-  border: 1px solid linear-gradient(135deg, red, var(--ghostAZ));
-  background: var(--ghostAZ);
-  border-radius: 8px;
-  box-shadow: 0px 0px 16px var(--ghostY);
+  background: var(--ghostB);
+  box-shadow: 0px 0px 8px var(--ghostX), 0px 0px 0px 50px var(--ghostZ);
 `
 
 const App = ({ id }) => {
@@ -91,7 +88,7 @@ const App = ({ id }) => {
 
   return (
     <>
-      {/* <ViewWrap style={{ background: 'var(--ghostB)' }} /> */}
+      <ViewWrap />
       {/* <div className='mainTop' />
       <div className='mainDappLoading'>
         {shouldDisplayError ? (

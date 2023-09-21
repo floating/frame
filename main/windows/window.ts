@@ -75,7 +75,7 @@ export function createViewInstance(
       sandbox: true,
       defaultEncoding: 'utf-8',
       nodeIntegration: false,
-      scrollBounce: true,
+      scrollBounce: false,
       navigateOnDragDrop: false,
       disableBlinkFeatures: 'Auxclick',
       preload: path.resolve('./main/windows/viewPreload.js'),

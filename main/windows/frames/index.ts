@@ -64,29 +64,54 @@ export default class WorkspaceManager {
       // Current Nav
       const currentNav = frame?.nav[0]
 
-      if (!frameInstance.overlay) {
-        frameInstance.overlay = overlayInstances.create(frameInstance)
-      }
+      if (!frameInstance.overlays) frameInstance.overlays = overlayInstances.create(frameInstance)
+
       const { width, height } = frameInstance.getBounds()
-      if (currentNav?.space === 'dapp' && currentNav?.data.hidden === true) {
-        frameInstance.overlay.setBounds({
-          y: height - 13,
-          x: 0,
-          width: width,
-          height: 13
+      frameInstance.overlays.dock.setBounds({
+        y: height - 128 - 8,
+        x: -200,
+        width: width + 400,
+        height: 128 + 8
+      })
+
+      // if (currentNav?.space === 'dapp' && currentNav?.data.hidden === true) {
+      //   frameInstance.overlays.dock.setBounds({
+      //     y: height - 13,
+      //     x: 0,
+      //     width: width,
+      //     height: 13
+      //   })
+      // } else {
+      //   frameInstance.overlays.dock.setBounds({
+      //     y: height - 96,
+      //     x: 0,
+      //     width: width,
+      //     height: 96
+      //   })
+      // }
+
+      if (frame.ribbon.expanded) {
+        frameInstance.overlays.ribbon.setBounds({
+          y: 0,
+          x: -200,
+          width: width + 400,
+          height: 400
         })
       } else {
-        frameInstance.overlay.setBounds({
-          y: height - 96,
-          x: 0,
-          width: width,
-          height: 96
+        frameInstance.overlays.ribbon.setBounds({
+          y: 0,
+          x: -200,
+          width: width + 400,
+          height: 64
         })
       }
 
       // We could track this on the instance to add it only when necessary
-      frameInstance.addBrowserView(frameInstance.overlay)
-      frameInstance.setTopBrowserView(frameInstance.overlay)
+      frameInstance.addBrowserView(frameInstance.overlays.dock)
+      frameInstance.addBrowserView(frameInstance.overlays.ribbon)
+
+      frameInstance.setTopBrowserView(frameInstance.overlays.dock)
+      frameInstance.setTopBrowserView(frameInstance.overlays.ribbon)
     })
   }
 
@@ -259,8 +284,9 @@ export default class WorkspaceManager {
     if (frameInstance && !frameInstance.isDestroyed()) {
       const webContents = frameInstance.webContents
       if (webContents) webContents.send(channel, ...args)
-      const overlayWebContents = frameInstance.overlay?.webContents
-      if (overlayWebContents) overlayWebContents.send(channel, ...args)
+      Object.values(frameInstance.overlays || {}).forEach((overlayInstance) => {
+        if (overlayInstance?.webContents) overlayInstance.webContents.send(channel, ...args)
+      })
     } else {
       log.error(
         new Error(
