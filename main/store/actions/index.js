@@ -886,7 +886,12 @@ module.exports = {
       return dapps || {}
     })
   },
-
+  setRibbon: (u, workspaceId, ribbon) => {
+    u('windows.workspaces', workspaceId, (workspace) => {
+      workspace.ribbon = Object.assign({}, workspace.ribbon || {}, ribbon)
+      return workspace
+    })
+  },
   // create a workspace
   addWorkspace: (u, workspace) => {
     u('windows.workspaces', workspace.id, () => workspace)

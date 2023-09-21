@@ -4,22 +4,21 @@
     <meta
       http-equiv="Content-Security-Policy"
       content="
-        script-src 'strict-dynamic' 'nonce-13b31a98-7c25-430d-a8b2-e3dc32dd0e83';
+        script-src 'strict-dynamic' 'nonce-2f0d956b-0d9c-4f1e-874a-57a1ec828872';
         base-uri 'self';
         connect-src *;
-        img-src *;
+        img-src blob: http://localhost:8421;
         frame-src 'none';
         style-src 'self' 'unsafe-inline';
         object-src 'none';
         require-trusted-types-for 'script';
       "
     />
-    <title>Tray</title>
+    <title>Dock</title>
     <link rel="stylesheet" href="../../resources/base.styl" type="text/css" />
-    <link rel="stylesheet" href="./index.styl" type="text/css" />
   </head>
   <body>
-    <div id="tray"></div>
-    <script type="module" src="./index.js" nonce="13b31a98-7c25-430d-a8b2-e3dc32dd0e83"></script>
+    <div id="dock"></div>
+    <script type="module" src="./index.js" nonce="2f0d956b-0d9c-4f1e-874a-57a1ec828872"></script>
   </body>
 </html>

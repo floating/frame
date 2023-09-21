@@ -10,25 +10,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   margin: auto auto;
-  width: 900px;
-  padding-left: 64px;
-`
-
-const MainButton = styled.div`
-  height: 64px;
-  width: 348px;
-  border-radius: 16px;
-  background: var(--ghostAZ);
-  cursor: pointer;
-  /* background: linear-gradient(170deg, #211d23, #1c181e);
-  box-shadow: 6px 6px 12px #1a171c, -6px -6px 12px #241f26; */
-  /* box-shadow: 20px 20px 60px #1e1a21, -20px -20px 60px #28242d; */
-  /* box-shadow: 4px 4px 6px var(--ghostA), -4px -4px 6px var(--ghostC); */
-  /* box-shadow: -6px 6px 12px var(--ghostA), 5px -5px 12px #ffffff, inset -6px 6px 12px var(--ghostC),
-    inset -5px -5px 14px rgba(255, 255, 255, 0.15); */
-  &:hover {
-    background: var(--ghostA);
-  }
+  min-width: 900px;
 `
 
 class Settings extends React.Component {
@@ -113,33 +95,28 @@ class Settings extends React.Component {
 }
 
 const HomeCenter = styled.div`
-  height: 400px;
   width: 65%;
-  min-height: 100%;
   border-radius: 16px;
 `
 const HomeRight = styled.div`
   width: 35%;
-  min-height: 550px;
   border-radius: 16px;
-  background: var(--ghostA);
+  border: 2px solid var(--ghostX);
   margin-left: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `
+
 const CommandBar = styled.div`
   height: 64px;
   width: 100%;
   border-radius: 16px;
-  background: var(--ghostA);
+  background: var(--ghostAZ);
   margin-bottom: 16px;
 `
 const Portfolio = styled.div`
-  height: 200px;
+  height: 300px;
   width: 100%;
   border-radius: 16px;
-  background: var(--ghostA);
+  border: 2px solid var(--ghostX);
   margin-bottom: 16px;
   display: flex;
   justify-content: center;
@@ -150,32 +127,53 @@ const AssetList = styled.div`
   height: 200px;
   width: 100%;
   border-radius: 16px;
-  background: var(--ghostA);
+  border: 2px solid var(--ghostX);
   margin-bottom: 16px;
   display: flex;
   justify-content: center;
   align-items: center;
 `
 
+const ActivityItem = styled.div`
+  height: 32px;
+  width: 100%;
+  border-bottom: 1px solid var(--ghostX);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+`
+
 const Home = ({ data }) => (
-  <Container>
-    {data.station === 'command' ? (
-      <CommandBar />
-    ) : data.station === 'dashboard' ? (
-      <>
-        <HomeCenter>
-          <Portfolio>Value</Portfolio>
-          <AssetList>Assets</AssetList>
-          <AssetList>Inventory</AssetList>
-        </HomeCenter>
-        <HomeRight>
-          <div>{'Account activity'}</div>
-        </HomeRight>
-      </>
-    ) : (
-      <pre>{JSON.stringify(data, null, 4)}</pre>
-    )}
-  </Container>
+  <>
+    <Container>
+      {data.station === 'command' ? (
+        <CommandBar />
+      ) : data.station === 'dashboard' ? (
+        <>
+          <HomeCenter>
+            <Portfolio>Value</Portfolio>
+            <AssetList>Assets</AssetList>
+            <AssetList>Inventory</AssetList>
+          </HomeCenter>
+          <HomeRight>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+            <ActivityItem>{'Account activity'}</ActivityItem>
+          </HomeRight>
+        </>
+      ) : (
+        <pre>{JSON.stringify(data, null, 4)}</pre>
+      )}
+    </Container>
+  </>
 )
 
 export default Home

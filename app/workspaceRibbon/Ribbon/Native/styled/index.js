@@ -1,11 +1,11 @@
 import styled, { css } from 'styled-components'
 
 export const NativeControls = styled.div`
-  position: absolute;
+  /* position: absolute; */
   left: ${(props) => (props.platform === 'darwin' ? '0' : 'unset')};
   right: ${(props) => (props.platform !== 'darwin' ? '0' : 'unset')};
-  top: 0px;
-  bottom: 0;
+  /* top: 0px;
+  bottom: 0; */
   height: 40px;
   width: 80px;
 `
