@@ -11,6 +11,8 @@ const bundler = new Parcel({
     'app/tray/index.dev.html',
     'app/workspace/index.dev.html',
     'app/workspaceDock/index.dev.html',
+    'app/workspaceRibbon/index.dev.html',
+    'app/workspaceLayer/index.dev.html',
     'app/onboard/index.dev.html',
     'app/notify/index.dev.html'
   ],

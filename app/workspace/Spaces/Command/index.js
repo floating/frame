@@ -3,6 +3,8 @@ import svg from '../../../../resources/svg'
 import link from '../../../../resources/link'
 import React from 'react'
 
+import Dock from './Dock'
+
 import { Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
 
 const Container = styled.div`
@@ -12,6 +14,7 @@ const Container = styled.div`
   margin: auto auto;
   width: 900px;
   padding-left: 64px;
+  height: 100vh;
 `
 
 const MainButton = styled.div`
@@ -158,24 +161,27 @@ const AssetList = styled.div`
 `
 
 const Home = ({ data }) => (
-  <Container>
-    {data.station === 'command' ? (
-      <CommandBar />
-    ) : data.station === 'dashboard' ? (
-      <>
-        <HomeCenter>
-          <Portfolio>Value</Portfolio>
-          <AssetList>Assets</AssetList>
-          <AssetList>Inventory</AssetList>
-        </HomeCenter>
-        <HomeRight>
-          <div>{'Account activity'}</div>
-        </HomeRight>
-      </>
-    ) : (
-      <pre>{JSON.stringify(data, null, 4)}</pre>
-    )}
-  </Container>
+  <>
+    <Container>
+      {data.station === 'command' ? (
+        <CommandBar />
+      ) : data.station === 'dashboard' ? (
+        <>
+          <HomeCenter>
+            <Portfolio>Value</Portfolio>
+            <AssetList>Assets</AssetList>
+            <AssetList>Inventory</AssetList>
+          </HomeCenter>
+          <HomeRight>
+            <div>{'Account activity'}</div>
+          </HomeRight>
+        </>
+      ) : (
+        <pre>{JSON.stringify(data, null, 4)}</pre>
+      )}
+    </Container>
+    {/* <Dock /> */}
+  </>
 )
 
 export default Home

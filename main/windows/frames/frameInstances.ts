@@ -44,7 +44,7 @@ export default {
       icon: path.join(__dirname, './AppIcon.png')
     })
 
-    frameInstance.webContents.openDevTools({ mode: 'detach' })
+    // frameInstance.webContents.openDevTools({ mode: 'detach' })
 
     frameInstance.loadURL(
       isDev
@@ -80,26 +80,45 @@ export default {
 
     frameInstance.on('resize', () => {
       // TODO: reflect correct state of dock
-      if (frameInstance.overlay) {
-        const { width, height } = frameInstance.getBounds()
+      // if (frameInstance.overlay) {
+      //   const { width, height } = frameInstance.getBounds()
 
-        frameInstance.overlay.setBounds({
-          y: height - 96,
-          x: 0,
-          width: width,
-          height: 96
+      //   frameInstance.overlay.setBounds({
+      //     y: height - 96,
+      //     x: 0,
+      //     width: width,
+      //     height: 96
+      //   })
+      // }
+
+      const { width, height } = frameInstance.getBounds()
+      if (frameInstance?.overlays?.dock) {
+        frameInstance.overlays.dock.setBounds({
+          y: height - 128 - 8,
+          x: -200,
+          width: width + 400,
+          height: 128 + 8
+        })
+      }
+
+      if (frameInstance?.overlays?.ribbon) {
+        frameInstance.overlays.ribbon.setBounds({
+          y: 0,
+          x: -200,
+          width: width + 400,
+          height: 50
         })
       }
 
       Object.values(frameInstance.views || {}).forEach((viewInstance) => {
         const { frameId } = frameInstance
         // const { fullscreen } = store('windows.workspaces', frameId)
-        const { width, height } = frameInstance.getBounds()
+
         viewInstance.setBounds({
-          x: 0,
-          y: 64,
-          width: width,
-          height: height - 96
+          y: 56,
+          x: 4,
+          width: width - 4 - 4,
+          height: height - 56 - 16
         })
       })
     })

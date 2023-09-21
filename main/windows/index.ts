@@ -166,9 +166,9 @@ function initTrayWindow() {
     })
   }, 2000)
 
-  if (devToolsEnabled) {
-    windows.tray.webContents.openDevTools()
-  }
+  // if (devToolsEnabled) {
+  //   windows.tray.webContents.openDevTools()
+  // }
 
   setTimeout(() => {
     windows.tray.on('blur', () => {
@@ -498,11 +498,11 @@ ipcMain.on('tray:mouseout', () => {
 // also set elsewhere but enforced globally here to minimize possible vectors of attack
 // - in the case of e.g. dependency injection
 // - as a 'to be sure' against possibility of misconfiguration in the future
-electronApp.on('web-contents-created', (_e, contents) => {
-  contents.on('will-navigate', (e) => e.preventDefault())
-  contents.on('will-attach-webview', (e) => e.preventDefault())
-  contents.setWindowOpenHandler(() => ({ action: 'deny' }))
-})
+// electronApp.on('web-contents-created', (_e, contents) => {
+//   contents.on('will-navigate', (e) => e.preventDefault())
+//   contents.on('will-attach-webview', (e) => e.preventDefault())
+//   contents.setWindowOpenHandler(() => ({ action: 'deny' }))
+// })
 
 electronApp.on('ready', () => {
   workspaceManager.start()

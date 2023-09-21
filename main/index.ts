@@ -312,7 +312,10 @@ const createWorkspace = (initialNav: Nav) => {
   store.addWorkspace({
     id,
     nav: [initialNav],
-    fullscreen: false
+    fullscreen: false,
+    ribbon: {
+      expanded: false
+    }
   })
 }
 
@@ -367,6 +370,12 @@ ipcMain.on('workspace:nav:forward', (e, workspaceId, steps) => {
 ipcMain.on('workspace:run', (e, space, data, views) => {
   const nav = createWorkspaceNav(space, data, views)
   runWorkspace(nav)
+})
+
+ipcMain.on('workspace:ribbon', (e, spaceId, ribbon) => {
+  // const nav = createWorkspaceNav(space, data, views)
+  // runWorkspace(nav)
+  store.setRibbon(spaceId, ribbon)
 })
 
 app.on('ready', () => {

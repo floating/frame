@@ -75,7 +75,7 @@ export function createViewInstance(
       sandbox: true,
       defaultEncoding: 'utf-8',
       nodeIntegration: false,
-      scrollBounce: true,
+      scrollBounce: false,
       navigateOnDragDrop: false,
       disableBlinkFeatures: 'Auxclick',
       preload: path.resolve('./main/windows/viewPreload.js'),
@@ -83,20 +83,16 @@ export function createViewInstance(
     }
   })
 
-  viewInstance.webContents.on('will-navigate', (e) => e.preventDefault())
-  viewInstance.webContents.on('will-attach-webview', (e) => e.preventDefault())
-  viewInstance.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  // viewInstance.webContents.on('will-navigate', (e) => e.preventDefault())
+  // viewInstance.webContents.on('will-attach-webview', (e) => e.preventDefault())
+  // viewInstance.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
 
   return viewInstance
 }
 
-export function createOverlayInstance(
-  url = '',
-  webPreferences: BrowserWindowConstructorOptions['webPreferences'] = {}
-) {
+export function createOverlayInstance() {
   const overlayInstance = new BrowserView({
     webPreferences: {
-      ...webPreferences,
       contextIsolation: true,
       webviewTag: false,
       sandbox: true,
@@ -109,9 +105,9 @@ export function createOverlayInstance(
     }
   })
 
-  overlayInstance.webContents.on('will-navigate', (e) => e.preventDefault())
-  overlayInstance.webContents.on('will-attach-webview', (e) => e.preventDefault())
-  overlayInstance.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  // overlayInstance.webContents.on('will-navigate', (e) => e.preventDefault())
+  // overlayInstance.webContents.on('will-attach-webview', (e) => e.preventDefault())
+  // overlayInstance.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
 
   return overlayInstance
 }
