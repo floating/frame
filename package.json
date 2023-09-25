@@ -158,7 +158,7 @@
     "@types/zxcvbn": "4.4.1",
     "@typescript-eslint/eslint-plugin": "5.54.1",
     "@typescript-eslint/parser": "5.54.1",
-    "electron": "26.2.1",
+    "electron": "25.8.2",
     "electron-builder": "23.6.0",
     "electron-devtools-installer": "3.2.0",
     "electron-extension-installer": "1.2.0",
