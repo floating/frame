@@ -1,6 +1,6 @@
 // status = Network Mismatch, Not Connected, Connected, Standby, Syncing
 
-const { powerMonitor } = require('electron')
+const { app, powerMonitor } = require('electron')
 const EventEmitter = require('events')
 const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
@@ -491,19 +491,21 @@ class Chains extends EventEmitter {
       })
     }
 
-    powerMonitor.on('resume', () => {
-      const activeConnections = Object.keys(this.connections)
-        .map((type) => Object.keys(this.connections[type]).map((chainId) => `${type}:${chainId}`))
-        .flat()
+    app.on('ready', () => {
+      powerMonitor.on('resume', () => {
+        const activeConnections = Object.keys(this.connections)
+          .map((type) => Object.keys(this.connections[type]).map((chainId) => `${type}:${chainId}`))
+          .flat()
 
-      log.info('System resuming, resetting active connections', { chains: activeConnections })
+        log.info('System resuming, resetting active connections', { chains: activeConnections })
 
-      activeConnections.forEach((id) => {
-        const [type, chainId] = id.split(':')
-        removeConnection(chainId, type)
+        activeConnections.forEach((id) => {
+          const [type, chainId] = id.split(':')
+          removeConnection(chainId, type)
+        })
+
+        updateConnections()
       })
-
-      updateConnections()
     })
 
     store.observer(updateConnections, 'chains:connections')
