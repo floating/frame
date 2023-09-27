@@ -5,6 +5,9 @@ import React from 'react'
 
 import { Cluster, ClusterRow, ClusterValue } from '../../../../resources/Components/Cluster'
 
+import Chart from '../Dashboard/PortfolioChart'
+import TotalValue from '../Dashboard/TotalValue'
+
 const Container = styled.div`
   position: relative;
   display: flex;
@@ -113,14 +116,10 @@ const CommandBar = styled.div`
   margin-bottom: 16px;
 `
 const Portfolio = styled.div`
-  height: 300px;
   width: 100%;
   border-radius: 16px;
   border: 2px solid var(--ghostX);
   margin-bottom: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `
 
 const AssetList = styled.div`
@@ -152,7 +151,10 @@ const Home = ({ data }) => (
       ) : data.station === 'dashboard' ? (
         <>
           <HomeCenter>
-            <Portfolio>Value</Portfolio>
+            <Portfolio>
+              <TotalValue />
+              <Chart />
+            </Portfolio>
             <AssetList>Assets</AssetList>
             <AssetList>Inventory</AssetList>
           </HomeCenter>
