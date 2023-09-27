@@ -283,10 +283,14 @@ export default class WorkspaceManager {
 
     if (frameInstance && !frameInstance.isDestroyed()) {
       const webContents = frameInstance.webContents
-      if (webContents) webContents.send(channel, ...args)
-      Object.values(frameInstance.overlays || {}).forEach((overlayInstance) => {
-        if (overlayInstance?.webContents) overlayInstance.webContents.send(channel, ...args)
-      })
+      if (webContents && !webContents.isDestroyed()) {
+        webContents.send(channel, ...args)
+        Object.values(frameInstance.overlays || {}).forEach((overlayInstance) => {
+          if (overlayInstance?.webContents && !overlayInstance?.webContents.isDestroyed()) {
+            overlayInstance.webContents.send(channel, ...args)
+          }
+        })
+      }
     } else {
       log.error(
         new Error(

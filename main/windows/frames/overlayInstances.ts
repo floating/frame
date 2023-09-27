@@ -56,7 +56,7 @@ export default {
     if (frameInstance && !frameInstance.isDestroyed()) frameInstance.removeBrowserView(views[viewId])
 
     const webcontents = views[viewId].webContents as any
-    webcontents.destroy()
+    if (webcontents && !webcontents.isDestroyed()) webcontents.destroy()
 
     delete views[viewId]
   },
