@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import styled from 'styled-components'
 import * as d3 from 'd3'
 
@@ -23,7 +23,7 @@ const TimeframeButton = styled.button`
 
 const LineGraph = () => {
   const svgRef = useRef(null)
-  const [containerWidth, setContainerWidth] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(585)
   const [timeframe, setTimeframe] = useState('1d')
   const [accountData, setAccountData] = useState({
     '1d': [270, 265, 258, 275, 285, 290, 300, 295, 289, 285, 279, 277],
@@ -37,7 +37,7 @@ const LineGraph = () => {
 
   const height = 300
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     function handleResize() {
       setContainerWidth(svgRef.current.parentElement.offsetWidth)
     }

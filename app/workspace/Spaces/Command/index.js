@@ -123,7 +123,6 @@ const Portfolio = styled.div`
 `
 
 const AssetList = styled.div`
-  height: 200px;
   width: 100%;
   border-radius: 16px;
   border: 2px solid var(--ghostX);
@@ -131,6 +130,27 @@ const AssetList = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+`
+
+const AssetItem = styled.div`
+  height: 32px;
+  width: 100%;
+  border-bottom: 1px solid var(--ghostX);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+`
+
+const InventoryItem = styled.div`
+  height: 32px;
+  width: 100%;
+  border-bottom: 1px solid var(--ghostX);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
 `
 
 const ActivityItem = styled.div`
@@ -151,12 +171,30 @@ const Home = ({ data }) => (
       ) : data.station === 'dashboard' ? (
         <>
           <HomeCenter>
+            <TotalValue />
             <Portfolio>
-              <TotalValue />
               <Chart />
             </Portfolio>
-            <AssetList>Assets</AssetList>
-            <AssetList>Inventory</AssetList>
+            <AssetList>
+              <AssetItem>{'Asset Item 1'}</AssetItem>
+              <AssetItem>{'Asset Item 2'}</AssetItem>
+              <AssetItem>{'Asset Item 3'}</AssetItem>
+              <AssetItem>{'Asset Item 4'}</AssetItem>
+              <AssetItem>{'Asset Item 5'}</AssetItem>
+              <AssetItem>{'Asset Item 6'}</AssetItem>
+              <AssetItem>{'Asset Item 7'}</AssetItem>
+              <AssetItem>{'Asset Item 8'}</AssetItem>
+            </AssetList>
+            <AssetList>
+              <InventoryItem>{'Inventory Item 1'}</InventoryItem>
+              <InventoryItem>{'Inventory Item 2'}</InventoryItem>
+              <InventoryItem>{'Inventory Item 3'}</InventoryItem>
+              <InventoryItem>{'Inventory Item 4'}</InventoryItem>
+              <InventoryItem>{'Inventory Item 5'}</InventoryItem>
+              <InventoryItem>{'Inventory Item 6'}</InventoryItem>
+              <InventoryItem>{'Inventory Item 7'}</InventoryItem>
+              <InventoryItem>{'Inventory Item 8'}</InventoryItem>
+            </AssetList>
           </HomeCenter>
           <HomeRight>
             <ActivityItem>{'Account activity'}</ActivityItem>

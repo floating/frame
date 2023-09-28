@@ -6,6 +6,7 @@ const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: 'VCR';
 `
 
 const AccountValue = styled.div`
@@ -16,7 +17,7 @@ const AccountValue = styled.div`
 `
 
 const Value = styled.div`
-  font-size: 32px;
+  font-size: 28px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,9 +32,11 @@ const Percent = styled.div`
   align-items: center;
 `
 
+const startValue = 250000
+
 const App = () => {
-  const [accountValue, setAccountValue] = useState(250000)
-  const [targetAccountValue, setTargetAccountValue] = useState(250000)
+  const [accountValue, setAccountValue] = useState(startValue)
+  const [targetAccountValue, setTargetAccountValue] = useState(startValue)
   const [percentChange, setPercentChange] = useState(0)
   const [color, setColor] = useState('var(--outerspace)')
 
@@ -45,7 +48,7 @@ const App = () => {
       setTargetAccountValue(newAccountValue)
 
       const startTime = Date.now()
-      const duration = 2000 // 2 seconds
+      const duration = 2000
       const initialAccountValue = accountValue
 
       const interval = setInterval(() => {
@@ -62,7 +65,7 @@ const App = () => {
         const easeOutT = t * (2 - t)
         const newValue = initialAccountValue + easeOutT * (targetAccountValue - initialAccountValue)
 
-        const newPercentChange = ((newValue - initialAccountValue) / initialAccountValue) * 100
+        const newPercentChange = ((newValue - startValue) / startValue) * 100
 
         setAccountValue(newValue)
         setPercentChange(newPercentChange.toFixed(2))
