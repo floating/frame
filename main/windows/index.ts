@@ -526,8 +526,11 @@ ipcMain.on('*:contextmenu', (e, x, y) => {
   }
 })
 
-const windowFromWebContents = (webContents: WebContents) =>
-  BrowserWindow.fromWebContents(webContents) as BrowserWindow
+const windowFromWebContents = (webContents: WebContents) => {
+  const win = BrowserWindow.fromWebContents(webContents) as BrowserWindow
+  if (win && !win.isDestroyed()) return win
+  return null
+}
 
 const init = () => {
   if (tray) {
@@ -618,22 +621,28 @@ export default {
     workspaceManager.refocus(frameId)
   },
   close(e: IpcMainEvent) {
-    windowFromWebContents(e.sender).close()
+    const win = windowFromWebContents(e.sender)
+    if (win) win.close()
   },
   full(e: IpcMainEvent) {
-    windowFromWebContents(e.sender).setFullScreen(true)
+    const win = windowFromWebContents(e.sender)
+    if (win) win.setFullScreen(true)
   },
   unfull(e: IpcMainEvent) {
-    windowFromWebContents(e.sender).setFullScreen(false)
+    const win = windowFromWebContents(e.sender)
+    if (win) win.setFullScreen(false)
   },
   max(e: IpcMainEvent) {
-    windowFromWebContents(e.sender).maximize()
+    const win = windowFromWebContents(e.sender)
+    if (win) win.maximize()
   },
   unmax(e: IpcMainEvent) {
-    windowFromWebContents(e.sender).unmaximize()
+    const win = windowFromWebContents(e.sender)
+    if (win) win.unmaximize()
   },
   min(e: IpcMainEvent) {
-    windowFromWebContents(e.sender).minimize()
+    const win = windowFromWebContents(e.sender)
+    if (win) win.minimize()
   },
   init
 }

@@ -54,6 +54,17 @@ const DockIcon = styled.div`
   transform: translate3d(0, 0, 0.00001);
   transition: transform 0.05s linear;
   user-select: none;
+  /* 
+  div {
+    background: linear-gradient(45deg, #ffc312, #00a8ff);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  svg {
+    -webkit-background-clip: text;
+    color: transparent;
+  } */
 
   * {
     pointer-events: none;
@@ -228,6 +239,14 @@ const Dock = () => {
               link.send('workspace:nav', window.frameId, 'command', { station: 'dashboard' })
             }
           },
+          {
+            type: 'space',
+            icon: svg.contact(16),
+            label: 'Contacts',
+            onClick: () => {
+              link.send('workspace:nav', window.frameId, 'command', { station: 'contacts' })
+            }
+          },
           { type: 'break' },
           {
             type: 'dapp',
@@ -275,6 +294,15 @@ const Dock = () => {
             label: 'cowswap',
             onClick: () => {
               link.send('workspace:run', 'dapp', {}, ['send.frame.eth'])
+            }
+          },
+          { type: 'break' },
+          {
+            type: 'space',
+            icon: svg.dapps(16),
+            label: 'Dapps',
+            onClick: () => {
+              link.send('workspace:nav', window.frameId, 'command', { station: 'dapps' })
             }
           }
         ].map(({ type, icon, label, onClick }, index) => {
