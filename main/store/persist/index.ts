@@ -4,13 +4,11 @@ import Conf, { Options } from 'conf'
 
 import migrations from '../migrate'
 
-type PersistOpts<T extends Record<string, any>> = Options<T>
-
 class PersistStore extends Conf {
   private blockUpdates = false
   private updates: Record<string, any> | null = {}
 
-  constructor(options?: PersistOpts<any>) {
+  constructor(options?: Options<any>) {
     options = { configFileMode: 0o600, configName: 'config', ...options }
     let defaultCwd = __dirname
     if (electron && electron.app) defaultCwd = electron.app.getPath('userData')
