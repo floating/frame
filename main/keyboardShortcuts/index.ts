@@ -4,11 +4,6 @@ import log from 'electron-log'
 import { shortcutKeyMap } from '../../resources/keyboard/mappings'
 import type { Shortcut } from '../store/state/types/shortcuts'
 
-const stringifyShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => ({
-  shortcutString: [...modifierKeys, shortcutKey].join('+'),
-  accelerator: [...modifierKeys.slice().sort(), shortcutKeyMap[shortcutKey] || shortcutKey].join('+')
-})
-
 function unregister(shortcut: Shortcut) {
   const { shortcutString, accelerator } = stringifyShortcut(shortcut)
 
@@ -35,6 +30,11 @@ function register(shortcut: Shortcut, shortcutHandler: (accelerator: string) => 
     log.error(`Failed to register accelerator "${accelerator}" for shortcut: ${shortcutString}`, e)
   }
 }
+
+export const stringifyShortcut = ({ modifierKeys, shortcutKey }: Shortcut) => ({
+  shortcutString: [...modifierKeys, shortcutKey].join('+'),
+  accelerator: [...modifierKeys.slice().sort(), shortcutKeyMap[shortcutKey] || shortcutKey].join('+')
+})
 
 export const registerShortcut = (shortcut: Shortcut, shortcutHandler: (accelerator: string) => void) => {
   unregister(shortcut)
