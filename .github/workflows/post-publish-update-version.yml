@@ -12,7 +12,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Update version
         id: update-version
-        run: sh scripts/update-version.sh
+        shell: bash
+        run: ./scripts/update-version.sh
       - name: Commit & Push new version
         run: |
           git config user.name github-actions
