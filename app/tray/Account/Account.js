@@ -216,7 +216,7 @@ class _AccountBody extends React.Component {
 
   getChainData(req) {
     if (req.type !== 'signErc20Permit') return {}
-    const chainId = req.typedMessage.data.domain.chainId
+    const chainId = parseInt(req.typedMessage.data.domain.chainId, 16)
     const chainName = this.store('main.networks.ethereum', chainId, 'name')
     const { primaryColor: chainColor, icon } = this.store('main.networksMeta.ethereum', chainId)
 
