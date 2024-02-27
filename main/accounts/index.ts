@@ -33,6 +33,7 @@ import { ActionType } from '../transaction/actions'
 import { openBlockExplorer } from '../windows/window'
 import { ApprovalType } from '../../resources/constants'
 import { accountNS } from '../../resources/domain/account'
+import { chainUsesOptimismFees } from '../../resources/utils/chains'
 
 function notify(title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -561,6 +562,26 @@ export class Accounts extends EventEmitter {
           log.error('Could not update gas fees for transaction', e)
         }
       })
+
+      if (chainId === 1) {
+        const l2Transactions = Object.entries(currentAccount.requests)
+          .filter(([_, req]) => req.type === 'transaction')
+          .map(([_, req]) => [_, req] as [string, TransactionRequest])
+          .filter(([_, req]) => chainUsesOptimismFees(parseInt(req.data.chainId, 16)))
+
+        l2Transactions.forEach(async ([_id, req]) => {
+          const estimate = await provider.getL1GasCost(req.data)
+
+          req.chainData = {
+            ...req.chainData,
+            optimism: {
+              l1Fees: estimate.toHexString()
+            }
+          }
+
+          currentAccount.update()
+        })
+      }
     }
   }
 

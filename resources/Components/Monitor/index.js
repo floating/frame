@@ -8,7 +8,7 @@ import { ClusterRow, ClusterValue } from '../Cluster'
 
 import svg from '../../svg'
 import { weiToGwei, hexToInt } from '../../utils'
-import { chainUsesOptimismFees, calculateOptimismL1DataFee } from '../../utils/chains'
+import { chainUsesOptimismFees } from '../../utils/chains'
 
 // estimated gas to perform various common tasks
 const gasToSendEth = 21 * 1000
@@ -161,11 +161,9 @@ class ChainSummaryComponent extends Component {
       // Optimism specific calculations
       const price = calculatedFees?.actualFee || gasPrice
 
-      const feeMarket = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees') || {}
-      const { nextBaseFee: ethBaseFee } = feeMarket
-
       const optimismEstimate = (serializedTx, l2Limit) => {
-        const l1Estimate = BigNumber(calculateOptimismL1DataFee(serializedTx, ethBaseFee)).shiftedBy(-9)
+        // TODO: how to replace this?
+        const l1Estimate = BigNumber(0) // BigNumber(calculateOptimismL1DataFee(serializedTx, ethBaseFee)).shiftedBy(-9)
         const l2Estimate = BigNumber(price * l2Limit)
 
         return toDisplayUSD(l1Estimate.plus(l2Estimate).shiftedBy(-9).multipliedBy(nativeUSD))
@@ -203,6 +201,7 @@ class ChainSummaryComponent extends Component {
       chainId,
       'gas.price.fees'
     )
+
     const calculatedFees = {
       actualBaseFee: roundGwei(weiToGwei(hexToInt(nextBaseFee))),
       priorityFee: levelDisplay(maxPriorityFeePerGas)
