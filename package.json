@@ -59,6 +59,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@eth-optimism/sdk": "^3.2.0",
     "@ethereumjs/common": "3.1.1",
     "@ethereumjs/tx": "4.1.1",
     "@ethereumjs/util": "8.0.3",
@@ -245,6 +246,9 @@
     "allowScripts": {
       "$root$": false,
       "@babel/node>core-js": true,
+      "@eth-optimism/sdk": false,
+      "@eth-optimism/sdk>@eth-optimism/contracts-bedrock": false,
+      "@eth-optimism/sdk>@eth-optimism/core-utils": false,
       "@lavamoat/preinstall-always-fail": false,
       "@ledgerhq/hw-transport-node-hid-noevents>node-hid": false,
       "@ledgerhq/hw-transport-node-hid-singleton>usb": false,

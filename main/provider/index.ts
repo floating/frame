@@ -413,6 +413,7 @@ export class Provider extends EventEmitter {
       jsonrpc: '2.0',
       id: 1
     }
+
     const targetChain: Chain = {
       type: 'ethereum',
       id: parseInt(rawTx.chainId, 16)
