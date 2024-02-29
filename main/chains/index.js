@@ -32,17 +32,8 @@ const resError = (error, payload, res) =>
     error: typeof error === 'string' ? { message: error, code: -1 } : error
   })
 
-function toDisplayUSD(bn) {
-  if (bn.toNumber() === 0) return '?'
-  return parseFloat(
-    bn.toNumber() >= 1
-      ? bn.toFixed(0, BigNumber.ROUND_UP).toString()
-      : bn.toFixed(2, BigNumber.ROUND_UP).toString()
-  )
-}
-
 function txEstimate(gasCost, nativeUSD) {
-  const usd = toDisplayUSD(gasCost.shiftedBy(-18).multipliedBy(nativeUSD))
+  const usd = gasCost.shiftedBy(-18).multipliedBy(nativeUSD).toNumber()
 
   return {
     gasEstimate: addHexPrefix(gasCost.toString(16)),

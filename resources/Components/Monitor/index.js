@@ -14,6 +14,14 @@ function levelDisplay(level) {
   return roundGwei(gwei) || 0
 }
 
+function toDisplayUSD(num) {
+  const bn = BigNumber(num)
+  if (num === 0) return '?'
+  return parseFloat(
+    num >= 1 ? bn.toFixed(0, BigNumber.ROUND_UP).toString() : bn.toFixed(2, BigNumber.ROUND_UP).toString()
+  )
+}
+
 const GasFees = ({ gasPrice, color }) => (
   <div className='gasItem gasItemLarge'>
     <div className='gasGweiNum'>{gasPrice}</div>
@@ -172,9 +180,7 @@ class ChainSummaryComponent extends Component {
                     <span className='gasEstimateSymbol'>
                       {!cost || cost >= 0.01 || cost === '?' ? `$` : '<$'}
                     </span>
-                    <span className='gasEstimateRangeLow'>{`${
-                      !cost ? 0 : cost < 0.01 ? 0.01 : cost < 1 ? cost.toFixed(2) : cost
-                    }`}</span>
+                    <span className='gasEstimateRangeLow'>{`${toDisplayUSD(cost)}`}</span>
                   </div>
                   <div className='gasEstimateLabel' style={{ color: this.props.color }}>
                     {label}

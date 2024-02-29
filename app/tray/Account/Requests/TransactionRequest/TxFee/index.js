@@ -101,7 +101,7 @@ class TxFee extends React.Component {
     // accounts for the 50% padding in the gas estimate in the provider
     const minGas = maxGas.dividedBy(BigNumber(1.5))
     const minFeeSourceValue = chainUsesOptimismFees(chain.id)
-      ? this.getOptimismFee(minFeePerGas, minGas, req.data, req.chainData?.optimism)
+      ? this.getOptimismFee(minFeePerGas, minGas, req.chainData?.optimism)
       : minFeePerGas.multipliedBy(minGas)
     const minFee = displayValueData(minFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
