@@ -1,7 +1,6 @@
 import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
-import { utils } from 'ethers'
 
 import { DisplayCoinBalance, DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import { GasFeesSource, usesBaseFee } from '../../../../../../resources/domain/transaction'
