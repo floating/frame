@@ -15,7 +15,6 @@ const { default: chainConfig } = require('./config')
 const { default: GasMonitor } = require('../transaction/gasMonitor')
 const { createGasCalculator } = require('./gas')
 const { NETWORK_PRESETS } = require('../../resources/constants')
-const { roundGwei, weiToGwei, hexToInt } = require('../../resources/utils')
 const { chainUsesOptimismFees } = require('../../resources/utils/chains')
 
 // These chain IDs are known to not support EIP-1559 and will be forced
@@ -51,11 +50,6 @@ function txEstimate(gasCost, nativeUSD) {
       usd
     }
   }
-}
-
-function levelDisplay(level) {
-  const gwei = weiToGwei(hexToInt(level))
-  return roundGwei(gwei) || 0
 }
 
 class ChainConnection extends EventEmitter {
