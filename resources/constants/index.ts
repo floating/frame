@@ -26,11 +26,14 @@ const NETWORK_PRESETS = {
     42161: {
       pylon: 'wss://evm.pylon.link/arbitrum'
     },
-    84531: {
-      pylon: 'wss://evm.pylon.link/base-goerli'
+    84532: {
+      pylon: 'wss://evm.pylon.link/base-sepolia'
     },
     11155111: {
       pylon: 'wss://evm.pylon.link/sepolia'
+    },
+    11155420: {
+      pylon: 'wss://evm.pylon.link/optimism-sepolia'
     }
   }
 }
