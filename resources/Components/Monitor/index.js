@@ -7,45 +7,18 @@ import link from '../../link'
 import { ClusterRow, ClusterValue } from '../Cluster'
 
 import svg from '../../svg'
-import { weiToGwei, hexToInt } from '../../utils'
-import { chainUsesOptimismFees, calculateOptimismL1DataFee } from '../../utils/chains'
-
-// estimated gas to perform various common tasks
-const gasToSendEth = 21 * 1000
-const gasToSendToken = 65 * 1000
-const gasForDexSwap = 200 * 1000
-
-function roundGwei(gwei) {
-  return parseFloat(
-    gwei >= 10
-      ? Math.round(gwei)
-      : gwei >= 5
-      ? Math.round(gwei * 10) / 10
-      : gwei >= 1
-      ? Math.round(gwei * 100) / 100
-      : Math.round(gwei * 1000) / 1000
-  )
-}
+import { weiToGwei, hexToInt, roundGwei } from '../../utils'
 
 function levelDisplay(level) {
   const gwei = weiToGwei(hexToInt(level))
   return roundGwei(gwei) || 0
 }
 
-function toDisplayUSD(bn) {
-  if (bn.toNumber() === 0) return '?'
+function toDisplayUSD(num) {
+  const bn = BigNumber(num)
+  if (num === 0) return '?'
   return parseFloat(
-    bn.toNumber() >= 1
-      ? bn.toFixed(0, BigNumber.ROUND_UP).toString()
-      : bn.toFixed(2, BigNumber.ROUND_UP).toString()
-  )
-}
-
-function txEstimate(value, gasLimit, nativeUSD) {
-  return toDisplayUSD(
-    BigNumber(value * gasLimit)
-      .shiftedBy(-9)
-      .multipliedBy(nativeUSD)
+    num >= 1 ? bn.toFixed(0, BigNumber.ROUND_UP).toString() : bn.toFixed(2, BigNumber.ROUND_UP).toString()
   )
 }
 
@@ -129,88 +102,6 @@ class ChainSummaryComponent extends Component {
     }
   }
 
-  txEstimates(type, id, gasPrice, calculatedFees, currentSymbol) {
-    const estimates = [
-      {
-        label: `Send ${currentSymbol}`,
-        estimatedGas: gasToSendEth,
-        serializedTxExample:
-          '0x02ed0a80832463478324670d827b0c94b120c885f1527394c78d50e7c7da57defb24f6128802c68af0bb14000080c0'
-      },
-      {
-        label: 'Send Tokens',
-        estimatedGas: gasToSendToken,
-        serializedTxExample:
-          '0x02f86d0a808403b35e108403b35e6d8302137894420000000000000000000000000000000000004280b844a9059cbb000000000000000000000000b120c885f1527394c78d50e7c7da57defb24f6120000000000000000000000000000000000000000000000c23cb3bdafde405080c0'
-      },
-      {
-        label: 'Dex Swap',
-        estimatedGas: gasForDexSwap,
-        serializedTxExample:
-          '0x02f903f60a808402bbcd0b8402bbcd638304b057943fc91a3afd70395cd496c647d5a6cc9d4b2b7fad8806e1a38167665296b903c43593564c000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000064cb05c500000000000000000000000000000000000000000000000000000000000000030b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000006e1a38167665296000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000420fbb40ad6fe5a000000000000000000000000000000000000000000000011ac6ccb6849433fc000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002b4200000000000000000000000000000000000006000bb842000000000000000000000000000000000000420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000002c0a7cd5c8f543c00000000000000000000000000000000000000000000000bc9f7effabef331c200000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002b42000000000000000000000000000000000000060001f44200000000000000000000000000000000000042000000000000000000000000000000000000000000c0'
-      }
-    ]
-
-    const isTestnet = this.store('main.networks', type, id, 'isTestnet')
-    const nativeCurrency = this.store('main.networksMeta', type, id, 'nativeCurrency')
-    const nativeUSD = BigNumber(
-      nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
-    )
-
-    if (chainUsesOptimismFees(id)) {
-      // Optimism specific calculations
-      const price = calculatedFees?.actualFee || gasPrice
-
-      const feeMarket = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees') || {}
-      const { nextBaseFee: ethBaseFee } = feeMarket
-
-      const optimismEstimate = (serializedTx, l2Limit) => {
-        const l1Estimate = BigNumber(calculateOptimismL1DataFee(serializedTx, ethBaseFee)).shiftedBy(-9)
-        const l2Estimate = BigNumber(price * l2Limit)
-
-        return toDisplayUSD(l1Estimate.plus(l2Estimate).shiftedBy(-9).multipliedBy(nativeUSD))
-      }
-
-      return estimates.map(({ label, estimatedGas, serializedTxExample }, i) => ({
-        low: optimismEstimate(serializedTxExample, estimatedGas),
-        high: optimismEstimate(serializedTxExample, estimatedGas),
-        label
-      }))
-    }
-
-    const low = calculatedFees
-      ? roundGwei(calculatedFees.actualBaseFee + calculatedFees.priorityFee)
-      : gasPrice
-
-    return estimates.map(({ label, estimatedGas }) => ({
-      low: txEstimate(low, estimatedGas, nativeUSD),
-      high: txEstimate(gasPrice, estimatedGas, nativeUSD),
-      label
-    }))
-  }
-
-  feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }) {
-    const type = 'ethereum'
-    const currentSymbol = this.store('main.networksMeta', type, chainId, 'nativeCurrency', 'symbol') || 'ETH'
-
-    if (!displayFeeMarket) {
-      return this.txEstimates(type, chainId, gasPrice, null, currentSymbol)
-    }
-
-    const { nextBaseFee, maxPriorityFeePerGas } = this.store(
-      'main.networksMeta',
-      type,
-      chainId,
-      'gas.price.fees'
-    )
-    const calculatedFees = {
-      actualBaseFee: roundGwei(weiToGwei(hexToInt(nextBaseFee))),
-      priorityFee: levelDisplay(maxPriorityFeePerGas)
-    }
-
-    return this.txEstimates(type, chainId, gasPrice, calculatedFees, currentSymbol)
-  }
-
   render() {
     const { address, chainId } = this.props
     const type = 'ethereum'
@@ -220,6 +111,7 @@ class ChainSummaryComponent extends Component {
     const gasPrice = levelDisplay(levels.fast)
 
     const explorer = this.store('main.networks', type, chainId, 'explorer')
+    const sampleOperations = this.store('main.networksMeta', type, chainId, 'gas.samples') || []
 
     // fees is either a populated object (EIP-1559 compatible) or falsy
     const displayFeeMarket = !!fees
@@ -279,26 +171,19 @@ class ChainSummaryComponent extends Component {
           </ClusterRow>
         )}
         <ClusterRow>
-          {this.feeEstimatesUSD({ chainId, displayFeeMarket, gasPrice }).map((estimate, i) => {
+          {sampleOperations.map(({ label, estimates }, i) => {
+            const cost = estimates.low?.cost.usd
             return (
               <ClusterValue key={i}>
                 <div className='gasEstimate'>
                   <div className='gasEstimateRange'>
                     <span className='gasEstimateSymbol'>
-                      {!estimate.low || estimate.low >= 0.01 || estimate.low === '?' ? `$` : '<$'}
+                      {!cost || cost >= 0.01 || cost === '?' ? `$` : '<$'}
                     </span>
-                    <span className='gasEstimateRangeLow'>{`${
-                      !estimate.low
-                        ? 0
-                        : estimate.low < 0.01
-                        ? 0.01
-                        : estimate.low < 1
-                        ? estimate.low.toFixed(2)
-                        : estimate.low
-                    }`}</span>
+                    <span className='gasEstimateRangeLow'>{(cost && `${toDisplayUSD(cost)}`) || '?'}</span>
                   </div>
                   <div className='gasEstimateLabel' style={{ color: this.props.color }}>
-                    {estimate.label}
+                    {label}
                   </div>
                 </div>
               </ClusterValue>

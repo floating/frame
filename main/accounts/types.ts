@@ -101,6 +101,11 @@ export interface TransactionRequest extends AccountRequest<'transaction'> {
   payload: RPC.SendTransaction.Request
   data: TransactionData
   decodedData?: DecodedCallData
+  chainData?: {
+    optimism?: {
+      l1Fees: string
+    }
+  }
   tx?: {
     receipt?: TransactionReceipt
     hash?: string

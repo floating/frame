@@ -1,9 +1,12 @@
-import { v4 as uuid } from 'uuid'
 import EventEmitter from 'events'
+import crypto from 'crypto'
 import log from 'electron-log'
+import { v4 as uuid } from 'uuid'
+import { Web3Provider } from '@ethersproject/providers'
+import { BigNumber } from 'ethers'
+import { estimateL1GasCost } from '@eth-optimism/sdk'
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util'
 import { isAddress } from '@ethersproject/address'
-import crypto from 'crypto'
 import { addHexPrefix, intToHex, isHexString, isHexPrefixed, fromUtf8 } from '@ethereumjs/util'
 
 import store from '../store'
@@ -299,6 +302,27 @@ export class Provider extends EventEmitter {
     })
   }
 
+  async getL1GasCost(txData: TransactionData) {
+    const { chainId, type, ...tx } = txData
+
+    const txRequest = {
+      ...tx,
+      type: parseInt(type, 16),
+      chainId: parseInt(chainId, 16)
+    }
+
+    const connection = this.connection.connections['ethereum'][txRequest.chainId] as any
+    const connectedProvider = connection?.primary?.connected
+      ? connection.primary?.provider
+      : connection.secondary?.provider
+
+    if (!connectedProvider) {
+      return BigNumber.from(0)
+    }
+
+    return estimateL1GasCost(new Web3Provider(connectedProvider), txRequest)
+  }
+
   signAndSend(req: TransactionRequest, cb: Callback<string>) {
     const rawTx = req.data
     const res = (data: any) => {
@@ -413,6 +437,7 @@ export class Provider extends EventEmitter {
       jsonrpc: '2.0',
       id: 1
     }
+
     const targetChain: Chain = {
       type: 'ethereum',
       id: parseInt(rawTx.chainId, 16)

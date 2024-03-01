@@ -3,6 +3,9 @@ const { powerMonitor } = require('electron')
 const EventEmitter = require('events')
 const { addHexPrefix } = require('@ethereumjs/util')
 const { Hardfork } = require('@ethereumjs/common')
+const { estimateL1GasCost } = require('@eth-optimism/sdk')
+const { Web3Provider } = require('@ethersproject/providers')
+const BigNumber = require('bignumber.js')
 const provider = require('eth-provider')
 const log = require('electron-log')
 
@@ -12,6 +15,7 @@ const { default: chainConfig } = require('./config')
 const { default: GasMonitor } = require('../transaction/gasMonitor')
 const { createGasCalculator } = require('./gas')
 const { NETWORK_PRESETS } = require('../../resources/constants')
+const { chainUsesOptimismFees } = require('../../resources/utils/chains')
 
 // These chain IDs are known to not support EIP-1559 and will be forced
 // not to use that mechanism
@@ -27,6 +31,17 @@ const resError = (error, payload, res) =>
     jsonrpc: payload.jsonrpc,
     error: typeof error === 'string' ? { message: error, code: -1 } : error
   })
+
+function txEstimate(gasCost, nativeUSD) {
+  const usd = gasCost.shiftedBy(-18).multipliedBy(nativeUSD).toNumber()
+
+  return {
+    gasEstimate: addHexPrefix(gasCost.toString(16)),
+    cost: {
+      usd
+    }
+  }
+}
 
 class ChainConnection extends EventEmitter {
   constructor(type, chainId) {
@@ -81,6 +96,91 @@ class ChainConnection extends EventEmitter {
     this.emit('connect')
   }
 
+  async txEstimates(type, id, gasPrice, currentSymbol, provider) {
+    const sampleEstimates = [
+      {
+        label: `Send ${currentSymbol}`,
+        txExample: {
+          value: '0x8e1bc9bf04000',
+          data: '0x00',
+          gasLimit: addHexPrefix((21000).toString(16))
+        }
+      },
+      {
+        label: 'Send Tokens',
+        txExample: {
+          value: '0x00',
+          data: '0xa9059cbb000000000000000000000000c1af8ca40dfe1cb43b9c7a8c93df762c2d6ecfd90000000000000000000000000000000000000000000000008ac7230489e80000',
+          gasLimit: addHexPrefix((65000).toString(16))
+        }
+      },
+      {
+        label: 'Dex Swap',
+        txExample: {
+          value: '0x13e1e16b2a10c9',
+          data: '0x049639fb0000000000000000000000000000000000000000000000000000000000000004000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000042000000000000000000000000000000000000420000000000000000000000000000000000000000000000000013e1e16b2a10c900000000000000000000000000000000000000000000000045575639011cb45400000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000038812aa3caf000000000000000000000000b63aae6c353636d66df13b89ba4425cfe13d10ba00000000000000000000000042000000000000000000000000000000000000060000000000000000000000004200000000000000000000000000000000000042000000000000000000000000b63aae6c353636d66df13b89ba4425cfe13d10ba000000000000000000000000a7ca2c8673bcfa5a26d8ceec2887f2cc2b0db22a0000000000000000000000000000000000000000000000000013e1e16b2a10c900000000000000000000000000000000000000000000000045575639011cb455000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f50000000000000000000000000000000000000000000000000000000001d700a007e5c0d20000000000000000000000000000000000000000000000000001b30001505126a132dab612db5cb9fc9ac426a0cc215a3423f9c942000000000000000000000000000000000000060004f41766d8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011edea400000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000b63aae6c353636d66df13b89ba4425cfe13d10ba0000000000000000000000000000000000000000000000000000000065e75a70000000000000000000000000000000000000000000000000000000000000000100000000000000000000000042000000000000000000000000000000000000060000000000000000000000007f5c764cbc14f9669b88837ca1490cca17c31607000000000000000000000000000000000000000000000000000000000000000102a000000000000000000000000000000000000000000000000045575639011cb455ee63c1e5801d751bc1a723accf1942122ca9aa82d49d08d2ae7f5c764cbc14f9669b88837ca1490cca17c316071111111254eeb25477b68fb85ed929f73a96058200000000000000000000000bd34b36000000000000000000000000000000000000000000000000',
+          gasLimit: addHexPrefix((200000).toString(16))
+        }
+      }
+    ]
+
+    const isTestnet = store('main.networks', type, id, 'isTestnet')
+    const nativeCurrency = store('main.networksMeta', type, id, 'nativeCurrency')
+    const nativeUSD = BigNumber(
+      nativeCurrency && nativeCurrency.usd && !isTestnet ? nativeCurrency.usd.price : 0
+    )
+
+    let estimates
+
+    if (chainUsesOptimismFees(id) && !isTestnet) {
+      estimates = await Promise.all(
+        sampleEstimates.map(async ({ label, txExample }) => {
+          const tx = {
+            ...txExample,
+            type: 2,
+            chainId: id
+          }
+
+          try {
+            const l1GasCost = BigNumber((await estimateL1GasCost(provider, tx)).toHexString())
+            const l2GasCost = BigNumber(tx.gasLimit).multipliedBy(gasPrice)
+            const estimatedGas = l1GasCost.plus(l2GasCost)
+
+            return {
+              label,
+              gasCost: estimatedGas
+            }
+          } catch (e) {
+            return {
+              label,
+              gasCost: BigNumber('')
+            }
+          }
+        })
+      )
+    } else {
+      estimates = sampleEstimates.map(({ label, txExample }) => ({
+        label,
+        gasCost: BigNumber(txExample.gasLimit).multipliedBy(gasPrice)
+      }))
+    }
+
+    return estimates.map(({ label, gasCost }) => ({
+      estimates: {
+        low: txEstimate(gasCost, nativeUSD),
+        high: txEstimate(gasCost, nativeUSD)
+      },
+      label
+    }))
+  }
+
+  async feeEstimatesUSD(chainId, gasPrice, provider) {
+    const type = 'ethereum'
+    const currentSymbol = store('main.networksMeta', type, chainId, 'nativeCurrency', 'symbol') || 'ETH'
+
+    return this.txEstimates(type, chainId, gasPrice, currentSymbol, provider)
+  }
+
   _createBlockMonitor(provider) {
     const monitor = new BlockMonitor(provider)
     const allowEip1559 = !legacyChains.includes(parseInt(this.chainId))
@@ -125,6 +225,19 @@ class ChainConnection extends EventEmitter {
             ...gas,
             custom: customLevel || gas.fast
           })
+        }
+
+        if (provider.connected) {
+          const gasPrice = store('main.networksMeta', this.type, this.chainId, 'gas.price.levels.slow')
+          const estimatedGasPrice = feeMarket
+            ? BigNumber(feeMarket.nextBaseFee).plus(BigNumber(feeMarket.maxPriorityFeePerGas))
+            : BigNumber(gasPrice)
+
+          this.feeEstimatesUSD(parseInt(this.chainId), estimatedGasPrice, new Web3Provider(provider)).then(
+            (samples) => {
+              store.addSampleGasCosts(this.type, this.chainId, samples)
+            }
+          )
         }
 
         store.setGasFees(this.type, this.chainId, feeMarket)
