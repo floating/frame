@@ -96,7 +96,7 @@ type M = Main & {
 }
 
 const mainState: M = {
-  _version: main('_version', 40),
+  _version: main('_version', 41),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {
@@ -416,13 +416,13 @@ const mainState: M = {
         },
         on: false
       },
-      84531: {
-        id: 84531,
+      84532: {
+        id: 84532,
         type: 'ethereum',
         layer: 'testnet',
         isTestnet: true,
-        name: 'Base Görli',
-        explorer: 'https://goerli-explorer.base.org',
+        name: 'Base Sepolia',
+        explorer: 'https://sepolia.basescan.org/',
         gas: {
           price: {
             selected: 'standard',
@@ -458,6 +458,41 @@ const mainState: M = {
         isTestnet: true,
         name: 'Sepolia',
         explorer: 'https://sepolia.etherscan.io',
+        gas: {
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        connection: {
+          primary: {
+            on: true,
+            current: 'pylon',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          },
+          secondary: {
+            on: false,
+            current: 'custom',
+            status: 'loading',
+            connected: false,
+            type: '',
+            network: '',
+            custom: ''
+          }
+        },
+        on: false
+      },
+      11155420: {
+        id: 11155420,
+        type: 'ethereum',
+        layer: 'testnet',
+        isTestnet: true,
+        name: 'Optimism Sepolia',
+        explorer: 'https://sepolia-optimism.etherscan.io/',
         gas: {
           price: {
             selected: 'standard',
@@ -644,7 +679,7 @@ const mainState: M = {
         icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
         primaryColor: 'accent7' // Arbitrum
       },
-      84531: {
+      84532: {
         blockHeight: 0,
         gas: {
           fees: {},
@@ -654,13 +689,13 @@ const mainState: M = {
           }
         },
         nativeCurrency: {
-          symbol: 'görETH',
+          symbol: 'sepETH',
           usd: {
             price: 0,
             change24hr: 0
           },
           icon: '',
-          name: 'Görli Ether',
+          name: 'Base Sepolia Ether',
           decimals: 18
         },
         icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
@@ -683,6 +718,28 @@ const mainState: M = {
           },
           icon: '',
           name: 'Sepolia Ether',
+          decimals: 18
+        },
+        icon: '',
+        primaryColor: 'accent2' // Testnet
+      },
+      11155420: {
+        blockHeight: 0,
+        gas: {
+          fees: {},
+          price: {
+            selected: 'standard',
+            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+          }
+        },
+        nativeCurrency: {
+          symbol: 'sepETH',
+          usd: {
+            price: 0,
+            change24hr: 0
+          },
+          icon: '',
+          name: 'Optimism Sepolia Ether',
           decimals: 18
         },
         icon: '',
