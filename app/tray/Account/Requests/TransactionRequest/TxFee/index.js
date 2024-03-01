@@ -66,7 +66,7 @@ class TxFee extends React.Component {
   }
 
   getOptimismFee = (l2Price, l2Limit, chainData) => {
-    const l1DataFee = BigNumber(chainData?.l1Fees).toNumber() || 0
+    const l1DataFee = BigNumber(chainData?.l1Fees).toNumber()
 
     // Compute the L2 execution fee
     const l2ExecutionFee = l2Price * l2Limit
@@ -89,10 +89,14 @@ class TxFee extends React.Component {
     const maxFeeSourceValue = chainUsesOptimismFees(chain.id)
       ? this.getOptimismFee(maxFeePerGas, maxGas, req.chainData?.optimism)
       : maxFeePerGas.multipliedBy(maxGas)
+
+    console.log({ maxFeeSourceValue })
     const maxFee = displayValueData(maxFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
     })
+
+    console.log({ maxFee })
 
     // accounts for two potential 12.5% block fee increases
     const reduceFactor = BigNumber(9).dividedBy(8)
@@ -124,7 +128,11 @@ class TxFee extends React.Component {
             <ClusterColumn grow={2}>
               <ClusterValue>
                 <div className='txSendingValue'>
-                  <DisplayCoinBalance amount={maxFee} symbol={nativeCurrency.symbol} />
+                  {!maxFee.bn || maxFee.bn.isNaN() ? (
+                    `? ${nativeCurrency.symbol}`
+                  ) : (
+                    <DisplayCoinBalance amount={maxFee} symbol={nativeCurrency.symbol} />
+                  )}
                 </div>
               </ClusterValue>
               <ClusterValue>

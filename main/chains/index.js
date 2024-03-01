@@ -141,13 +141,20 @@ class ChainConnection extends EventEmitter {
             chainId: id
           }
 
-          const l1GasCost = BigNumber((await estimateL1GasCost(provider, tx)).toHexString())
-          const l2GasCost = BigNumber(tx.gasLimit).multipliedBy(gasPrice)
-          const estimatedGas = l1GasCost.plus(l2GasCost)
+          try {
+            const l1GasCost = BigNumber((await estimateL1GasCost(provider, tx)).toHexString())
+            const l2GasCost = BigNumber(tx.gasLimit).multipliedBy(gasPrice)
+            const estimatedGas = l1GasCost.plus(l2GasCost)
 
-          return {
-            label,
-            gasCost: estimatedGas
+            return {
+              label,
+              gasCost: estimatedGas
+            }
+          } catch (e) {
+            return {
+              label,
+              gasCost: BigNumber('')
+            }
           }
         })
       )

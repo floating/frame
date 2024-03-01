@@ -173,6 +173,7 @@ class ChainSummaryComponent extends Component {
         <ClusterRow>
           {sampleOperations.map(({ label, estimates }, i) => {
             const cost = estimates.low?.cost.usd
+            console.log({ cost })
             return (
               <ClusterValue key={i}>
                 <div className='gasEstimate'>
@@ -180,7 +181,7 @@ class ChainSummaryComponent extends Component {
                     <span className='gasEstimateSymbol'>
                       {!cost || cost >= 0.01 || cost === '?' ? `$` : '<$'}
                     </span>
-                    <span className='gasEstimateRangeLow'>{`${toDisplayUSD(cost)}`}</span>
+                    <span className='gasEstimateRangeLow'>{(cost && `${toDisplayUSD(cost)}`) || '?'}</span>
                   </div>
                   <div className='gasEstimateLabel' style={{ color: this.props.color }}>
                     {label}
