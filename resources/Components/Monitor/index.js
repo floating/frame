@@ -173,7 +173,6 @@ class ChainSummaryComponent extends Component {
         <ClusterRow>
           {sampleOperations.map(({ label, estimates }, i) => {
             const cost = estimates.low?.cost.usd
-            console.log({ cost })
             return (
               <ClusterValue key={i}>
                 <div className='gasEstimate'>

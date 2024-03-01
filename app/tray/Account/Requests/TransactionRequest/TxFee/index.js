@@ -90,13 +90,10 @@ class TxFee extends React.Component {
       ? this.getOptimismFee(maxFeePerGas, maxGas, req.chainData?.optimism)
       : maxFeePerGas.multipliedBy(maxGas)
 
-    console.log({ maxFeeSourceValue })
     const maxFee = displayValueData(maxFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
       isTestnet
     })
-
-    console.log({ maxFee })
 
     // accounts for two potential 12.5% block fee increases
     const reduceFactor = BigNumber(9).dividedBy(8)
