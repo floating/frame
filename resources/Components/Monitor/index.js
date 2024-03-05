@@ -177,7 +177,7 @@ class ChainSummaryComponent extends Component {
                     <span className='gasEstimateSymbol'>
                       {!cost || cost >= 0.01 || cost === '?' ? `$` : '<$'}
                     </span>
-                    <span className='gasEstimateRangeLow'>{`${toDisplayUSD(cost)}`}</span>
+                    <span className='gasEstimateRangeLow'>{toDisplayUSD(cost)}</span>
                   </div>
                   <div className='gasEstimateLabel' style={{ color: this.props.color }}>
                     {label}
