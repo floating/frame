@@ -41,10 +41,6 @@ export const multicallAddresses: Record<number, { version: MulticallVersion; add
     version: MulticallVersion.V2,
     address: '0x5ba1e12693dc8f9c48aad8770482f4739beed696' // rinkeby
   },
-  5: {
-    version: MulticallVersion.V2,
-    address: '0x5ba1e12693dc8f9c48aad8770482f4739beed696' // goerli
-  },
   10: {
     version: MulticallVersion.V2,
     address: '0xed386Fe855C1EFf2f843B910923Dd8846E45C5A4' // optimism

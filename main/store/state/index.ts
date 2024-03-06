@@ -206,41 +206,6 @@ const mainState: M = {
         },
         on: true
       },
-      5: {
-        id: 5,
-        type: 'ethereum',
-        layer: 'testnet',
-        isTestnet: true,
-        name: 'Görli',
-        explorer: 'https://goerli.etherscan.io',
-        gas: {
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        connection: {
-          primary: {
-            on: true,
-            current: 'pylon',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          },
-          secondary: {
-            on: false,
-            current: 'custom',
-            status: 'loading',
-            connected: false,
-            type: '',
-            network: '',
-            custom: ''
-          }
-        },
-        on: false
-      },
       10: {
         id: 10,
         type: 'ethereum',
@@ -546,28 +511,6 @@ const mainState: M = {
         },
         icon: '',
         primaryColor: 'accent1' // Mainnet
-      },
-      5: {
-        blockHeight: 0,
-        gas: {
-          fees: {},
-          price: {
-            selected: 'standard',
-            levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-          }
-        },
-        nativeCurrency: {
-          symbol: 'görETH',
-          usd: {
-            price: 0,
-            change24hr: 0
-          },
-          icon: '',
-          name: 'Görli Ether',
-          decimals: 18
-        },
-        icon: '',
-        primaryColor: 'accent2' // Testnet
       },
       10: {
         blockHeight: 0,

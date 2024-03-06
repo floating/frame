@@ -1,6 +1,6 @@
+import log from 'electron-log'
 import EventEmitter from 'events'
 import { addHexPrefix, intToHex } from '@ethereumjs/util'
-import log from 'electron-log'
 
 import store from '../../../main/store'
 import { gweiToHex } from '../../util'
@@ -64,14 +64,14 @@ const state = {
   main: {
     currentNetwork: {
       type: 'ethereum',
-      id: '5'
+      id: '11155111'
     },
     networks: {
       ethereum: {
-        5: {
-          id: 5,
+        11155111: {
+          id: 11155111,
           type: 'ethereum',
-          name: 'Goerli',
+          name: 'Sepolia',
           connection: {
             primary: {
               on: false,
@@ -124,7 +124,7 @@ const state = {
     },
     networksMeta: {
       ethereum: {
-        5: {
+        11155111: {
           gas: {
             price: {
               selected: 'standard',
@@ -151,9 +151,9 @@ jest.mock('../../../main/accounts', () => ({ updatePendingFees: jest.fn() }))
 jest.mock('../../../main/store/persist')
 
 const mockConnections = {
-  'wss://evm.pylon.link/goerli': {
-    id: '5',
-    name: 'goerli',
+  'wss://evm.pylon.link/sepolia': {
+    id: '11155111',
+    name: 'sepolia',
     connection: new MockConnection(5)
   },
   'wss://evm.pylon.link/polygon': {

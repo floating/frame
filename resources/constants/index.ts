@@ -11,9 +11,6 @@ const NETWORK_PRESETS = {
     1: {
       pylon: 'wss://evm.pylon.link/mainnet'
     },
-    5: {
-      pylon: 'wss://evm.pylon.link/goerli'
-    },
     10: {
       pylon: 'wss://evm.pylon.link/optimism'
     },

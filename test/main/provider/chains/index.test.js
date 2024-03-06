@@ -22,21 +22,21 @@ const chains = {
     connection: { primary: { connected: true }, secondary: { connected: false } },
     on: true
   },
-  5: {
-    name: 'Ethereum Testnet Görli',
-    id: 5,
-    explorer: 'https://goerli.etherscan.io',
-    connection: {
-      primary: { status: 'disconnected', connected: false, on: true },
-      secondary: { status: 'disconnected', connected: false, on: true }
-    },
-    on: true
-  },
   137: {
     name: 'Polygon',
     id: 137,
     connection: { primary: { connected: true }, secondary: { connected: false } },
     on: false
+  },
+  11155111: {
+    name: 'Ethereum Testnet Sepolia',
+    id: 11155111,
+    explorer: 'https://sepolia.etherscan.io',
+    connection: {
+      primary: { status: 'disconnected', connected: false, on: true },
+      secondary: { status: 'disconnected', connected: false, on: true }
+    },
+    on: true
   }
 }
 
@@ -45,14 +45,14 @@ const chainMeta = {
     nativeCurrency: ether,
     primaryColor: 'accent1'
   },
-  5: {
+  137: { nativeCurrency: {}, primaryColor: 'accent6' },
+  11155111: {
     nativeCurrency: {
       ...ether,
-      name: 'Görli Ether'
+      name: 'Sepolia Ether'
     },
     primaryColor: 'accent2'
-  },
-  137: { nativeCurrency: {}, primaryColor: 'accent6' }
+  }
 }
 
 const selectedAddress = '0x2796317b0ff8538f253012862c06787adfb8ceb6'
@@ -63,7 +63,7 @@ beforeEach(() => {
 
 describe('#getActiveChains', () => {
   it('returns all chains that are active', () => {
-    expect(getActiveChains().map((chain) => chain.chainId)).toEqual([1, 5])
+    expect(getActiveChains().map((chain) => chain.chainId)).toEqual([1, 11155111])
   })
 
   it('returns an EVM chain object', () => {
@@ -149,28 +149,6 @@ describe('#createChainsObserver', () => {
         connected: true
       },
       {
-        chainId: 5,
-        networkId: 5,
-        name: 'Ethereum Testnet Görli',
-        icon: [{ url: 'https://assets.coingecko.com/coins/images/ethereum.png' }],
-        nativeCurrency: {
-          name: 'Görli Ether',
-          symbol: 'ETH',
-          decimals: 18
-        },
-        explorers: [
-          {
-            url: 'https://goerli.etherscan.io'
-          }
-        ],
-        external: {
-          wallet: {
-            colors: [{ r: 255, g: 153, b: 51, hex: '#ff9933' }]
-          }
-        },
-        connected: false
-      },
-      {
         chainId: 10,
         networkId: 10,
         name: 'Optimism',
@@ -191,6 +169,28 @@ describe('#createChainsObserver', () => {
           }
         },
         connected: true
+      },
+      {
+        chainId: 11155111,
+        networkId: 11155111,
+        name: 'Ethereum Testnet Sepolia',
+        icon: [{ url: 'https://assets.coingecko.com/coins/images/ethereum.png' }],
+        nativeCurrency: {
+          name: 'Sepolia Ether',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        explorers: [
+          {
+            url: 'https://sepolia.etherscan.io'
+          }
+        ],
+        external: {
+          wallet: {
+            colors: [{ r: 255, g: 153, b: 51, hex: '#ff9933' }]
+          }
+        },
+        connected: false
       }
     ])
   })
@@ -209,11 +209,11 @@ describe('#createChainsObserver', () => {
     fireObserver()
 
     const changedChains = handler.chainsChanged.mock.calls[0][1]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 5, 10])
+    expect(changedChains.map((c) => c.chainId)).toEqual([1, 10, 11155111])
   })
 
   it('invokes the handler when a chain is removed', () => {
-    const { 5: goerli, ...remaining } = chains
+    const { 11155111: sepolia, ...remaining } = chains
     setChains(remaining)
 
     fireObserver()
@@ -233,16 +233,16 @@ describe('#createChainsObserver', () => {
     fireObserver()
 
     const changedChains = handler.chainsChanged.mock.calls[0][1]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 5, 137])
+    expect(changedChains.map((c) => c.chainId)).toEqual([1, 137, 11155111])
   })
 
   it('invokes the handler when a chain is deactivated', () => {
     const {
-      5: { ...goerli }
+      11155111: { ...sepolia }
     } = chains
-    goerli.on = false
+    sepolia.on = false
 
-    setChains({ ...chains, 5: goerli })
+    setChains({ ...chains, 11155111: sepolia })
 
     fireObserver()
 
@@ -252,16 +252,16 @@ describe('#createChainsObserver', () => {
 
   it('invokes the handler when a chain name changes', () => {
     const {
-      5: { ...goerli }
+      11155111: { ...sepolia }
     } = chains
-    goerli.name = 'Girly'
+    sepolia.name = 'Seppohleea'
 
-    setChains({ ...chains, 5: goerli })
+    setChains({ ...chains, 11155111: sepolia })
 
     fireObserver()
 
     const changedChains = handler.chainsChanged.mock.calls[0][1]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 5])
+    expect(changedChains.map((c) => c.chainId)).toEqual([1, 11155111])
   })
 
   it('does not invoke the handler when no chains have changed', () => {
