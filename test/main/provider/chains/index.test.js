@@ -63,7 +63,7 @@ beforeEach(() => {
 
 describe('#getActiveChains', () => {
   it('returns all chains that are active', () => {
-    expect(getActiveChains().map((chain) => chain.chainId)).toEqual([1, 5])
+    expect(getActiveChains().map((chain) => chain.chainId)).toEqual([1, 11155111])
   })
 
   it('returns an EVM chain object', () => {
@@ -209,7 +209,7 @@ describe('#createChainsObserver', () => {
     fireObserver()
 
     const changedChains = handler.chainsChanged.mock.calls[0][1]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 5, 10])
+    expect(changedChains.map((c) => c.chainId)).toEqual([1, 10, 11155111])
   })
 
   it('invokes the handler when a chain is removed', () => {
@@ -233,7 +233,7 @@ describe('#createChainsObserver', () => {
     fireObserver()
 
     const changedChains = handler.chainsChanged.mock.calls[0][1]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 5, 137])
+    expect(changedChains.map((c) => c.chainId)).toEqual([1, 137, 11155111])
   })
 
   it('invokes the handler when a chain is deactivated', () => {
@@ -261,7 +261,7 @@ describe('#createChainsObserver', () => {
     fireObserver()
 
     const changedChains = handler.chainsChanged.mock.calls[0][1]
-    expect(changedChains.map((c) => c.chainId)).toEqual([1, 5])
+    expect(changedChains.map((c) => c.chainId)).toEqual([1, 11155111])
   })
 
   it('does not invoke the handler when no chains have changed', () => {
