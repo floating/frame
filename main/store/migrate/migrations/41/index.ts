@@ -1,6 +1,6 @@
 import log from 'electron-log'
 
-import { v38StateSchema } from '../38/schema'
+import { v38Connection, v38StateSchema } from '../38/schema'
 
 function baseSepolia() {
   const chain = {
@@ -128,6 +128,37 @@ function optimismSepolia() {
   return { chain, metadata }
 }
 
+function removeGoerliPylonPreset(connection: v38Connection) {
+  // remove Goerli Pylon preset
+  const isPylon = connection.current === 'pylon'
+
+  if (isPylon) {
+    log.info('Migration 41: removing Pylon presets from Goerli')
+  }
+
+  return {
+    ...connection,
+    current: isPylon ? 'custom' : connection.current,
+    custom: isPylon ? 'wss://evm.pylon.link/goerli' : connection.custom
+  }
+}
+
+function removeBaseGoerliConnection(connection: v38Connection) {
+  // remove Base Goerli Pylon preset
+  const isPylon = connection.current === 'pylon'
+
+  if (isPylon) {
+    log.info('Migration 41: removing Pylon presets from Base Goerli')
+  }
+
+  return {
+    ...connection,
+    on: isPylon ? false : connection.on,
+    current: isPylon ? 'custom' : connection.current,
+    custom: isPylon ? '' : connection.custom
+  }
+}
+
 const migrate = (initial: unknown) => {
   try {
     const state = v38StateSchema.parse(initial)
@@ -145,6 +176,34 @@ const migrate = (initial: unknown) => {
       const { chain, metadata } = optimismSepolia()
       state.main.networks.ethereum[11155420] = chain
       state.main.networksMeta.ethereum[11155420] = metadata
+    }
+
+    const goerliChainPresent = '5' in state.main.networks.ethereum
+
+    if (goerliChainPresent) {
+      const goerliChain = state.main.networks.ethereum[5]
+
+      state.main.networks.ethereum[5] = {
+        ...goerliChain,
+        connection: {
+          primary: removeGoerliPylonPreset(goerliChain.connection.primary),
+          secondary: removeGoerliPylonPreset(goerliChain.connection.secondary)
+        }
+      }
+    }
+
+    const baseGoerliChainPresent = '84531' in state.main.networks.ethereum
+
+    if (baseGoerliChainPresent) {
+      const baseGoerliChain = state.main.networks.ethereum[84531]
+
+      state.main.networks.ethereum[84531] = {
+        ...baseGoerliChain,
+        connection: {
+          primary: removeBaseGoerliConnection(baseGoerliChain.connection.primary),
+          secondary: removeBaseGoerliConnection(baseGoerliChain.connection.secondary)
+        }
+      }
     }
 
     return state
