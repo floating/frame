@@ -11,6 +11,19 @@ const weiHexToGweiInt = (weiHex: string) => hexToInt(weiHex) / 1e9
 const weiIntToEthInt = (wei: number) => wei / 1e18
 const gweiToWeiHex = (gwei: number) => intToHex(gweiToWei(gwei))
 
+function roundGwei(gwei: number) {
+  const rounded =
+    gwei >= 10
+      ? Math.round(gwei)
+      : gwei >= 5
+      ? Math.round(gwei * 10) / 10
+      : gwei >= 1
+      ? Math.round(gwei * 100) / 100
+      : Math.round(gwei * 1000) / 1000
+
+  return parseFloat(rounded.toString())
+}
+
 function randomLetters(num: number) {
   return [...Array(num)].map(() => String.fromCharCode(65 + randomInt(0, 26))).join('')
 }
@@ -99,6 +112,7 @@ export {
   weiHexToGweiInt,
   weiIntToEthInt,
   gweiToWeiHex,
+  roundGwei,
   getAddress,
   stripHexPrefix,
   matchFilter,

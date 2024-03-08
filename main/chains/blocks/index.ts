@@ -62,7 +62,7 @@ class BlockMonitor extends EventEmitter {
   }
 
   start() {
-    log.verbose(`%cStarting block updates for chain ${parseInt(this.connection.chainId)}`, 'color: green')
+    log.verbose(`%cStarting block updates for chain ${this.chainId}`, 'color: green')
 
     this.connection.on('message', this.handleMessage)
 
@@ -81,7 +81,7 @@ class BlockMonitor extends EventEmitter {
   }
 
   stop() {
-    log.verbose(`%cStopping block updates for chain ${parseInt(this.connection.chainId)}`, 'color: red')
+    log.verbose(`%cStopping block updates for chain ${this.chainId}`, 'color: red')
 
     if (this.subscriptionId) {
       this.clearSubscription()
@@ -90,6 +90,10 @@ class BlockMonitor extends EventEmitter {
     if (this.poller) {
       this.stopPoller()
     }
+  }
+
+  get chainId() {
+    return parseInt(this.connection.chainId, 16)
   }
 
   private clearSubscription() {
@@ -106,7 +110,7 @@ class BlockMonitor extends EventEmitter {
     this.connection
       .send({ id: 1, jsonrpc: '2.0', method: 'eth_getBlockByNumber', params: ['latest', false] })
       .then((block) => this.handleBlock(block))
-      .catch((err) => this.handleError(`Could not load block for chain ${this.connection.chainId}`, err))
+      .catch((err) => this.handleError(`Could not load block for chain ${this.chainId}`, err))
   }
 
   private handleMessage(message: SubscriptionMessage) {
@@ -115,16 +119,16 @@ class BlockMonitor extends EventEmitter {
     }
   }
 
-  private handleBlock(block: Block) {
-    log.debug(
-      `%cReceived block ${parseInt(block.number)} for chain ${parseInt(this.connection.chainId)}`,
-      'color: yellow',
-      {
-        latestBlock: parseInt(this.latestBlock)
-      }
-    )
+  private handleBlock(blockUpdate: unknown) {
+    if (!blockUpdate || typeof blockUpdate !== 'object') {
+      return this.handleError(`Received invalid block on chain ${this.chainId}`)
+    }
 
-    if (!block) return this.handleError('handleBlock received undefined block')
+    const block = blockUpdate as Block
+
+    log.debug(`%cReceived block ${parseInt(block.number)} for chain ${this.chainId}`, 'color: yellow', {
+      latestBlock: parseInt(this.latestBlock)
+    })
 
     if (block.number !== this.latestBlock) {
       this.latestBlock = block.number
