@@ -73,7 +73,7 @@
     "@ledgerhq/hw-transport-web-ble": "6.27.15",
     "@metamask/eth-sig-util": "5.0.2",
     "@sentry/electron": "4.3.0",
-    "@trezor/connect": "9.0.11",
+    "@trezor/connect": "9.1.1",
     "auto-launch": "5.0.5",
     "bip39": "3.1.0",
     "cheerio": "1.0.0-rc.12",
