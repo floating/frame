@@ -107,12 +107,12 @@ module.exports = {
       // Add stored signers
       for (const id of Object.keys(storedSigners)) {
         await wait(100)
-        const { addresses, encryptedKeys, encryptedSeed, type, network } = storedSigners[id]
+        const { addresses, encryptedKeys, encryptedPhrase, encryptedSeed, type, network } = storedSigners[id]
         if (addresses && addresses.length) {
           const id = crypt.stringToKey(addresses.join()).toString('hex')
           if (!signers.exists(id)) {
             if (type === 'seed') {
-              signers.add(new SeedSigner({ network, addresses, encryptedSeed }))
+              signers.add(new SeedSigner({ network, addresses, encryptedPhrase, encryptedSeed }))
             } else if (type === 'ring') {
               signers.add(new RingSigner({ network, addresses, encryptedKeys }))
             }

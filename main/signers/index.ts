@@ -212,6 +212,17 @@ class Signers extends EventEmitter {
     ;(signer as RingSigner).addKeystore(keystore, keystorePassword, password, cb)
   }
 
+  getSecret(id: string, index: number, cb: Callback<string>) {
+    const signer = this.get(id)
+
+    // @ts-ignore
+    if (signer && signer.getSecret) {
+      ;(signer as HotSigner).getSecret(index, cb)
+    } else {
+      log.error('Signer has no secret stored locally, no getSecret method')
+    }
+  }
+
   lock(id: string, cb: Callback<Signer>) {
     const signer = this.get(id)
 
