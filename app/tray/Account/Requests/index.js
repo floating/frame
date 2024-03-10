@@ -162,7 +162,7 @@ class Requests extends React.Component {
                 </RequestItem>
               )
             } else if (req.type === 'signErc20Permit') {
-              const chainId = req.typedMessage.data.domain.chainId
+              const chainId = parseInt(req.typedMessage.data.domain.chainId, 16)
               const chainName = this.store('main.networks.ethereum', chainId, 'name')
               const { primaryColor, icon } = this.store('main.networksMeta.ethereum', chainId)
 
