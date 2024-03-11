@@ -1,13 +1,13 @@
 import { EthereumChainsSchema } from '../../../../../main/store/state/types/chain'
 
 const validChain = {
-  id: 5,
+  id: 11155111,
   type: 'ethereum',
   layer: 'testnet',
   isTestnet: true,
   on: false,
-  name: 'Görli',
-  explorer: 'https://goerli.etherscan.io',
+  name: 'Sepolia',
+  explorer: 'https://sepolia.etherscan.io',
   connection: {
     primary: {
       on: true,
@@ -27,9 +27,9 @@ const validChain = {
 }
 
 it('parses a valid chain', () => {
-  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: validChain } })
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 11155111: validChain } })
 
-  expect(chains['5']).toEqual(validChain)
+  expect(chains['11155111']).toEqual(validChain)
 })
 
 it('sets the primary connection to disconnected to start', () => {
@@ -43,9 +43,11 @@ it('sets the primary connection to disconnected to start', () => {
     }
   }
 
-  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: previouslyConnectedChain } })
+  const { ethereum: chains } = EthereumChainsSchema.parse({
+    ethereum: { 11155111: previouslyConnectedChain }
+  })
 
-  expect(chains['5'].connection.primary.connected).toBe(false)
+  expect(chains['11155111'].connection.primary.connected).toBe(false)
 })
 
 it('sets the secondary connection to disconnected to start', () => {
@@ -59,27 +61,29 @@ it('sets the secondary connection to disconnected to start', () => {
     }
   }
 
-  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: previouslyConnectedChain } })
+  const { ethereum: chains } = EthereumChainsSchema.parse({
+    ethereum: { 11155111: previouslyConnectedChain }
+  })
 
-  expect(chains['5'].connection.secondary.connected).toBe(false)
+  expect(chains['11155111'].connection.secondary.connected).toBe(false)
 })
 
 it('replaces a corrupt chain with a known id with the default value from the state', () => {
   const chain = {
-    id: 5,
+    id: 11155111,
     test: 'bogusvalue'
   }
 
-  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: chain } })
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 11155111: chain } })
 
-  expect(chains['5']).toEqual({
-    id: 5,
+  expect(chains['11155111']).toEqual({
+    id: 11155111,
     type: 'ethereum',
     layer: 'testnet',
     isTestnet: true,
     on: false,
-    name: 'Görli',
-    explorer: 'https://goerli.etherscan.io',
+    name: 'Sepolia',
+    explorer: 'https://sepolia.etherscan.io',
     connection: {
       primary: {
         on: true,
@@ -104,9 +108,9 @@ it('removes an unknown corrupt chain from the state', () => {
     test: 'bogusvalue'
   }
 
-  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 5: chain } })
+  const { ethereum: chains } = EthereumChainsSchema.parse({ ethereum: { 11155111: chain } })
 
-  expect(chains['5']).toBeUndefined()
+  expect(chains['11155111']).toBeUndefined()
 })
 
 it('adds mainnet if not present in the state', () => {

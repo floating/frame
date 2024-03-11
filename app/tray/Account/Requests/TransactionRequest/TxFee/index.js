@@ -1,13 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
 import BigNumber from 'bignumber.js'
-import { utils } from 'ethers'
 
+import link from '../../../../../../resources/link'
 import { DisplayCoinBalance, DisplayValue } from '../../../../../../resources/Components/DisplayValue'
 import { GasFeesSource, usesBaseFee } from '../../../../../../resources/domain/transaction'
 import { displayValueData } from '../../../../../../resources/utils/displayValue'
-import { chainUsesOptimismFees, calculateOptimismL1DataFee } from '../../../../../../resources/utils/chains'
-import link from '../../../../../../resources/link'
+import { chainUsesOptimismFees } from '../../../../../../resources/utils/chains'
 import { ClusterBox, Cluster, ClusterRow, ClusterValue } from '../../../../../../resources/Components/Cluster'
 
 const FEE_WARNING_THRESHOLD_USD = 50
@@ -71,20 +70,8 @@ class TxFee extends React.Component {
     super(props, context)
   }
 
-  getOptimismFee = (l2Price, l2Limit, rawTx) => {
-    const { maxFeePerGas, maxPriorityFeePerGas, gasPrice, data, gasLimit, nonce, to, value } = rawTx
-    const chainId = parseInt(rawTx.chainId, 16)
-    const txData = { chainId, data, gasLimit, nonce, to, value }
-
-    const tx = !!maxFeePerGas
-      ? { ...txData, maxFeePerGas, maxPriorityFeePerGas, type: 2 }
-      : { ...txData, gasPrice, type: 0 }
-
-    const serializedTransaction = utils.serializeTransaction(tx)
-
-    // Get current Ethereum gas price
-    const ethBaseFee = this.store('main.networksMeta.ethereum', 1, 'gas.price.fees.nextBaseFee')
-    const l1DataFee = calculateOptimismL1DataFee(serializedTransaction, ethBaseFee)
+  getOptimismFee = (l2Price, l2Limit, chainData) => {
+    const l1DataFee = BigNumber(chainData?.l1Fees).toNumber()
 
     // Compute the L2 execution fee
     const l2ExecutionFee = l2Price * l2Limit
@@ -105,7 +92,7 @@ class TxFee extends React.Component {
     const maxGas = BigNumber(req.data.gasLimit, 16)
     const maxFeePerGas = BigNumber(req.data[usesBaseFee(req.data) ? 'maxFeePerGas' : 'gasPrice'])
     const maxFeeSourceValue = chainUsesOptimismFees(chain.id)
-      ? this.getOptimismFee(maxFeePerGas, maxGas, req.data)
+      ? this.getOptimismFee(maxFeePerGas, maxGas, req.chainData?.optimism)
       : maxFeePerGas.multipliedBy(maxGas)
     const maxFee = displayValueData(maxFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
@@ -119,7 +106,7 @@ class TxFee extends React.Component {
     // accounts for the 50% padding in the gas estimate in the provider
     const minGas = maxGas.dividedBy(BigNumber(1.5))
     const minFeeSourceValue = chainUsesOptimismFees(chain.id)
-      ? this.getOptimismFee(minFeePerGas, minGas, req.data)
+      ? this.getOptimismFee(minFeePerGas, minGas, req.chainData?.optimism)
       : minFeePerGas.multipliedBy(minGas)
     const minFee = displayValueData(minFeeSourceValue, {
       currencyRate: nativeCurrency.usd,
@@ -142,7 +129,11 @@ class TxFee extends React.Component {
             </ClusterValue>
             <ClusterValue>
               <div className='txSendingValue'>
-                <DisplayCoinBalance amount={maxFee} symbol={nativeCurrency.symbol} />
+                {!maxFee.bn || maxFee.bn.isNaN() ? (
+                  `? ${nativeCurrency.symbol}`
+                ) : (
+                  <DisplayCoinBalance amount={maxFee} symbol={nativeCurrency.symbol} />
+                )}
               </div>
             </ClusterValue>
           </ClusterRow>

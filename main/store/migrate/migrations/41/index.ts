@@ -68,7 +68,7 @@ const migrate = (initial: unknown) => {
 
     return state
   } catch (e) {
-    log.error('Migration 40: could not parse state', e)
+    log.error('Migration 41: could not parse state', e)
   }
 
   return initial
