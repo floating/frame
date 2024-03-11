@@ -8,7 +8,7 @@ export const chainMetaDefaults = {
   1: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard',
@@ -31,7 +31,7 @@ export const chainMetaDefaults = {
   10: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard',
@@ -54,7 +54,7 @@ export const chainMetaDefaults = {
   100: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard',
@@ -77,7 +77,7 @@ export const chainMetaDefaults = {
   137: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard',
@@ -100,7 +100,7 @@ export const chainMetaDefaults = {
   8453: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard',
@@ -123,7 +123,7 @@ export const chainMetaDefaults = {
   42161: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard',
@@ -146,7 +146,7 @@ export const chainMetaDefaults = {
   84532: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard',
@@ -169,7 +169,7 @@ export const chainMetaDefaults = {
   11155111: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard',
@@ -192,7 +192,7 @@ export const chainMetaDefaults = {
   11155420: {
     blockHeight: 0,
     gas: {
-      fees: null,
+      fees: {},
       samples: [],
       price: {
         selected: 'standard' as const,
