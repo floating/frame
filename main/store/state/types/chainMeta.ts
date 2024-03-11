@@ -8,7 +8,8 @@ export const chainMetaDefaults = {
   1: {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
+      samples: [],
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -27,32 +28,11 @@ export const chainMetaDefaults = {
     icon: '',
     primaryColor: 'accent1' // Mainnet
   },
-  5: {
-    blockHeight: 0,
-    gas: {
-      fees: {},
-      price: {
-        selected: 'standard',
-        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
-      }
-    },
-    nativeCurrency: {
-      symbol: 'görETH',
-      usd: {
-        price: 0,
-        change24hr: 0
-      },
-      icon: '',
-      name: 'Görli Ether',
-      decimals: 18
-    },
-    icon: '',
-    primaryColor: 'accent2' // Testnet
-  },
   10: {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
+      samples: [],
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -74,7 +54,8 @@ export const chainMetaDefaults = {
   100: {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
+      samples: [],
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -96,7 +77,8 @@ export const chainMetaDefaults = {
   137: {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
+      samples: [],
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -118,7 +100,8 @@ export const chainMetaDefaults = {
   8453: {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
+      samples: [],
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -140,7 +123,8 @@ export const chainMetaDefaults = {
   42161: {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
+      samples: [],
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -159,23 +143,24 @@ export const chainMetaDefaults = {
     icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/arbitrum.svg',
     primaryColor: 'accent7' // Arbitrum
   },
-  84531: {
+  84532: {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
+      samples: [],
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
       }
     },
     nativeCurrency: {
-      symbol: 'görETH',
+      symbol: 'sepETH',
       usd: {
         price: 0,
         change24hr: 0
       },
       icon: '',
-      name: 'Görli Ether',
+      name: 'Base Sepolia Ether',
       decimals: 18
     },
     icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
@@ -184,7 +169,8 @@ export const chainMetaDefaults = {
   11155111: {
     blockHeight: 0,
     gas: {
-      fees: {},
+      fees: null,
+      samples: [],
       price: {
         selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
@@ -202,6 +188,29 @@ export const chainMetaDefaults = {
     },
     icon: '',
     primaryColor: 'accent2' // Testnet
+  },
+  11155420: {
+    blockHeight: 0,
+    gas: {
+      fees: null,
+      samples: [],
+      price: {
+        selected: 'standard' as const,
+        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+      }
+    },
+    nativeCurrency: {
+      symbol: 'sepETH',
+      usd: {
+        price: 0,
+        change24hr: 0
+      },
+      icon: '',
+      name: 'Optimism Sepolia Ether',
+      decimals: 18
+    },
+    icon: '',
+    primaryColor: 'accent2' as const // Testnet
   }
 }
 

@@ -1,5 +1,22 @@
 import { z } from 'zod'
 
+const GasEstimateSchema = z.object({
+  gasEstimate: z.string(),
+  cost: z.object({
+    usd: z.number().nullish()
+  })
+})
+
+const GasSampleSchema = z.object({
+  label: z.string(),
+  estimates: z
+    .object({
+      low: GasEstimateSchema,
+      high: GasEstimateSchema
+    })
+    .partial()
+})
+
 const GasLevelsSchema = z.object({
   slow: z.string().optional(),
   standard: z.string().optional(),
@@ -17,6 +34,7 @@ export const GasFeesSchema = z.object({
 })
 
 export const GasSchema = z.object({
+  samples: z.array(GasSampleSchema).default([]),
   price: z.object({
     selected: GasLevelsSchema.keyof(),
     levels: GasLevelsSchema,

@@ -28,20 +28,48 @@ import {
   PermitSignatureRequest
 } from './types'
 
-import { ActionType } from '../transaction/actions'
 import { openBlockExplorer } from '../windows/window'
 import { ApprovalType } from '../../resources/constants'
 import { accountNS } from '../../resources/domain/account'
 import { getMaxTotalFee } from '../../resources/gas'
+import { chainUsesOptimismFees } from '../../resources/utils/chains'
 
 import type { Chain } from '../chains'
+import type { ActionType } from '../transaction/actions'
 import type { Account, AccountMetadata, Gas } from '../store/state'
+
+type RequestWithId = [string, TransactionRequest]
 
 function notify(title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
   notification.on('click', action)
 
   setTimeout(() => notification.show(), 1000)
+}
+
+function toTransactionsByLayer(requests: Record<string, AccountRequest>, chainId?: number) {
+  return Object.entries(requests)
+    .filter(([_, req]) => req.type === 'transaction')
+    .reduce(
+      ({ l1Transactions, l2Transactions }, [id, req]) => {
+        const txRequest = req as TransactionRequest
+        if (
+          !txRequest.locked &&
+          !txRequest.feesUpdatedByUser &&
+          txRequest.data.gasFeesSource === GasFeesSource.Frame &&
+          (!chainId || parseInt(txRequest.data.chainId, 16) === chainId)
+        ) {
+          l1Transactions.push([id, txRequest])
+        }
+
+        if (chainUsesOptimismFees(parseInt(txRequest.data.chainId, 16))) {
+          l2Transactions.push([id, txRequest])
+        }
+
+        return { l1Transactions, l2Transactions }
+      },
+      { l1Transactions: [] as RequestWithId[], l2Transactions: [] as RequestWithId[] }
+    )
 }
 
 const frameOriginId = uuidv5('frame-internal', uuidv5.DNS)
@@ -535,18 +563,9 @@ export class Accounts extends EventEmitter {
 
     if (currentAccount) {
       // If chainId, update pending tx requests from that chain, otherwise update all pending tx requests
-      const transactions = Object.entries(currentAccount.requests)
-        .filter(([_, req]) => req.type === 'transaction')
-        .map(([_, req]) => [_, req] as [string, TransactionRequest])
-        .filter(
-          ([_, req]) =>
-            !req.locked &&
-            !req.feesUpdatedByUser &&
-            req.data.gasFeesSource === GasFeesSource.Frame &&
-            (!chainId || parseInt(req.data.chainId, 16) === chainId)
-        )
+      const { l1Transactions, l2Transactions } = toTransactionsByLayer(currentAccount.requests, chainId)
 
-      transactions.forEach(([id, req]) => {
+      l1Transactions.forEach(([id, req]) => {
         try {
           const tx = req.data
           const chain = { type: 'ethereum', id: parseInt(tx.chainId, 16) }
@@ -570,6 +589,26 @@ export class Accounts extends EventEmitter {
           log.error('Could not update gas fees for transaction', e)
         }
       })
+
+      if (chainId === 1) {
+        l2Transactions.forEach(async ([_id, req]) => {
+          let estimate = ''
+          try {
+            estimate = (await provider.getL1GasCost(req.data)).toHexString()
+          } catch (e) {
+            log.error('Error estimating L1 gas cost', e)
+          }
+
+          req.chainData = {
+            ...req.chainData,
+            optimism: {
+              l1Fees: estimate
+            }
+          }
+
+          currentAccount.update()
+        })
+      }
     }
   }
 

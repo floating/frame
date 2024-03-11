@@ -32,31 +32,6 @@ export const chainDefaults = {
       }
     }
   },
-  5: {
-    id: 5,
-    type,
-    layer: 'testnet' as const,
-    isTestnet: true,
-    name: 'Görli',
-    explorer: 'https://goerli.etherscan.io',
-    on: false,
-    connection: {
-      primary: {
-        on: true,
-        current: 'pylon' as const,
-        status: 'loading' as const,
-        connected: false,
-        custom: ''
-      },
-      secondary: {
-        on: false,
-        current: 'custom' as const,
-        status: 'loading' as const,
-        connected: false,
-        custom: ''
-      }
-    }
-  },
   10: {
     id: 10,
     type,
@@ -182,21 +157,21 @@ export const chainDefaults = {
       }
     }
   },
-  84531: {
-    id: 84531,
+  84532: {
+    id: 84532,
     type,
     layer: 'testnet' as const,
     isTestnet: true,
-    name: 'Base Görli',
-    explorer: 'https://goerli-explorer.base.org',
+    name: 'Base Sepolia',
+    explorer: 'https://sepolia.basescan.org',
     on: false,
     connection: {
       primary: {
         on: true,
-        current: 'custom' as const,
+        current: 'pylon' as const,
         status: 'loading' as const,
         connected: false,
-        custom: 'https://goerli.base.org'
+        custom: ''
       },
       secondary: {
         on: false,
@@ -214,6 +189,31 @@ export const chainDefaults = {
     isTestnet: true,
     name: 'Sepolia',
     explorer: 'https://sepolia.etherscan.io',
+    on: false,
+    connection: {
+      primary: {
+        on: true,
+        current: 'pylon' as const,
+        status: 'loading' as const,
+        connected: false,
+        custom: ''
+      },
+      secondary: {
+        on: false,
+        current: 'custom' as const,
+        status: 'loading' as const,
+        connected: false,
+        custom: ''
+      }
+    }
+  },
+  11155420: {
+    id: 11155420,
+    type,
+    layer: 'testnet' as const,
+    isTestnet: true,
+    name: 'Optimism Sepolia',
+    explorer: 'https://sepolia-optimism.etherscan.io',
     on: false,
     connection: {
       primary: {
