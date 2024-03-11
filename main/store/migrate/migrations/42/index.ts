@@ -1,11 +1,6 @@
-import { z } from 'zod'
 import log from 'electron-log'
 
-import { v39 as ChainsSchema } from '../../../state/types/chains'
-import { v42 as ChainMetaSchema } from '../../../state/types/chainMeta'
-
-type Chain = z.infer<typeof ChainsSchema>
-type Connection = Chain['ethereum']['1']['connection']['primary']
+import { v38Connection, v38StateSchema } from '../38/schema'
 
 function baseSepolia() {
   const chain = {
@@ -14,14 +9,21 @@ function baseSepolia() {
     layer: 'testnet',
     isTestnet: true,
     name: 'Base Sepolia',
-    explorer: 'https://sepolia.basescan.org',
-    on: false,
+    explorer: 'https://sepolia.basescan.org/',
+    gas: {
+      price: {
+        selected: 'standard',
+        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+      }
+    },
     connection: {
       primary: {
         on: true,
         current: 'pylon',
         status: 'loading',
         connected: false,
+        type: '',
+        network: '',
         custom: ''
       },
       secondary: {
@@ -29,18 +31,20 @@ function baseSepolia() {
         current: 'custom',
         status: 'loading',
         connected: false,
+        type: '',
+        network: '',
         custom: ''
       }
-    }
+    },
+    on: false
   } as const
 
   const metadata = {
     blockHeight: 0,
     gas: {
-      fees: null,
-      samples: [],
+      fees: {},
       price: {
-        selected: 'standard' as const,
+        selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
       }
     },
@@ -55,8 +59,8 @@ function baseSepolia() {
       decimals: 18
     },
     icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/baseiconcolor.png',
-    primaryColor: 'accent2' as const // Testnet
-  }
+    primaryColor: 'accent2' // Testnet
+  } as const
 
   return { chain, metadata }
 }
@@ -68,14 +72,21 @@ function optimismSepolia() {
     layer: 'testnet',
     isTestnet: true,
     name: 'Optimism Sepolia',
-    explorer: 'https://sepolia-optimism.etherscan.io',
-    on: false,
+    explorer: 'https://sepolia-optimism.etherscan.io/',
+    gas: {
+      price: {
+        selected: 'standard',
+        levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
+      }
+    },
     connection: {
       primary: {
         on: true,
         current: 'pylon',
         status: 'loading',
         connected: false,
+        type: '',
+        network: '',
         custom: ''
       },
       secondary: {
@@ -83,18 +94,20 @@ function optimismSepolia() {
         current: 'custom',
         status: 'loading',
         connected: false,
+        type: '',
+        network: '',
         custom: ''
       }
-    }
+    },
+    on: false
   } as const
 
   const metadata = {
     blockHeight: 0,
     gas: {
-      fees: null,
-      samples: [],
+      fees: {},
       price: {
-        selected: 'standard' as const,
+        selected: 'standard',
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
       }
     },
@@ -109,13 +122,13 @@ function optimismSepolia() {
       decimals: 18
     },
     icon: '',
-    primaryColor: 'accent2' as const // Testnet
-  }
+    primaryColor: 'accent2' // Testnet
+  } as const
 
   return { chain, metadata }
 }
 
-function removeGoerliPylonPreset(connection: Connection) {
+function removeGoerliPylonPreset(connection: v38Connection) {
   // remove Goerli Pylon preset
   const isPylon = connection.current === 'pylon'
 
@@ -130,7 +143,7 @@ function removeGoerliPylonPreset(connection: Connection) {
   }
 }
 
-function removeBaseGoerliConnection(connection: Connection) {
+function removeBaseGoerliConnection(connection: v38Connection) {
   // remove Base Goerli Pylon preset
   const isPylon = connection.current === 'pylon'
 
@@ -146,20 +159,9 @@ function removeBaseGoerliConnection(connection: Connection) {
   }
 }
 
-const StateSchema = z
-  .object({
-    main: z
-      .object({
-        networks: ChainsSchema,
-        networksMeta: ChainMetaSchema
-      })
-      .passthrough()
-  })
-  .passthrough()
-
 const migrate = (initial: unknown) => {
   try {
-    const state = StateSchema.parse(initial)
+    const state = v38StateSchema.parse(initial)
     const usingBaseSepolia = '84532' in state.main.networks.ethereum
 
     if (!usingBaseSepolia) {
@@ -206,7 +208,7 @@ const migrate = (initial: unknown) => {
 
     return state
   } catch (e) {
-    log.error('Migration 42: could not parse state', e)
+    log.error('Migration 41: could not parse state', e)
   }
 
   return initial
