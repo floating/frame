@@ -130,8 +130,6 @@ class BlockMonitor extends EventEmitter {
       latestBlock: parseInt(this.latestBlock)
     })
 
-    if (!block) return this.handleError('handleBlock received undefined block')
-
     if (block.number !== this.latestBlock) {
       this.latestBlock = block.number
       this.connection.emit('status', 'connected')
