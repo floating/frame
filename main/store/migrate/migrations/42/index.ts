@@ -42,6 +42,7 @@ function baseSepolia() {
   const metadata = {
     blockHeight: 0,
     gas: {
+      samples: [],
       fees: {},
       price: {
         selected: 'standard',
@@ -79,7 +80,7 @@ function optimismSepolia() {
         levels: { slow: '', standard: '', fast: '', asap: '', custom: '' }
       }
     },
-    connection: {
+    codsfnnection: {
       primary: {
         on: true,
         current: 'pylon',
