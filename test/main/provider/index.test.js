@@ -199,7 +199,7 @@ describe('#send', () => {
         done()
       }
 
-      sendRequest({ chainId: '0x5', chainName: 'Goerli' }, cb)
+      sendRequest({ chainId: '0xaa36a7', chainName: 'Sepolia' }, cb)
     })
 
     it('should create a request to add the chain', (done) => {

@@ -133,7 +133,7 @@ function removeGoerliPylonPreset(connection: v38Connection) {
   const isPylon = connection.current === 'pylon'
 
   if (isPylon) {
-    log.info('Migration 41: removing Pylon presets from Goerli')
+    log.info('Migration 42: removing Pylon presets from Goerli')
   }
 
   return {
@@ -148,7 +148,7 @@ function removeBaseGoerliConnection(connection: v38Connection) {
   const isPylon = connection.current === 'pylon'
 
   if (isPylon) {
-    log.info('Migration 41: removing Pylon presets from Base Goerli')
+    log.info('Migration 42: removing Pylon presets from Base Goerli')
   }
 
   return {
@@ -208,7 +208,7 @@ const migrate = (initial: unknown) => {
 
     return state
   } catch (e) {
-    log.error('Migration 41: could not parse state', e)
+    log.error('Migration 42: could not parse state', e)
   }
 
   return initial
