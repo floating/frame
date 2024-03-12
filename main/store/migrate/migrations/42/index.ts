@@ -121,7 +121,7 @@ function optimismSepolia() {
       name: 'Optimism Sepolia Ether',
       decimals: 18
     },
-    icon: '',
+    icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
     primaryColor: 'accent2' // Testnet
   } as const
 

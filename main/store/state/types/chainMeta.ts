@@ -209,7 +209,7 @@ export const chainMetaDefaults = {
       name: 'Optimism Sepolia Ether',
       decimals: 18
     },
-    icon: '',
+    icon: 'https://frame.nyc3.cdn.digitaloceanspaces.com/icons/optimism.svg',
     primaryColor: 'accent2' as const // Testnet
   }
 }
