@@ -3,9 +3,9 @@ name: sync-upstream
 
 on:
   schedule:
-    - cron: '*/5 0-3 * * *'
-    - cron: '*/5 18-23 * * *'
-    - cron: '*/30 4-17 * * *'
+    - cron: '*/20 0-3 * * *'
+    - cron: '*/20 18-23 * * *'
+    - cron: '0 4-17 * * *'
   workflow_dispatch:
 
 jobs:
