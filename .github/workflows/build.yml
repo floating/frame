@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: read version from package.json
         id: package-version
         uses: martinbeentjes/npm-get-version-action@master
@@ -56,8 +56,8 @@ jobs:
       APPLE_ID_PASSWORD: ${{ secrets[matrix.apple_app_specific_password_key] }}
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.12.1
           cache: 'npm'
