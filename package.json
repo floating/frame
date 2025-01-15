@@ -103,7 +103,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-is": "18.2.0",
-    "react-restore": "0.6.1",
+    "react-restore": "0.7.2",
     "react-transition-group": "4.4.5",
     "rlp": "3.0.0",
     "semver": "7.3.8",
