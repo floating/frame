@@ -2,7 +2,7 @@ import signatureTypes from './types'
 import { SignTypedDataVersion, MessageTypeProperty } from '@metamask/eth-sig-util'
 
 import type { TypedMessage, TypedSignatureRequestType } from '../accounts/types'
-import type { EIP712MessageDomain } from '@ledgerhq/hw-app-eth/lib/modules/EIP712/EIP712.types'
+import type { EIP712MessageDomain } from '@ledgerhq/types-live'
 
 const matchesMsgType = (properties: MessageTypeProperty[], required: MessageTypeProperty[]) =>
   properties.length === required.length &&
