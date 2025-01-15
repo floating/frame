@@ -6,7 +6,7 @@ import { app } from 'electron'
 import { globSource } from 'ipfs-http-client'
 import { importer } from 'ipfs-unixfs-importer'
 
-import type { ImporterOptions } from 'ipfs-unixfs-importer'
+import type { UserImporterOptions } from 'ipfs-unixfs-importer/types'
 
 const blockstore = {
   get: async (cid: string) => {
@@ -17,7 +17,7 @@ const blockstore = {
   }
 }
 
-const hash = async (content: any, opts: ImporterOptions = {}) => {
+const hash = async (content: any, opts: UserImporterOptions = {}) => {
   const options = {
     ...opts,
     onlyHash: true,
@@ -34,7 +34,7 @@ const hash = async (content: any, opts: ImporterOptions = {}) => {
   return lastCID
 }
 
-const hashFiles = async (path: string, options: ImporterOptions) => hash(globSource(path, '**'), options)
+const hashFiles = async (path: string, options: UserImporterOptions) => hash(globSource(path, '**'), options)
 const getCID = async (path: string, isDirectory = true) => hashFiles(path, { wrapWithDirectory: isDirectory })
 
 export function getDappCacheDir() {
