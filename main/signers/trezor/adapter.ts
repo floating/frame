@@ -1,6 +1,6 @@
 import log from 'electron-log'
 
-import type { Device as TrezorDevice } from '@trezor/connect'
+import type { DeviceUniquePath, Device as TrezorDevice } from '@trezor/connect'
 
 import { SignerAdapter } from '../adapters'
 import Trezor, { Status } from './Trezor'
@@ -221,7 +221,7 @@ export default class TrezorSignerAdapter extends SignerAdapter {
     } else {
       // this Trezor is not open because it was never connected,
       // attempt to force a reload by calling this method
-      TrezorBridge.getFeatures({ device: { path: trezor.path } })
+      TrezorBridge.getFeatures({ device: { path: trezor.path as DeviceUniquePath } })
     }
   }
 
