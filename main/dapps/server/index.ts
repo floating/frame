@@ -1,5 +1,5 @@
 import http from 'http'
-import cookie from 'cookie'
+import { parse } from 'cookie'
 import { URL } from 'url'
 import { hash } from 'eth-ens-namehash'
 
@@ -12,7 +12,7 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
   const ens = url.hostname.replace('.localhost', '')
   const namehash = hash(ens)
-  const session = (req.headers.cookie && cookie.parse(req.headers.cookie).__frameSession) || ''
+  const session = (req.headers.cookie && parse(req.headers.cookie).__frameSession) || ''
 
   // check if dapp is added before progressing
   if (!store('main.dapps', namehash)) {
