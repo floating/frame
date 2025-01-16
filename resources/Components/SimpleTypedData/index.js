@@ -1,14 +1,17 @@
 const SimpleJSON = ({ json }) => {
   return (
     <div className='simpleJson'>
-      {Object.keys(json).map((key, o) => (
-        <div key={key + o} className='simpleJsonChild'>
-          <div className='simpleJsonKey simpleJsonKeyTx'>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
-          <div className='simpleJsonValue'>
-            {typeof json[key] === 'object' ? <SimpleJSON json={json[key]} key={key} /> : json[key]}
+      {Object.keys(json).map((key, o) => {
+        const value = json[key]
+        return (
+          <div key={key + o} className='simpleJsonChild'>
+            <div className='simpleJsonKey simpleJsonKeyTx'>{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+            <div className='simpleJsonValue'>
+              {!!value && typeof value === 'object' ? <SimpleJSON json={value} key={key} /> : value}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
