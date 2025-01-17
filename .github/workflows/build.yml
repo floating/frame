@@ -36,6 +36,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - ubuntu-latest
         include:
           - os: macos-13
             cert_key: APPLE_DEVELOPER_SIGNING_CERTIFICATE
@@ -43,6 +45,9 @@ jobs:
             apple_id_key: APPLE_ID
             apple_app_specific_password_key: APPLE_ID_PASSWORD
             apple_team_id_key: APPLE_TEAM_ID
+          - os: windows-latest
+            cert_key: WINDOWS_CSC_CERTIFICATE
+            cert_password_key: WINDOWS_CSC_PASSWORD
 
     runs-on: ${{ matrix.os }}
 
