@@ -242,6 +242,9 @@
     }
   },
   "repository": "github:floating/frame",
+  "overrides": {
+    "@framelabs/logger": "1.1.1"
+  },
   "lavamoat": {
     "allowScripts": {
       "$root$": false,
