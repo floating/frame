@@ -179,6 +179,7 @@
     "rimraf": "4.4.0",
     "shx": "0.3.4",
     "stylus": "0.59.0",
+    "svgo": "3.3.2",
     "tree-kill": "1.2.2",
     "ts-jest": "29.0.5",
     "typescript": "4.9.5",

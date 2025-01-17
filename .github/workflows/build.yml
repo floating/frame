@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'develop'
+      - 'test-release'
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,6 +73,7 @@ jobs:
       - run: npm run compile
       - run: npm run test:unit:main -- --testTimeout=5000 --verbose --detectOpenHandles --forceExit
       - run: npm run test:unit:components
+      - run: ls -la node_modules
       - run: npm run bundle
       - name: Sleep for 4 seconds
         shell: bash
