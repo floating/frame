@@ -36,17 +36,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
         include:
           - os: macos-13
             cert_key: APPLE_DEVELOPER_SIGNING_CERTIFICATE
             cert_password_key: APPLE_CERTIFICATE_PASSWORD
             apple_id_key: APPLE_ID
             apple_app_specific_password_key: APPLE_ID_PASSWORD
-          - os: windows-latest
-            cert_key: WINDOWS_CSC_CERTIFICATE
-            cert_password_key: WINDOWS_CSC_PASSWORD
 
     runs-on: ${{ matrix.os }}
 
@@ -67,6 +62,10 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt install -y libudev-dev
+      - name: install Macos dev tools
+        if: matrix.os == 'macos-13'
+        run: |
+          sudo -H pip install setuptools
       - name: create NPM config file
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
       - run: npm run setup:ci
