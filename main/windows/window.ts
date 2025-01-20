@@ -85,7 +85,6 @@ const externalWhitelist = [
   'https://discord.gg/UH7NGqY',
   'https://frame.canny.io',
   'https://feedback.frame.sh',
-  'https://wiki.trezor.io/Trezor_Bridge',
   'https://opensea.io'
 ]
 

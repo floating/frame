@@ -63,20 +63,6 @@ class AddHardware extends React.Component {
                 <div className='addAccountItemDevice'>
                   <div className='addAccountItemDeviceTitle'>No Devices Found</div>
                 </div>
-                {this.deviceName === 'trezor' ? (
-                  <div className='addAccountItemTrezorBridgeWarning'>
-                    <div>Don&apos;t see your Trezor?</div>
-                    <div>
-                      <span>Make sure you&apos;ve installed </span>
-                      <span
-                        className='openBridgeUrl'
-                        onClick={() => link.send('tray:openExternal', 'https://wiki.trezor.io/Trezor_Bridge')}
-                      >
-                        Trezor bridge
-                      </span>
-                    </div>
-                  </div>
-                ) : null}
               </>
             )}
           </div>

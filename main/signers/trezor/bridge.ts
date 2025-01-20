@@ -29,7 +29,8 @@ const config = {
   popup: false,
   webusb: false,
   debug: false,
-  lazyLoad: false
+  lazyLoad: false,
+  transports: ['NodeUsbTransport' as const]
 }
 
 async function handleResponse<T>(p: Response<T>) {
