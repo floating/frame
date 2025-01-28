@@ -65,7 +65,7 @@ jobs:
           node-version: 18.12.1
           cache: 'npm'
       - name: install Linux dev tools
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-22.04'
         run: |
           sudo apt update -y
           sudo apt install -y libudev-dev
