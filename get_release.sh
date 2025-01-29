@@ -1,6 +1,7 @@
 #! /bin/bash
 
 RELEASE_VERSION=$1
+INSTALLER_FORMAT=$2
 
 RELEASE_ID=$(curl -L \
   -H "Accept: application/vnd.github+json" \
@@ -12,7 +13,7 @@ ASSET_ID=$(curl -L \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/repos/floating/frame/releases/$RELEASE_ID | jq -r '.assets[] | {(.id |tostring): .name}' | grep -i appimage | grep -v arm | cut -d '"' -f 2)
+  https://api.github.com/repos/floating/frame/releases/$RELEASE_ID | jq -r '.assets[] | {(.id |tostring): .name}' | grep -v arm | grep -i $INSTALLER_FORMAT | cut -d '"' -f 2)
 
 curl -L \
   -o frame.AppImage \
