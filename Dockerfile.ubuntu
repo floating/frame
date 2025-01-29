@@ -1,9 +1,0 @@
-FROM ubuntu:22.04
-
-COPY get_release.sh /get_release.sh
-RUN chmod +x /get_release.sh
-
-RUN apt update -y
-RUN apt install -y jq curl xvfb libfuse2 libgtk-3-dev libnss3-dev libasound2 libnotify4 libxss1 xdg-utils libsecret-1-0
-
-CMD ["/bin/bash"]
