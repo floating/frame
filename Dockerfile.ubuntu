@@ -3,6 +3,6 @@ FROM ubuntu:22.04
 COPY get_release.sh /get_release.sh
 
 RUN apt update -y
-RUN apt install -y wget
+RUN apt install -y jq curl xvfb libfuse2 libgtk-3 libnss3-dev libasound2
 
 CMD ["/bin/bash"]
