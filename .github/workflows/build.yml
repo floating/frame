@@ -68,6 +68,7 @@ jobs:
       - name: Configure arm64 build for Linux
         if: matrix.os == 'ubuntu-22.04-arm'
         run: |
+          LINE=$(cat electron-builder.json | grep -n snap | cut -d ':' -f 1)
           sed "$((LINE-1)),$((LINE+2))d" electron-builder.json | sed 's/x64/arm64/g' > electron-builder.json.tmp
           mv electron-builder.json.tmp electron-builder.json
       - name: install Linux dev tools
