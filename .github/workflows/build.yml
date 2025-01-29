@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-20.04
+          #- ubuntu-20.04
           - ubuntu-22.04-arm
         # include:
         #   - os: macos-13
@@ -69,8 +69,12 @@ jobs:
         if: matrix.os == 'ubuntu-22.04-arm'
         run: |
           LINE=$(cat electron-builder.json | grep -n snap | cut -d ':' -f 1)
-          sed "$((LINE-1)),$((LINE+2))d" electron-builder.json | sed 's/x64/arm64/g' > electron-builder.json.tmp
-          mv electron-builder.json.tmp electron-builder.json
+          sed -i "$((LINE-1)),$((LINE+2))d" electron-builder.json
+          
+          LINE=$(cat electron-builder.json | grep -n deb | cut -d ':' -f 1)
+          sed -i "$((LINE-1)),$((LINE+2))d" electron-builder.json
+          
+          sed -i 's/x64/arm64/g' electron-builder.json
       - name: install Linux dev tools
         if: startsWith(matrix.os, 'ubuntu')
         run: |
