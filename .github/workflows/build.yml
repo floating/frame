@@ -85,8 +85,8 @@ jobs:
         shell: bash
         run: sleep 4
       - name: Publish
-        if: startsWith(matrix.os, 'ubuntu') && endsWith(matrix.os, 'arm')
+        if: ${{ startsWith(matrix.os, 'ubuntu') && endsWith(matrix.os, 'arm') }}
         run: npm run publish:arm64
       - name: Publish
-        if: !startsWith(matrix.os, 'ubuntu') || !endsWith(matrix.os, 'arm')
+        if: ${{ !startsWith(matrix.os, 'ubuntu') || !endsWith(matrix.os, 'arm') }}
         run: npm run publish
