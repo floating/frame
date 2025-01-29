@@ -22,5 +22,21 @@
       }
     ]
   },
+  "mac": {
+    "target": {
+      "target": "default",
+      "arch": ["x64", "arm64"]
+    },
+    "notarize": false,
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "requirements": "build/electron-builder-requirements.txt"
+  },
+  "win": {
+    "publisherName": "Frame Labs, Inc.",
+    "signAndEditExecutable": true,
+    "icon": "build/icons/icon.png"
+  },
   "files": ["compiled", "bundle", "!compiled/main/dev"]
 }
