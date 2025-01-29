@@ -11,7 +11,7 @@ env:
 
 jobs:
   create_draft_release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -65,16 +65,6 @@ jobs:
         with:
           node-version: 18.12.1
           cache: 'npm'
-      - name: Configure arm64 build for Linux
-        if: matrix.os == 'ubuntu-22.04-arm'
-        run: |
-          LINE=$(cat electron-builder.json | grep -n snap | cut -d ':' -f 1)
-          sed -i "$((LINE-1)),$((LINE+2))d" electron-builder.json
-          
-          LINE=$(cat electron-builder.json | grep -n deb | cut -d ':' -f 1)
-          sed -i "$((LINE-1)),$((LINE+2))d" electron-builder.json
-          
-          sed -i 's/x64/arm64/g' electron-builder.json
       - name: install Linux dev tools
         if: startsWith(matrix.os, 'ubuntu')
         run: |
@@ -84,8 +74,6 @@ jobs:
         if: startsWith(matrix.os, 'macos')
         run: |
           sudo -H pip install setuptools
-      - name: print electron builder config
-        run: cat electron-builder.json
       - name: create NPM config file
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
       - run: npm run setup:ci
@@ -97,8 +85,8 @@ jobs:
         shell: bash
         run: sleep 4
       - name: Publish
-        if: matrix.os == 'ubuntu-22.04-arm'
+        if: startsWith(matrix.os, 'ubuntu') && endsWith(matrix.os, 'arm')
         run: npm run publish:arm64
       - name: Publish
-        if: matrix.os != 'ubuntu-22.04-arm'
+        if: !startsWith(matrix.os, 'ubuntu') || !endsWith(matrix.os, 'arm')
         run: npm run publish
