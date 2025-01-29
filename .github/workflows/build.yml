@@ -37,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          #- ubuntu-20.04
+          - ubuntu-20.04
           - ubuntu-22.04-arm
         # include:
         #   - os: macos-13
@@ -96,4 +96,9 @@ jobs:
       - name: Sleep for 4 seconds
         shell: bash
         run: sleep 4
-      - run: npm run publish
+      - name: Publish
+        if: matrix.os == 'ubuntu-22.04-arm'
+        run: npm run publish:arm64
+      - name: Publish
+        if: matrix.os != 'ubuntu-22.04-arm'
+        run: npm run publish
