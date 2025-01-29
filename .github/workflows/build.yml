@@ -37,7 +37,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-22.04
+          - ubuntu-20.04
+          - ubuntu-22.04-arm
         # include:
         #   - os: macos-13
         #     cert_key: APPLE_DEVELOPER_SIGNING_CERTIFICATE
@@ -64,13 +65,18 @@ jobs:
         with:
           node-version: 18.12.1
           cache: 'npm'
+      - name: Configure arm64 build for Linux
+        if: matrix.os == 'ubuntu-22.04-arm'
+        run: |
+          sed "$((LINE-1)),$((LINE+2))d" electron-builder.json | sed 's/x64/arm64/g' > electron-builder.json.tmp
+          mv electron-builder.json.tmp electron-builder.json
       - name: install Linux dev tools
-        if: matrix.os == 'ubuntu-22.04'
+        if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt update -y
           sudo apt install -y libudev-dev
       - name: install Macos dev tools
-        if: matrix.os == 'macos-13'
+        if: startsWith(matrix.os, 'macos')
         run: |
           sudo -H pip install setuptools
       - name: create NPM config file
