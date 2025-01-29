@@ -79,6 +79,8 @@ jobs:
         if: startsWith(matrix.os, 'macos')
         run: |
           sudo -H pip install setuptools
+      - name: print electron builder config
+        run: cat electron-builder.json
       - name: create NPM config file
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ./.npmrc
       - run: npm run setup:ci
