@@ -4,7 +4,7 @@ const baseConfig = require('./electron-builder-base.js')
 
 const config = {
   ...baseConfig,
-  //afterSign: './build/notarize.js',
+  afterSign: './build/notarize.js',
   linux: {
     target: [
       {
