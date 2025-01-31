@@ -149,6 +149,7 @@ function initTrayWindow() {
   windows.tray.setPosition(width + x, height + y)
 
   windows.tray.on('show', () => {
+    console.log('---> Tray show')
     if (process.platform === 'win32') {
       systemTray.closeContextMenu()
     }

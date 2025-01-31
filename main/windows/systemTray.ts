@@ -22,9 +22,16 @@ export class SystemTray {
     // Electron Tray can only be instantiated when the app is ready
     this.electronTray = new ElectronTray(path.join(__dirname, isMacOS ? './IconTemplate.png' : './Icon.png'))
     this.electronTray.on('click', (_event: KeyboardEvent, bounds: Rectangle) => {
+      console.log('---> Received click on tray', { bounds})
       const mainWindowBounds = mainWindow.getBounds()
+      console.log('---> Main window bounds', mainWindowBounds)
       const currentDisplay = screen.getDisplayMatching(bounds)
+      console.log('---> Current display', currentDisplay)
       const trayClickDisplay = screen.getDisplayMatching(mainWindowBounds)
+      console.log('---> Tray click display', trayClickDisplay)
+
+      console.log('---> Tray click display id', trayClickDisplay.id)
+      console.log('---> Current display id', currentDisplay.id)
       if (trayClickDisplay.id !== currentDisplay.id) {
         this.setContextMenu('show', { switchScreen: true })
       }
@@ -36,6 +43,7 @@ export class SystemTray {
     type: string,
     { displaySummonShortcut = false, accelerator = 'Alt+/', switchScreen = false }
   ) {
+    //console.log('---> Setting context menu', { type, displaySummonShortcut, accelerator, switchScreen })
     const separatorMenuItem = {
       label: 'Frame',
       click: () => {},
