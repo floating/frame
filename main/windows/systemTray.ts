@@ -10,16 +10,17 @@ let isUbuntu23OrGreater = false
 
 if (process.platform === 'linux') {
   try {
-  getos((error: Error, osInfo: any) => {
-    if (error) {
-      console.error('Could not determine Linux version', error)
-    } else {
-      if (osInfo.dist === 'Ubuntu' && osInfo.release) {
-        const majorVersion = parseInt(osInfo.release.split('.')[0], 10)
-        isUbuntu23OrGreater = majorVersion >= 23
+    getos((error: Error, osInfo: any) => {
+      if (error) {
+        console.error('Could not determine Linux version', error)
+      } else {
+        if (osInfo.dist === 'Ubuntu' && osInfo.release) {
+          const majorVersion = parseInt(osInfo.release.split('.')[0], 10)
+          isUbuntu23OrGreater = majorVersion >= 23
+          }
+        }
       }
-    }
-    })
+    )
   } catch (error) {
     console.error('Could not determine Linux version', error)
   }
