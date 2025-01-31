@@ -17,10 +17,9 @@ if (process.platform === 'linux') {
         if (osInfo.dist === 'Ubuntu' && osInfo.release) {
           const majorVersion = parseInt(osInfo.release.split('.')[0], 10)
           isUbuntu23OrGreater = majorVersion >= 23
-          }
         }
       }
-    )
+    })
   } catch (error) {
     console.error('Could not determine Linux version', error)
   }
