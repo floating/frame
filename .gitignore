@@ -10,6 +10,7 @@ dist
 compiled
 release
 test/.userData
+.idea
 .vscode
 .parcel-cache
 *.tsbuildinfo
