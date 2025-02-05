@@ -7,6 +7,10 @@ class RingSignerWorker extends HotSignerWorker {
     process.on('message', (message) => this.handleMessage(message))
   }
 
+  getSecret({ index }, pseudoCallback) {
+    pseudoCallback(null, this.keys[index].toString('hex'))
+  }
+
   unlock({ encryptedKeys, password }, pseudoCallback) {
     try {
       this.keys = this._decrypt(encryptedKeys, password)

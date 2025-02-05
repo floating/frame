@@ -56,6 +56,10 @@ class HotSigner extends Signer {
     log.info('Signer erased from disk')
   }
 
+  getSecret(index, cb) {
+    this._callWorker({ method: 'getSecret', params: { index } }, cb)
+  }
+
   lock(cb) {
     this._callWorker({ method: 'lock' }, () => {
       this.status = 'locked'
@@ -92,7 +96,11 @@ class HotSigner extends Signer {
       // Update id
       this.id = derivedId
       // Write to disk
-      this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
+      this.save({
+        encryptedKeys: this.encryptedKeys,
+        encryptedPhrase: this.encryptedPhrase,
+        encryptedSeed: this.encryptedSeed
+      })
     } else if (this.id !== derivedId) {
       // On changed ID
       // Erase from disk
@@ -102,7 +110,11 @@ class HotSigner extends Signer {
       // Update id
       this.id = derivedId
       // Write to disk
-      this.save({ encryptedKeys: this.encryptedKeys, encryptedSeed: this.encryptedSeed })
+      this.save({
+        encryptedKeys: this.encryptedKeys,
+        encryptedPhrase: this.encryptedPhrase,
+        encryptedSeed: this.encryptedSeed
+      })
     }
 
     store.updateSigner(this.summary())

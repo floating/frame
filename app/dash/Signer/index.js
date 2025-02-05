@@ -23,7 +23,10 @@ class Signer extends React.Component {
       addressLimit: 5,
       latticePairCode: '',
       tPin: '',
-      tPhrase: ''
+      tPhrase: '',
+      exportIndex: null,
+      exportCb: null,
+      exportSecret: null
     }
   }
 
@@ -202,7 +205,15 @@ class Signer extends React.Component {
   statusText() {
     const status = this.getStatus()
 
-    if (status === 'ok') {
+    if (this.state.exportCb) {
+      const signer = this.store('main.signers', this.props.id)
+      return (
+        <div className='signerStatusText signerStatusIssue'>
+          {'exporting ' +
+            (this.state.exportIndex === null ? 'seed phrase' : signer.addresses[this.state.exportIndex])}
+        </div>
+      )
+    } else if (status === 'ok') {
       return <div className='signerStatusText signerStatusReady'>{'ready to sign'}</div>
     } else if (status === 'locked') {
       const hwSigner = isHardwareSigner(this.props.type)
@@ -350,7 +361,13 @@ class Signer extends React.Component {
   renderSignerStatus() {
     const signer = this.store('main.signers', this.props.id)
 
-    return <SignerStatus signer={signer} />
+    return <SignerStatus signer={signer} exportCb={this.state.exportCb} />
+  }
+
+  showSecret() {
+    link.rpc('getSecret', this.props.id, this.state.exportIndex, (err, secret) => {
+      if (!err) this.setState({ exportSecret: secret, exportCb: null })
+    })
   }
 
   renderExpanded() {
@@ -375,108 +392,156 @@ class Signer extends React.Component {
     const zIndex = 1000 - index
 
     return (
-      <div className={'expandedSigner cardShow'} style={{ zIndex }}>
-        {<div style={{ height: '22px' }} />}
-        {this.statusText()}
-        {type === 'lattice' && status === 'pair' ? (
-          <div className='signerLatticePair'>
-            <div className='signerLatticePairTitle'>Please input your Lattice&apos;s pairing code</div>
-            <div className='signerLatticePairInput'>
-              <input
-                autoFocus
-                tabIndex='1'
-                value={this.state.latticePairCode}
-                onChange={(e) => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') this.pairToLattice()
-                }}
-              />
+      <div>
+        <div className={'expandedSigner cardShow'} style={{ zIndex }}>
+          {<div style={{ height: '22px' }} />}
+          {this.statusText()}
+          {type === 'lattice' && status === 'pair' ? (
+            <div className='signerLatticePair'>
+              <div className='signerLatticePairTitle'>Please input your Lattice&apos;s pairing code</div>
+              <div className='signerLatticePairInput'>
+                <input
+                  autoFocus
+                  tabIndex='1'
+                  value={this.state.latticePairCode}
+                  onChange={(e) => this.setState({ latticePairCode: (e.target.value || '').toUpperCase() })}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') this.pairToLattice()
+                  }}
+                />
+              </div>
+              <div onMouseDown={() => this.pairToLattice()} className='signerLatticePairSubmit'>
+                Pair
+              </div>
             </div>
-            <div onMouseDown={() => this.pairToLattice()} className='signerLatticePairSubmit'>
-              Pair
-            </div>
-          </div>
-        ) : status === 'ok' || isLocked ? (
-          <>
-            {this.renderSignerStatus()}
-            <div className='signerAddedAccountTitle'>{'available accounts'}</div>
-            <div className='signerAccounts'>
-              {signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
-                const added = this.store('main.accounts', address.toLowerCase())
-                const checkSummedAddress = getAddress(address)
-                return (
-                  <div
-                    key={address}
-                    className={!added ? 'signerAccount' : 'signerAccount signerAccountAdded'}
-                    onClick={() => {
-                      if (this.store('main.accounts', address.toLowerCase())) {
-                        link.rpc('removeAccount', address, {}, () => {})
-                      } else {
-                        const type = getSignerDisplayType(signer)
-                        link.rpc(
-                          'createAccount',
-                          address,
-                          `${capitalize(type)} Account`,
-                          { type: signer.type },
-                          (e) => {
-                            if (e) console.error(e)
-                          }
-                        )
-                      }
-                    }}
-                  >
-                    <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
-                    <div className='signerAccountAddress'>
-                      {checkSummedAddress.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })}{' '}
-                      {checkSummedAddress.substr(address.length - 10)}
+          ) : status === 'ok' || isLocked ? (
+            <>
+              {this.renderSignerStatus()}
+              <div className='signerAddedAccountTitle'>{'available accounts'}</div>
+              <div className='signerAccounts'>
+                {signer.addresses.slice(startIndex, startIndex + addressLimit).map((address, index) => {
+                  const added = this.store('main.accounts', address.toLowerCase())
+                  const checkSummedAddress = getAddress(address)
+                  return (
+                    <div
+                      key={address}
+                      className={!added ? 'signerAccount' : 'signerAccount signerAccountAdded'}
+                      onClick={() => {
+                        if (this.store('main.accounts', address.toLowerCase())) {
+                          link.rpc('removeAccount', address, {}, () => {})
+                        } else {
+                          const type = getSignerDisplayType(signer)
+                          link.rpc(
+                            'createAccount',
+                            address,
+                            `${capitalize(type)} Account`,
+                            { type: signer.type },
+                            (e) => {
+                              if (e) console.error(e)
+                            }
+                          )
+                        }
+                      }}
+                    >
+                      <div className='signerAccountIndex'>{index + 1 + startIndex}</div>
+                      <div className='signerAccountAddress'>
+                        {checkSummedAddress.substr(0, 11)} {svg.octicon('kebab-horizontal', { height: 20 })}{' '}
+                        {checkSummedAddress.substr(address.length - 10)}
+                      </div>
+                      {status === 'ok' && (
+                        <div
+                          className='signerAccountExport'
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (this.state.exportCb && this.state.exportIndex === index + startIndex) {
+                              this.setState({ exportCb: null })
+                            } else {
+                              this.setState({
+                                exportIndex: index + startIndex,
+                                exportCb: this.showSecret.bind(this)
+                              })
+                            }
+                          }}
+                        >
+                          {svg.export(15)}
+                        </div>
+                      )}
+                      <div className='signerAccountCheck' />
                     </div>
-                    <div className='signerAccountCheck' />
-                  </div>
-                )
-              })}
-            </div>
-            <div className='signerBottom'>
-              <div className='signerBottomPageBack' onMouseDown={() => this.nextPage(true)}>
-                {svg.triangleLeft(20)}
+                  )
+                })}
               </div>
-              <div className='signerBottomPages'>
-                {page + 1 + ' / ' + Math.ceil(signer.addresses.length / addressLimit)}
+              <div className='signerBottom'>
+                <div className='signerBottomPageBack' onMouseDown={() => this.nextPage(true)}>
+                  {svg.triangleLeft(20)}
+                </div>
+                <div className='signerBottomPages'>
+                  {page + 1 + ' / ' + Math.ceil(signer.addresses.length / addressLimit)}
+                </div>
+                <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>
+                  {svg.triangleLeft(20)}
+                </div>
               </div>
-              <div className='signerBottomPageNext' onMouseDown={() => this.nextPage()}>
-                {svg.triangleLeft(20)}
+            </>
+          ) : type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
+            <div className='signerInterface'>
+              {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
+              {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
+            </div>
+          ) : loading ? (
+            <div className='signerLoading'>
+              <div className='signerLoadingLoader' />
+            </div>
+          ) : (
+            <></>
+          )}
+          <div className='signerControls'>
+            {permissionId ? (
+              <div className='signerControlDetail'>
+                <div className='signerControlDetailKey'>{'PERMISSION ID:'}</div>
+                <div className='signerControlDetailValue'>{permissionId}</div>
               </div>
+            ) : null}
+            {canReconnect && <ReloadSignerButton id={id} />}
+            {this.props.type === 'seed' && status === 'ok' && (
+              <div
+                className='signerControlOption signerControlOptionImportant'
+                onClick={() => {
+                  if (this.state.exportCb && this.state.exportIndex === null) {
+                    this.setState({ exportCb: null })
+                  } else {
+                    this.setState({ exportIndex: null, exportCb: this.showSecret.bind(this) })
+                  }
+                }}
+              >
+                Export Seed Phrase
+              </div>
+            )}
+            <div
+              className='signerControlOption signerControlOptionImportant'
+              onClick={() => {
+                link.send('dash:removeSigner', id)
+                link.send('tray:action', 'backDash')
+              }}
+            >
+              Remove Signer
             </div>
-          </>
-        ) : type === 'trezor' && (status === 'need pin' || status === 'enter passphrase') ? (
-          <div className='signerInterface'>
-            {this.renderTrezorPin(this.props.type === 'trezor' && status === 'need pin')}
-            {this.renderTrezorPhrase(this.props.type === 'trezor' && status === 'enter passphrase')}
-          </div>
-        ) : loading ? (
-          <div className='signerLoading'>
-            <div className='signerLoadingLoader' />
-          </div>
-        ) : (
-          <></>
-        )}
-        <div className='signerControls'>
-          {permissionId ? (
-            <div className='signerControlDetail'>
-              <div className='signerControlDetailKey'>{'PERMISSION ID:'}</div>
-              <div className='signerControlDetailValue'>{permissionId}</div>
-            </div>
-          ) : null}
-          {canReconnect && <ReloadSignerButton id={id} />}
-          <div
-            className='signerControlOption signerControlOptionImportant'
-            onClick={() => {
-              link.send('dash:removeSigner', id)
-              link.send('tray:action', 'backDash')
-            }}
-          >
-            Remove Signer
           </div>
         </div>
+        {this.state.exportSecret && (
+          <div className='signerSecretExport'>
+            <textarea readOnly value={this.state.exportSecret} />
+            <div
+              className='signerSecretOption'
+              onClick={() => link.send('tray:clipboardData', this.state.exportSecret)}
+            >
+              Copy
+            </div>
+            <div className='signerSecretOption' onClick={() => this.setState({ exportSecret: null })}>
+              Hide
+            </div>
+          </div>
+        )}
       </div>
     )
   }

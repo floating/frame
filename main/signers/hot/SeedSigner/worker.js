@@ -4,12 +4,16 @@ const HotSignerWorker = require('../HotSigner/worker')
 class SeedSignerWorker extends HotSignerWorker {
   constructor() {
     super()
+    this.phrase = null
     this.seed = null
     process.on('message', (message) => this.handleMessage(message))
   }
 
-  unlock({ encryptedSeed, password }, pseudoCallback) {
+  unlock({ encryptedPhrase, encryptedSeed, password }, pseudoCallback) {
     try {
+      this.phrase = encryptedPhrase
+        ? this._decrypt(encryptedPhrase, password)
+        : 'The seed phrase for this signer is unknown'
       this.seed = this._decrypt(encryptedSeed, password)
       pseudoCallback(null)
     } catch (e) {
@@ -17,9 +21,18 @@ class SeedSignerWorker extends HotSignerWorker {
     }
   }
 
+  getSecret({ index }, pseudoCallback) {
+    pseudoCallback(null, index === null ? this.phrase : this._derivePrivateKey(index).toString('hex'))
+  }
+
   lock(_, pseudoCallback) {
+    this.phrase = null
     this.seed = null
     pseudoCallback(null)
+  }
+
+  encryptPhrase({ phrase, password }, pseudoCallback) {
+    pseudoCallback(null, this._encrypt(phrase, password))
   }
 
   encryptSeed({ seed, password }, pseudoCallback) {
