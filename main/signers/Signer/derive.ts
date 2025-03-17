@@ -16,8 +16,8 @@ export function deriveHDAccounts(publicKey: string, chainCode: string, cb: Callb
     hdk.chainCode = Buffer.from(chainCode, 'hex')
     const derive = (index: number) => {
       const derivedKey = hdk.derive(`m/${index}`)
-      const address = publicToAddress(derivedKey.publicKey, true)
-      return toChecksumAddress(`0x${address.toString('hex')}`)
+      const address = Buffer.from(publicToAddress(derivedKey.publicKey, true)).toString('hex')
+      return toChecksumAddress(`0x${address}`)
     }
     const accounts = []
     for (let i = 0; i < 100; i++) {

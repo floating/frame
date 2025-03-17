@@ -7,6 +7,7 @@ type RPCRequestCallback = RPCCallback<RPCResponsePayload>
 
 type Address = string // 20 hex bytes, 0x-prefixed
 type Caip2ChainId = string // format: "<namespace>:<chainId>", ex: "eip155:1"
+type TransactionType = '0x0' | '0x1' | '0x2' | '0x4'
 
 interface RPCId {
   id: number
@@ -151,6 +152,12 @@ declare namespace RPC {
   }
 
   namespace SendTransaction {
+    interface Authorization {
+      contractAddress: Address
+      chainId: string
+      nonce: string
+    }
+
     interface TxParams {
       nonce?: string
       gasPrice?: string
@@ -163,7 +170,8 @@ declare namespace RPC {
       data?: string
       value?: string
       chainId: string
-      type?: string
+      type?: TransactionType
+      authorizationList?: Authorization[]
     }
 
     interface Request extends Omit<RPCRequestPayload, 'method'> {

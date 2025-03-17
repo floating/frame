@@ -7,7 +7,7 @@ import { BigNumber } from 'ethers'
 import { estimateL1GasCost } from '@eth-optimism/sdk'
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util'
 import { isAddress } from '@ethersproject/address'
-import { addHexPrefix, intToHex, isHexString, isHexPrefixed, fromUtf8 } from '@ethereumjs/util'
+import { addHexPrefix, intToHex, isHexString, fromUtf8, PrefixedHexString } from '@ethereumjs/util'
 
 import store from '../store'
 import packageFile from '../../package.json'
@@ -241,15 +241,7 @@ export class Provider extends EventEmitter {
     const payload = req.payload
     let [address, rawMessage] = payload.params
 
-    let message = rawMessage
-
-    if (isHexString(rawMessage)) {
-      if (!isHexPrefixed(rawMessage)) {
-        message = addHexPrefix(rawMessage)
-      }
-    } else {
-      message = fromUtf8(rawMessage)
-    }
+    const message = isHexString(rawMessage) ? rawMessage : fromUtf8(rawMessage)
 
     accounts.signMessage(address, message, (err, signed) => {
       if (err) {
@@ -427,7 +419,7 @@ export class Provider extends EventEmitter {
     return handlerId
   }
 
-  private async getGasEstimate(rawTx: TransactionData) {
+  private async getGasEstimate(rawTx: TransactionData): Promise<PrefixedHexString> {
     const { from, to, value, data, nonce } = rawTx
     const txParams = { from, to, value, data, nonce }
 
@@ -443,7 +435,7 @@ export class Provider extends EventEmitter {
       id: parseInt(rawTx.chainId, 16)
     }
 
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<PrefixedHexString>((resolve, reject) => {
       this.connection.send(
         payload,
         (response) => {
@@ -496,7 +488,7 @@ export class Provider extends EventEmitter {
       const gas = gasFees(rawTx)
       const { chainConfig } = connection
 
-      const estimateGasLimit = async () => {
+      const estimateGasLimit = async (): Promise<PrefixedHexString> => {
         try {
           return await this.getGasEstimate(rawTx)
         } catch (error) {

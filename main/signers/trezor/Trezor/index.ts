@@ -321,7 +321,10 @@ export default class Trezor extends Signer {
         }
       })
 
-      cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
+      const serializedTx = signedTx.serialize()
+      const txHex = addHexPrefix(Buffer.from(serializedTx).toString('hex'))
+
+      cb(null, txHex)
     } catch (e: unknown) {
       const err = e as DeviceError
       cb(err)

@@ -1,6 +1,8 @@
 import { JsonTx } from '@ethereumjs/tx'
 import { addHexPrefix, isHexString } from '@ethereumjs/util'
 
+import type { PrefixedHexString } from '@ethereumjs/util'
+
 export enum GasFeesSource {
   Dapp = 'Dapp',
   Frame = 'Frame'
@@ -12,7 +14,7 @@ export interface TransactionData extends Omit<JsonTx, 'chainId' | 'type'> {
   from?: string
   feesUpdated?: boolean
   chainId: string
-  type: string
+  type: PrefixedHexString
   gasFeesSource: GasFeesSource
   recipientType?: string
 }

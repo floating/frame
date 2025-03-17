@@ -1,12 +1,12 @@
 import BigNumber from 'bignumber.js'
-import { addHexPrefix, intToHex } from '@ethereumjs/util'
+import { addHexPrefix, intToHex, PrefixedHexString } from '@ethereumjs/util'
 import { TransactionFactory, TypedTransaction } from '@ethereumjs/tx'
 import { Common } from '@ethereumjs/common'
 
+import chainConfig from '../chains/config'
 import { AppVersion, SignerSummary } from '../signers/Signer'
 import { GasFeesSource, TransactionData, typeSupportsBaseFee } from '../../resources/domain/transaction'
 import { isNonZeroHex } from '../../resources/utils'
-import chainConfig from '../chains/config'
 import { TransactionRequest, TxClassification } from '../accounts/types'
 
 import type { Gas } from '../store/state'
@@ -115,7 +115,7 @@ function populate(rawTx: TransactionData, chainConfig: Common, gas: Gas): Transa
   }
 
   // EIP-1559 case
-  txData.type = intToHex(2)
+  txData.type = parseInt(txData.type) === 4 ? intToHex(4) : intToHex(2)
 
   const useFrameMaxFeePerGas = !rawTx.maxFeePerGas || isNaN(parseInt(rawTx.maxFeePerGas, 16))
   const useFrameMaxPriorityFeePerGas =
@@ -144,8 +144,8 @@ function populate(rawTx: TransactionData, chainConfig: Common, gas: Gas): Transa
 
   // if no valid dapp-supplied value for maxPriorityFeePerGas we use the Frame-supplied value
   txData.maxPriorityFeePerGas = useFrameMaxPriorityFeePerGas
-    ? addHexPrefix(BigNumber(maxPriorityFee).toString(16))
-    : txData.maxPriorityFeePerGas
+    ? (addHexPrefix(BigNumber(maxPriorityFee).toString(16)) as PrefixedHexString)
+    : (txData.maxPriorityFeePerGas as PrefixedHexString)
 
   return txData
 }
