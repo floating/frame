@@ -7,33 +7,37 @@ import { v5 as uuidv5 } from 'uuid'
 import provider from '../provider'
 import store from '../store'
 import FrameAccount from './Account'
-import ExternalDataScanner, { DataScanner } from '../externalData'
+import ExternalDataScanner from '../externalData'
 import Signer from '../signers/Signer'
-import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatibility } from '../transaction'
+import { signerCompatibility as transactionCompatibility, maxFee } from '../transaction'
 
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
 import { findUnavailableSigners, isSignerReady } from '../../resources/domain/signer'
 
-import {
-  AccountRequest,
-  AccessRequest,
-  TransactionRequest,
-  TransactionReceipt,
-  ReplacementType,
-  RequestStatus,
-  RequestMode,
-  TypedMessage,
-  PermitSignatureRequest
-} from './types'
+import { ReplacementType, RequestStatus, RequestMode } from './types'
 
-import type { Chain } from '../chains'
-import { ActionType } from '../transaction/actions'
 import { openBlockExplorer } from '../windows/window'
 import { ApprovalType } from '../../resources/constants'
 import { accountNS } from '../../resources/domain/account'
 import { chainUsesOptimismFees } from '../../resources/utils/chains'
+
+import type { PrefixedHexString } from '@ethereumjs/util'
+
+import type { Chain } from '../chains'
+import type { SignerCompatibility } from '../transaction'
+import type { ActionType } from '../transaction/actions'
+import type { DataScanner } from '../externalData'
+
+import type {
+  AccountRequest,
+  AccessRequest,
+  TransactionRequest,
+  TransactionReceipt,
+  TypedMessage,
+  PermitSignatureRequest
+} from './types'
 
 function notify(title: string, body: string, action: (event: Electron.Event) => void) {
   const notification = new Notification({ title, body })
@@ -158,7 +162,7 @@ export class Accounts extends EventEmitter {
     return this._current ? this.accounts[this._current] : null
   }
 
-  updateNonce(reqId: string, nonce: string) {
+  updateNonce(reqId: string, nonce: PrefixedHexString) {
     log.info('Update Nonce: ', reqId, nonce)
 
     const currentAccount = this.current()
@@ -1215,7 +1219,7 @@ export class Accounts extends EventEmitter {
     const txRequest = this.getTransactionRequest(currentAccount, handlerId)
     const initialNonce = txRequest.payload.params[0].nonce
     if (initialNonce) {
-      txRequest.data.nonce = initialNonce
+      txRequest.data.nonce = initialNonce as PrefixedHexString
     } else {
       delete txRequest.data.nonce
     }

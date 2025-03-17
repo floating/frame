@@ -6,7 +6,8 @@ import {
   pubToAddress,
   ecrecover,
   hashPersonalMessage,
-  PrefixedHexString
+  toBytes,
+  unpadHex
 } from '@ethereumjs/util'
 import log from 'electron-log'
 import BN from 'bignumber.js'
@@ -15,10 +16,12 @@ import { isHexString } from 'ethers/lib/utils'
 
 import store from '../store'
 import protectedMethods from '../api/protectedMethods'
-import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
+import { usesBaseFee, GasFeesSource } from '../../resources/domain/transaction'
 import { getAddress } from '../../resources/utils'
 
-import type { Chain, Permission } from '../store/state'
+import type { TransactionData } from '../../resources/domain/transaction'
+import type { Chain } from '../store/state'
+import type { PrefixedHexString } from '@ethereumjs/util'
 
 const permission = (date: number, method: string) => ({ parentCapability: method, date })
 
@@ -52,8 +55,8 @@ export function checkExistingNonceGas(tx: TransactionData) {
         // Bump fees by 10%
         const bumpedFee = Math.max(Math.ceil(existingFee * 1.1), feeInt)
         const bumpedBase = Math.max(Math.ceil((existingMax - existingFee) * 1.1), Math.ceil(maxInt - feeInt))
-        tx.maxFeePerGas = '0x' + (bumpedBase + bumpedFee).toString(16)
-        tx.maxPriorityFeePerGas = '0x' + bumpedFee.toString(16)
+        tx.maxFeePerGas = intToHex(bumpedBase + bumpedFee)
+        tx.maxPriorityFeePerGas = intToHex(bumpedFee)
         tx.gasFeesSource = GasFeesSource.Frame
         tx.feesUpdated = true
       }
@@ -63,7 +66,7 @@ export function checkExistingNonceGas(tx: TransactionData) {
       if (existingPrice >= priceInt) {
         // Bump price by 10%
         const bumpedPrice = Math.ceil(existingPrice * 1.1)
-        tx.gasPrice = '0x' + bumpedPrice.toString(16)
+        tx.gasPrice = intToHex(bumpedPrice)
         tx.gasFeesSource = GasFeesSource.Frame
         tx.feesUpdated = true
       }
@@ -84,7 +87,7 @@ export function feeTotalOverMax(rawTx: TransactionData, maxTotalFee: number) {
 
 function parseValue(value = '') {
   const parsedHex = parseInt(value, 16)
-  return (!!parsedHex && addHexPrefix(unpadHexString(value))) || '0x0'
+  return (!!parsedHex && addHexPrefix(unpadHex(value))) || '0x0'
 }
 
 export function getRawTx(newTx: RPC.SendTransaction.TxParams): TransactionData {
@@ -105,15 +108,25 @@ export function getRawTx(newTx: RPC.SendTransaction.TxParams): TransactionData {
 
   const tx: TransactionData = {
     ...rawTx,
+    maxPriorityFeePerGas: isHexString(rawTx.maxPriorityFeePerGas)
+      ? (rawTx.maxPriorityFeePerGas as PrefixedHexString)
+      : intToHex(parseInt(rawTx.maxPriorityFeePerGas || '0', 10)),
+    maxFeePerGas: isHexString(rawTx.maxFeePerGas)
+      ? (rawTx.maxFeePerGas as PrefixedHexString)
+      : intToHex(parseInt(rawTx.maxFeePerGas || '0', 10)),
+    gasPrice: isHexString(rawTx.gasPrice)
+      ? (rawTx.gasPrice as PrefixedHexString)
+      : intToHex(parseInt(rawTx.gasPrice || '0', 10)),
     ...(from && { from: getAddress(from) }),
     ...(to && { to: getAddress(to) }),
     type: '0x0',
     value: parseValue(value),
     data: addHexPrefix(padToEven(stripHexPrefix(data || '0x'))),
-    gasLimit: gasLimit || gas,
+    gasLimit: (gasLimit || gas) as PrefixedHexString,
     chainId: rawTx.chainId,
     nonce: getNonce(),
-    gasFeesSource: GasFeesSource.Dapp
+    gasFeesSource: GasFeesSource.Dapp,
+    authorizationList: []
   }
 
   return tx
@@ -138,9 +151,9 @@ export function getSignedAddress(signed: string, message: string, cb: Callback<s
   if (signature.length !== 65) return cb(new Error('Frame verifySignature: Signature has incorrect length'))
   let v = signature[64]
   v = v === 0 || v === 1 ? v + 27 : v
-  const r = signature.slice(0, 32))
-  const s = toBuffer(signature.slice(32, 64))
-  const hash = hashPersonalMessage(toBuffer(message))
+  const r = Uint8Array.prototype.slice.call(signature, 0, 32)
+  const s = Uint8Array.prototype.slice.call(signature, 32, 64)
+  const hash = hashPersonalMessage(toBytes(message))
   const addressBuffer = Buffer.from(pubToAddress(ecrecover(hash, BigInt(v), r, s)))
   const verifiedAddress = `0x${addressBuffer.toString('hex')}`
 

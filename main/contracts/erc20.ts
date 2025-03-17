@@ -1,10 +1,12 @@
+import provider from '../provider'
 import { TransactionDescription } from '@ethersproject/abi'
 import { Contract } from '@ethersproject/contracts'
 import { Web3Provider } from '@ethersproject/providers'
 import { addHexPrefix } from '@ethereumjs/util'
-import provider from '../provider'
 import { BigNumber } from 'ethers'
 import { erc20Interface } from '../../resources/contracts'
+
+import type { PrefixedHexString } from '@ethereumjs/util'
 
 export interface TokenData {
   decimals?: number
@@ -75,7 +77,7 @@ export default class Erc20Contract {
   }
 
   static encodeCallData(fn: string, params: any[]) {
-    return erc20Interface.encodeFunctionData(fn, params)
+    return erc20Interface.encodeFunctionData(fn, params) as PrefixedHexString
   }
 
   async getTokenData(): Promise<TokenData> {
