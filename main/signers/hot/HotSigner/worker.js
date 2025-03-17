@@ -72,7 +72,7 @@ class HotSignerWorker {
     }
 
     const chainId = parseInt(rawTx.chainId, 16)
-    const hardfork = parseInt(rawTx.type) === 2 ? 'london' : 'berlin'
+    const hardfork = parseInt(rawTx.type) === 2 ? 'london' : parseInt(rawTx.type) === 4 ? 'pectra' : 'london'
     const common = chainConfig(chainId, hardfork)
 
     const tx = TransactionFactory.fromTxData(rawTx, { common })

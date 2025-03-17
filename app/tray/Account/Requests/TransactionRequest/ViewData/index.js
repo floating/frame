@@ -136,7 +136,10 @@ class ViewData extends React.Component {
   decodeRawTx(tx) {
     const decodeTx = {}
     Object.keys(tx).forEach((key) => {
-      if (tx[key] && !tx[key].startsWith('0x')) {
+      console.log('key: ', key)
+      if (key === 'authorizationList') {
+        decodeTx[key] = tx[key].toString()
+      } else if (tx[key] && !tx[key].startsWith('0x')) {
         decodeTx[key] = tx[key]
       } else if (
         [

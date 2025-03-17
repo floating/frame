@@ -1,13 +1,12 @@
 import {
   padToEven,
-  unpadHexString,
   addHexPrefix,
   stripHexPrefix,
   intToHex,
-  toBuffer,
   pubToAddress,
   ecrecover,
-  hashPersonalMessage
+  hashPersonalMessage,
+  PrefixedHexString
 } from '@ethereumjs/util'
 import log from 'electron-log'
 import BN from 'bignumber.js'
@@ -93,7 +92,7 @@ export function getRawTx(newTx: RPC.SendTransaction.TxParams): TransactionData {
   const getNonce = () => {
     // pass through hex string or undefined
     if (rawTx.nonce === undefined || isHexString(rawTx.nonce)) {
-      return rawTx.nonce
+      return rawTx.nonce as PrefixedHexString
     }
 
     // convert positive integer strings to hex, reject everything else
@@ -139,10 +138,12 @@ export function getSignedAddress(signed: string, message: string, cb: Callback<s
   if (signature.length !== 65) return cb(new Error('Frame verifySignature: Signature has incorrect length'))
   let v = signature[64]
   v = v === 0 || v === 1 ? v + 27 : v
-  const r = toBuffer(signature.slice(0, 32))
+  const r = signature.slice(0, 32))
   const s = toBuffer(signature.slice(32, 64))
   const hash = hashPersonalMessage(toBuffer(message))
-  const verifiedAddress = '0x' + pubToAddress(ecrecover(hash, BigInt(v), r, s)).toString('hex')
+  const addressBuffer = Buffer.from(pubToAddress(ecrecover(hash, BigInt(v), r, s)))
+  const verifiedAddress = `0x${addressBuffer.toString('hex')}`
+
   cb(null, verifiedAddress)
 }
 

@@ -309,7 +309,10 @@ export default class Lattice extends Signer {
         }
       })
 
-      cb(null, addHexPrefix(signedTx.serialize().toString('hex')))
+      const serializedTx = signedTx.serialize()
+      const txHex = addHexPrefix(Buffer.from(serializedTx).toString('hex'))
+
+      cb(null, txHex)
     } catch (err) {
       log.error('error signing transaction with Lattice', err)
       const latticeErrorMessage = (err as LatticeResponseError).errorMessage
@@ -386,7 +389,8 @@ export default class Lattice extends Signer {
     const fwVersion = (this.connection as Client).getFwVersion()
 
     if (fwVersion && (fwVersion.major > 0 || fwVersion.minor >= 15)) {
-      const payload = tx.type ? tx.getMessageToSign(false) : encode(tx.getMessageToSign(false))
+      const message = tx.getMessageToSign()
+      const payload = tx.type ? message : encode(message)
 
       const to = tx.to?.toString() ?? undefined
 
