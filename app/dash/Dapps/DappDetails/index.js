@@ -49,23 +49,18 @@ class DappDetails extends React.Component {
         </div>
         <div className='originSwapTitle'>default chain</div>
         <div>{this.updateOriginChain()}</div>
-        {/* <div 
-          className='clearOriginsButton'
-          style={{ color: 'var(--good)' }}
-          onClick={() => {
-            link.send('tray:openExternal', `https://${origin.name}/`)
-          }
-        }>{'launch dapp'}</div> */}
-        {/* <div 
-          className='clearOriginsButton' 
-          style={{ color: 'var(--bad)' }}
-          onClick={() => {
-            link.send('tray:removeOrigin', this.props.originId)
-            link.send('tray:action', 'navDash', { view: 'dapps', data: {}})
-          }}
-        >
-          Remove Dapp
-        </div>   */}
+        <div className='clearPermissionsButton'>
+          <div
+            onClick={() => {
+              link.send('tray:removeOrigin', this.props.originId)
+              link.send('tray:action', 'navDash', { view: 'dapps', data: {} })
+            }}
+            className='moduleButton'
+            style={{ color: 'var(--bad)' }}
+          >
+            Remove Dapp
+          </div>
+        </div>
       </div>
     )
   }
