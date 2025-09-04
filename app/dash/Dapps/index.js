@@ -2,7 +2,7 @@ import React, { createRef } from 'react'
 import Restore from 'react-restore'
 import link from '../../../resources/link'
 import { isNetworkConnected, isNetworkEnabled } from '../../../resources/utils/chains'
-// import svg from '../../../resources/svg'
+import svg from '../../../resources/svg'
 
 import RingIcon from '../../../resources/Components/RingIcon'
 
@@ -80,7 +80,8 @@ class _OriginModule extends React.Component {
 
     this.state = {
       expanded: false,
-      averageRequests: '0.0'
+      averageRequests: '0.0',
+      showDeleteConfirm: false
     }
 
     this.ref = createRef()
@@ -106,8 +107,47 @@ class _OriginModule extends React.Component {
     this.setState({ averageRequests: (origin.session.requests / sessionLengthSeconds).toFixed(2) })
   }
 
+  handleDeleteClick(e) {
+    e.stopPropagation() // Prevent navigation to details view
+    this.setState({ showDeleteConfirm: true })
+  }
+
+  handleDeleteConfirm() {
+    const { origin } = this.props
+    link.send('tray:removeOrigin', origin.id)
+    this.setState({ showDeleteConfirm: false })
+  }
+
+  handleDeleteCancel() {
+    this.setState({ showDeleteConfirm: false })
+  }
+
   render() {
     const { origin, connected } = this.props
+
+    if (this.state.showDeleteConfirm) {
+      return (
+        <div className='sliceOrigin' style={{ background: 'var(--bad1)', border: '1px solid var(--bad)' }}>
+          <div className='sliceOriginTitle' style={{ color: 'var(--bad)' }}>
+            Remove &quot;{origin.name}&quot;?
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <div
+              className='sliceOriginDelete sliceOriginDeleteConfirm'
+              onClick={() => this.handleDeleteConfirm()}
+            >
+              Remove
+            </div>
+            <div
+              className='sliceOriginDelete sliceOriginDeleteCancel'
+              onClick={() => this.handleDeleteCancel()}
+            >
+              Cancel
+            </div>
+          </div>
+        </div>
+      )
+    }
 
     return (
       <div>
@@ -122,6 +162,9 @@ class _OriginModule extends React.Component {
           <div className='sliceOriginReqs'>
             <div className='sliceOriginReqsNumber'>{this.state.averageRequests}</div>
             <div className='sliceOriginReqsLabel'>{'reqs/min'}</div>
+          </div>
+          <div className='sliceOriginDelete' onClick={(e) => this.handleDeleteClick(e)} title='Remove dapp'>
+            {svg.octicon('x', { height: 16 })}
           </div>
         </div>
         {this.state.expanded ? <div>{'origin quick menu'}</div> : null}
