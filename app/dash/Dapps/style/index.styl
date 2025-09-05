@@ -200,3 +200,68 @@
 
   .originChainItemActive
     color var(--good)
+
+.sliceOriginDelete
+  position absolute
+  right 16px
+  width 24px
+  height 24px
+  display flex
+  justify-content center
+  align-items center
+  border-radius 12px
+  background var(--ghostY)
+  cursor pointer
+  pointer-events auto
+  transition var(--standard)
+  
+  *
+    pointer-events none
+    
+.sliceOriginDelete:hover
+  background var(--bad1)
+  color var(--bad)
+
+.sliceOriginConfirm
+  display flex
+  justify-content center
+  align-items center
+  gap 12px
+  background var(--bad1)
+  border 1px solid var(--bad)
+  padding 8px 16px
+
+.sliceOriginDeleteConfirm
+  position relative
+  right auto
+  flex 1
+  background var(--bad)
+  color var(--ghostA)
+  padding 8px 16px
+  border-radius 20px
+  font-size 13px
+  font-weight 500
+  text-transform uppercase
+  letter-spacing 1px
+  text-align center
+  
+.sliceOriginDeleteConfirm:hover
+  background var(--badHighlight)
+  color var(--ghostA)
+
+.sliceOriginDeleteCancel
+  position relative
+  right auto
+  flex 1
+  background var(--ghostB)
+  color var(--outerspace)
+  padding 8px 16px
+  border-radius 20px
+  font-size 13px
+  font-weight 500
+  text-transform uppercase
+  letter-spacing 1px
+  text-align center
+  
+.sliceOriginDeleteCancel:hover
+  background var(--ghostC)
