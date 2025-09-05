@@ -222,17 +222,28 @@
   background var(--bad1)
   color var(--bad)
 
+.sliceOriginConfirm
+  display flex
+  justify-content center
+  align-items center
+  gap 12px
+  background var(--bad1)
+  border 1px solid var(--bad)
+  padding 8px 16px
+
 .sliceOriginDeleteConfirm
   position relative
   right auto
+  flex 1
   background var(--bad)
   color var(--ghostA)
-  padding 6px 12px
-  border-radius 16px
-  font-size 12px
+  padding 8px 16px
+  border-radius 20px
+  font-size 13px
   font-weight 500
   text-transform uppercase
   letter-spacing 1px
+  text-align center
   
 .sliceOriginDeleteConfirm:hover
   background var(--badHighlight)
@@ -241,14 +252,16 @@
 .sliceOriginDeleteCancel
   position relative
   right auto
+  flex 1
   background var(--ghostB)
   color var(--outerspace)
-  padding 6px 12px
-  border-radius 16px
-  font-size 12px
+  padding 8px 16px
+  border-radius 20px
+  font-size 13px
   font-weight 500
   text-transform uppercase
   letter-spacing 1px
+  text-align center
   
 .sliceOriginDeleteCancel:hover
   background var(--ghostC)

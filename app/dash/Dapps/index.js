@@ -127,23 +127,18 @@ class _OriginModule extends React.Component {
 
     if (this.state.showDeleteConfirm) {
       return (
-        <div className='sliceOrigin' style={{ background: 'var(--bad1)', border: '1px solid var(--bad)' }}>
-          <div className='sliceOriginTitle' style={{ color: 'var(--bad)' }}>
-            Remove &quot;{origin.name}&quot;?
+        <div className='sliceOrigin sliceOriginConfirm'>
+          <div
+            className='sliceOriginDelete sliceOriginDeleteConfirm'
+            onClick={() => this.handleDeleteConfirm()}
+          >
+            Remove
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <div
-              className='sliceOriginDelete sliceOriginDeleteConfirm'
-              onClick={() => this.handleDeleteConfirm()}
-            >
-              Remove
-            </div>
-            <div
-              className='sliceOriginDelete sliceOriginDeleteCancel'
-              onClick={() => this.handleDeleteCancel()}
-            >
-              Cancel
-            </div>
+          <div
+            className='sliceOriginDelete sliceOriginDeleteCancel'
+            onClick={() => this.handleDeleteCancel()}
+          >
+            Cancel
           </div>
         </div>
       )
