@@ -113,12 +113,33 @@ describe('#createObserver', () => {
     })
   })
 
-  it('does not invoke the handler when no account is selected', () => {
+  it('does not invoke the handler when no account is available', () => {
     store.set('selected.current', undefined)
+    store.set('selected.last', undefined)
+    store.set('main.accounts', {})
 
     fireObserver()
 
     expect(handler.assetsChanged).not.toHaveBeenCalled()
+  })
+
+  it('falls back to last selected account when no current account', () => {
+    store.set('selected.current', undefined)
+    store.set('selected.last', account)
+
+    fireObserver()
+
+    expect(handler.assetsChanged).toHaveBeenCalledWith(account, expect.any(Object))
+  })
+
+  it('falls back to first account when no current or last selected', () => {
+    store.set('selected.current', undefined)
+    store.set('selected.last', undefined)
+    store.set('main.accounts', { [account]: { balances: { lastUpdated: new Date() } } })
+
+    fireObserver()
+
+    expect(handler.assetsChanged).toHaveBeenCalledWith(account, expect.any(Object))
   })
 
   it('does not invoke the handler when no assets are present', () => {

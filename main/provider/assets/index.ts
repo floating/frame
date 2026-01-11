@@ -30,11 +30,23 @@ const storeApi = {
   }
 }
 
+function getActiveAccountId(): string {
+  const current = store('selected.current') as string
+  if (current) return current
+
+  const last = store('selected.last') as string
+  if (last) return last
+
+  // Fallback to first available account
+  const accounts = (store('main.accounts') || {}) as Record<string, unknown>
+  return Object.keys(accounts)[0] || ''
+}
+
 function createObserver(handler: AssetsChangedHandler) {
   let debouncedAssets: RPC.GetAssets.Assets | null = null
 
   return function () {
-    const currentAccountId = store('selected.current') as string
+    const currentAccountId = getActiveAccountId()
 
     if (currentAccountId) {
       const assets = fetchAssets(currentAccountId)

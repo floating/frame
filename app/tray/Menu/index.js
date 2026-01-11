@@ -24,6 +24,9 @@ class Menu extends React.Component {
     )
   }
   render() {
+    const accounts = this.store('main.accounts') || {}
+    const hasAccounts = Object.keys(accounts).length > 0
+
     return (
       <div className='panelMenu'>
         <div
@@ -40,22 +43,24 @@ class Menu extends React.Component {
         >
           {this.glitch(svg.sidebar(15), this.state.glitchOnSidebar)}
         </div>
-        <div
-          className={'panelMenuItem panelMenuItemSend'}
-          onClick={() => {
-            clearTimeout(this.clickTimer)
-            this.clickTimer = setTimeout(() => {
-              this.setState({ glitchOnSend: false })
-              link.send('*:addFrame', 'dappLauncher')
-              link.send('tray:action', 'setDash', { showing: false })
-            }, 50)
-          }}
-          onMouseEnter={() => this.setState({ glitchOnSend: true })}
-          onMouseOver={() => this.setState({ glitchOnSend: true })}
-          onMouseLeave={() => this.setState({ glitchOnSend: false })}
-        >
-          {this.glitch(svg.send(15), this.state.glitchOnSend)}
-        </div>
+        {hasAccounts && (
+          <div
+            className={'panelMenuItem panelMenuItemSend'}
+            onClick={() => {
+              clearTimeout(this.clickTimer)
+              this.clickTimer = setTimeout(() => {
+                this.setState({ glitchOnSend: false })
+                link.send('*:addFrame', 'dappLauncher')
+                link.send('tray:action', 'setDash', { showing: false })
+              }, 50)
+            }}
+            onMouseEnter={() => this.setState({ glitchOnSend: true })}
+            onMouseOver={() => this.setState({ glitchOnSend: true })}
+            onMouseLeave={() => this.setState({ glitchOnSend: false })}
+          >
+            {this.glitch(svg.send(15), this.state.glitchOnSend)}
+          </div>
+        )}
       </div>
     )
   }

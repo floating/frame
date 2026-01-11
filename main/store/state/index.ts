@@ -791,6 +791,7 @@ const initial = {
     minimized: true,
     open: false,
     current: '',
+    last: '',
     view: 'default',
     settings: {
       viewIndex: 0,

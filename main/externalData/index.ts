@@ -14,7 +14,18 @@ export interface DataScanner {
 }
 
 const storeApi = {
-  getActiveAddress: () => (store('selected.current') || '') as Address,
+  getActiveAddress: () => {
+    const current = store('selected.current') as string
+    if (current) return current as Address
+
+    const last = store('selected.last') as string
+    if (last) return last as Address
+
+    // Fallback to first available account
+    const accounts = (store('main.accounts') || {}) as Record<string, unknown>
+    const firstAccountId = Object.keys(accounts)[0]
+    return (firstAccountId || '') as Address
+  },
   getCustomTokens: () => (store('main.tokens.custom') || []) as Token[],
   getKnownTokens: (address?: Address) => ((address && store('main.tokens.known', address)) || []) as Token[],
   getConnectedNetworks: () => {
