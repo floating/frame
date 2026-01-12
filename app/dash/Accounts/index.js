@@ -107,7 +107,7 @@ class AddAccounts extends React.Component {
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('qr')}>
           <div className='accountTypeSelectIcon'>{svg.qr(20)}</div>
-          <div>{'QR Hardware (Keystone)'}</div>
+          <div>{'QR Device'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('seed')}>
           <div className='accountTypeSelectIcon'>{svg.seedling(25)}</div>
@@ -165,7 +165,12 @@ class Dash extends React.Component {
     const hardwareSigners = Object.keys(this.store('main.signers'))
       .map((s) => {
         const signer = this.store('main.signers', s)
-        if (signer.type === 'ledger' || signer.type === 'trezor' || signer.type === 'lattice' || signer.type === 'qr') {
+        if (
+          signer.type === 'ledger' ||
+          signer.type === 'trezor' ||
+          signer.type === 'lattice' ||
+          signer.type === 'qr'
+        ) {
           return signer
         } else {
           return false
