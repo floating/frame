@@ -141,7 +141,14 @@ function initTrayWindow() {
   initWindow('tray', trayOpts)
 
   windows.tray.on('closed', () => delete windows.tray)
-  windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => res(false))
+  windows.tray.webContents.session.setPermissionRequestHandler((webContents, permission, res) => {
+    // Allow camera/microphone for QR code scanning
+    if (permission === 'media') {
+      res(true)
+    } else {
+      res(false)
+    }
+  })
   windows.tray.setResizable(false)
   windows.tray.setMovable(false)
 

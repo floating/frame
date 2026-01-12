@@ -5,6 +5,7 @@ import svg from '../../../../resources/svg'
 
 import AddHardware from './AddHardware'
 import AddHardwareLattice from './AddHardwareLattice'
+import AddHardwareQR from './AddHardwareQR'
 import AddPhrase from './AddPhrase'
 import AddRing from './AddRing'
 import AddAddress from './AddAddress'
@@ -71,17 +72,18 @@ class Add extends React.Component {
                       <AddHardware index={1} type='ledger' />
                       <AddHardware index={2} type='trezor' />
                       <AddHardwareLattice index={3} type='lattice' />
+                      <AddHardwareQR index={4} type='qr' />
                       <div className='addAccountHeader'>
                         <div style={{ margin: '-1px 10px 0px 0px' }}>{svg.flame(18)}</div>
                         <div>Hot Accounts</div>
                       </div>
-                      <AddPhrase index={4} />
-                      <AddRing index={5} />
+                      <AddPhrase index={5} />
+                      <AddRing index={6} />
                       <div className='addAccountHeader'>
                         <div style={{ margin: '-3px 10px 0px 0px' }}>{svg.handshake(23)}</div>
                         <div>Nonsigning Accounts</div>
                       </div>
-                      <AddAddress index={6} />
+                      <AddAddress index={7} />
                       <div className='addAccountBreak' style={{ margin: '40px 0px 0px 0px' }} />
                       <div className='addAccountFooter'>{svg.logo(32)}</div>
                     </div>

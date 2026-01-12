@@ -13,6 +13,8 @@ class Command extends React.Component {
       return <div className='expandedSignerIcon'>{svg.flame(23)}</div>
     } else if (type === 'lattice') {
       return <div className='expandedSignerIcon'>{svg.lattice(22)}</div>
+    } else if (type === 'qr') {
+      return <div className='expandedSignerIcon'>{svg.qr(20)}</div>
     } else {
       return <div className='expandedSignerIcon'>{svg.logo(20)}</div>
     }

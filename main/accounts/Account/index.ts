@@ -106,10 +106,13 @@ class FrameAccount {
       const updatedSigner = this.findSigner(this.address)
 
       if (updatedSigner) {
-        if (this.signer !== updatedSigner.id || this.signerStatus !== updatedSigner.status) {
-          this.signer = updatedSigner.id
-          const signerType = getSignerType(updatedSigner.type)
+        const signerType = getSignerType(updatedSigner.type)
+        const signerChanged = this.signer !== updatedSigner.id
+        const statusChanged = this.signerStatus !== updatedSigner.status
+        const typeChanged = signerType && this.lastSignerType !== signerType
 
+        if (signerChanged || statusChanged || typeChanged) {
+          this.signer = updatedSigner.id
           this.lastSignerType = signerType || this.lastSignerType
           this.signerStatus = updatedSigner.status
 
@@ -552,10 +555,12 @@ class FrameAccount {
 
   signTransaction(rawTx: TransactionData, cb: Callback<string>) {
     // if(index === typeof 'object' && cb === typeof 'undefined' && typeof rawTx === 'function') cb = rawTx; rawTx = index; index = 0;
+    log.info(`signTransaction: account=${this.address}, signer=${this.signer}`)
     this.validateTransaction(rawTx, (err) => {
       if (err) return cb(err)
       if (this.signer) {
         const s = signers.get(this.signer)
+        log.info(`signTransaction: got signer type=${s?.type}, status=${s?.status}`)
         if (!s) return cb(new Error(`Cannot find signer for this account`))
 
         const index = s.addresses.map((a) => a.toLowerCase()).indexOf(this.address)

@@ -85,6 +85,13 @@ class Signer extends React.Component {
           <div>{'Hot'}</div>
         </div>
       )
+    } else if (type === 'qr') {
+      return (
+        <div className='moduleItemSignerType'>
+          <div className='moduleItemIcon'>{svg.qr(16)}</div>
+          <div>{'QR Hardware'}</div>
+        </div>
+      )
     } else {
       return (
         <div className='moduleItemSignerType'>

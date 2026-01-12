@@ -82,6 +82,7 @@ type M = Main & {
   latticeSettings: any
   ledger: any
   trezor: any
+  qr: any
   privacy: any
   addresses: any
   tokens: any
@@ -150,6 +151,11 @@ const mainState: M = {
   },
   trezor: {
     derivation: main('trezor.derivation', 'standard')
+  },
+  qr: {
+    devices: main('qr.devices', {}),
+    signRequest: null,
+    verifyAddress: null
   },
   origins: main('origins', {}),
   knownExtensions: main('knownExtensions', {}),

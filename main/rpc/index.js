@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { ipcMain } = require('electron')
+const { ipcMain, systemPreferences } = require('electron')
 const log = require('electron-log')
 const { randomBytes } = require('crypto')
 import { isAddress } from '@ethersproject/address'
@@ -17,6 +17,8 @@ const nebulaApi = require('../nebula').default
 const { arraysEqual, randomLetters } = require('../../resources/utils')
 const { isSignatureRequest } = require('../signatures')
 const { default: TrezorBridge } = require('../../main/signers/trezor/bridge')
+const { default: QRAdapter } = require('../../main/signers/qr/adapter')
+const { parseAccountSyncUR, parseSignatureUR } = require('../../main/signers/qr/ur-utils')
 
 const callbackWhenDone = (fn, cb) => {
   try {
@@ -114,6 +116,73 @@ const rpc = {
       } catch (e) {
         cb(e.message)
       }
+    }
+  },
+  // Camera Permission
+  async requestCameraAccess(cb) {
+    try {
+      if (process.platform === 'darwin') {
+        const status = await systemPreferences.askForMediaAccess('camera')
+        cb(null, { granted: status })
+      } else {
+        // On other platforms, permission is granted through the browser API
+        cb(null, { granted: true })
+      }
+    } catch (e) {
+      log.error('Failed to request camera access:', e)
+      cb(null, { granted: false, error: e.message })
+    }
+  },
+  // QR Hardware Wallet Methods
+  async importQRDevice(urData, deviceName, cb) {
+    try {
+      // Parse the scanned UR data to extract device info
+      const deviceData = parseAccountSyncUR(urData)
+      deviceData.name = deviceName || deviceData.name || 'QR Wallet'
+
+      // Get the QR adapter
+      const qrAdapter = signers.getAdapter('qr')
+
+      if (!qrAdapter) {
+        return cb(new Error('QR adapter not found'))
+      }
+
+      const signer = await qrAdapter.importDevice(deviceData)
+      cb(null, { id: signer.id, addresses: signer.addresses })
+    } catch (e) {
+      log.error('Failed to import QR device:', e)
+      cb(e.message || 'Failed to import QR device')
+    }
+  },
+  submitQRSignature(signerId, urData, cb) {
+    try {
+      const { signature } = parseSignatureUR(urData)
+
+      const qrAdapter = signers.getAdapter('qr')
+
+      if (!qrAdapter) {
+        return cb(new Error('QR adapter not found'))
+      }
+
+      qrAdapter.submitSignature(signerId, signature)
+      cb(null, { success: true })
+    } catch (e) {
+      log.error('Failed to submit QR signature:', e)
+      cb(e.message || 'Failed to submit signature')
+    }
+  },
+  cancelQRSignRequest(signerId, reason, cb) {
+    try {
+      const qrAdapter = signers.getAdapter('qr')
+
+      if (!qrAdapter) {
+        return cb(new Error('QR adapter not found'))
+      }
+
+      qrAdapter.cancelSignRequest(signerId, reason)
+      cb(null, { success: true })
+    } catch (e) {
+      cb(e.message || 'Failed to cancel sign request')
     }
   },
   launchStatus: launch.status,

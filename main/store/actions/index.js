@@ -200,6 +200,22 @@ module.exports = {
   setTrezorDerivation: (u, value) => {
     u('main.trezor.derivation', () => value)
   },
+  // QR Hardware Wallet Actions
+  setQRDevices: (u, devices) => {
+    u('main.qr.devices', () => devices)
+  },
+  setQRSignRequest: (u, signerId, request) => {
+    u('main.qr.signRequest', () => (request ? { signerId, ...request } : null))
+  },
+  clearQRSignRequest: (u) => {
+    u('main.qr.signRequest', () => null)
+  },
+  setQRVerifyAddress: (u, signerId, data) => {
+    u('main.qr.verifyAddress', () => (data ? { signerId, ...data } : null))
+  },
+  clearQRVerifyAddress: (u) => {
+    u('main.qr.verifyAddress', () => null)
+  },
   setLiveAccountLimit: (u, value) => {
     u('main.ledger.liveAccountLimit', () => value)
   },

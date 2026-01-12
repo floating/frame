@@ -14,7 +14,7 @@ import { signerCompatibility as transactionCompatibility, maxFee, SignerCompatib
 import { weiIntToEthInt, hexToInt } from '../../resources/utils'
 import { accountPanelCrumb, signerPanelCrumb } from '../../resources/domain/nav'
 import { usesBaseFee, TransactionData, GasFeesSource } from '../../resources/domain/transaction'
-import { findUnavailableSigners, isSignerReady } from '../../resources/domain/signer'
+import { findUnavailableSigners, isSignerReady, getSignerType } from '../../resources/domain/signer'
 
 import {
   AccountRequest,
@@ -121,13 +121,13 @@ export class Accounts extends EventEmitter {
     return account.getRequest(id)
   }
 
-  async add(address: Address, name = '', options = {}, cb: Callback<FrameAccount> = () => {}) {
+  async add(address: Address, name = '', options: any = {}, cb: Callback<FrameAccount> = () => {}) {
     if (!address) return cb(new Error('No address, will not add account'))
     address = address.toLowerCase()
 
     let account = store('main.accounts', address)
     if (!account) {
-      log.info(`Account ${address} not found, creating account`)
+      log.info(`Account ${address} not found, creating account with options:`, JSON.stringify(options))
 
       const created = 'new:' + Date.now()
       const accountMetaId = uuidv5(address, accountNS)
@@ -137,6 +137,17 @@ export class Accounts extends EventEmitter {
         this
       )
       account = this.accounts[address]
+      log.info(`Account ${address} created with lastSignerType: ${account.lastSignerType}`)
+    } else if (options.type && this.accounts[address]) {
+      // Update lastSignerType if account exists but has a different type
+      const existingAccount = this.accounts[address]
+      const newType = getSignerType(options.type)
+      if (newType && existingAccount.lastSignerType !== newType) {
+        log.info(`Updating account ${address} lastSignerType from ${existingAccount.lastSignerType} to ${newType}`)
+        existingAccount.lastSignerType = newType
+        existingAccount.update()
+      }
+      account = existingAccount
     }
 
     return cb(null, account)
