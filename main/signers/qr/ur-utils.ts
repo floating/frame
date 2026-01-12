@@ -181,9 +181,7 @@ export function parseSignatureUR(urData: string): { signature: string; requestId
   const s = signature.slice(32, 64)
   const v = signature[64]
 
-  const signatureHex = addHexPrefix(
-    r.toString('hex') + s.toString('hex') + v.toString(16).padStart(2, '0')
-  )
+  const signatureHex = addHexPrefix(r.toString('hex') + s.toString('hex') + v.toString(16).padStart(2, '0'))
 
   return {
     signature: signatureHex,

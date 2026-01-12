@@ -53,7 +53,11 @@ export default class QRSignerAdapter extends SignerAdapter {
 
       // Remove any signers whose devices were removed
       Object.values(this.knownSigners).forEach((signer) => {
-        log.verbose(`QR adapter: checking signer ${signer.name} (fingerprint: ${signer.masterFingerprint}) - exists in store: ${!!qrDevices[signer.masterFingerprint]}`)
+        log.verbose(
+          `QR adapter: checking signer ${signer.name} (fingerprint: ${
+            signer.masterFingerprint
+          }) - exists in store: ${!!qrDevices[signer.masterFingerprint]}`
+        )
         if (!qrDevices[signer.masterFingerprint]) {
           this.removeSigner(signer)
         }
@@ -87,7 +91,7 @@ export default class QRSignerAdapter extends SignerAdapter {
     log.info(`Reloading QR signer: ${signer.name}`)
 
     const deviceData = signer.getDeviceData()
-    this.removeSignerObject(signer)  // Don't remove from store during reload
+    this.removeSignerObject(signer) // Don't remove from store during reload
 
     // Re-create the signer
     this.loadDevice(deviceData)
@@ -202,9 +206,11 @@ export default class QRSignerAdapter extends SignerAdapter {
       log.info('QR signer sign request:', request.type)
 
       try {
-        const requestId = uuidv4()  // Keep dashes - Keystone library requires proper UUID format
+        const requestId = uuidv4() // Keep dashes - Keystone library requires proper UUID format
         // Ensure derivation path has m/ prefix for Keystone library
-        const basePath = signer.derivationPath.startsWith('m/') ? signer.derivationPath : `m/${signer.derivationPath}`
+        const basePath = signer.derivationPath.startsWith('m/')
+          ? signer.derivationPath
+          : `m/${signer.derivationPath}`
         const derivationPath = `${basePath}/0/${request.index}`
         let urData: { urData: string; animated: boolean; frames?: string[] }
 
@@ -223,7 +229,14 @@ export default class QRSignerAdapter extends SignerAdapter {
           const bytesArray = Array.isArray(unsignedTxBytes) ? unsignedTxBytes[0] : unsignedTxBytes
           const signData = addHexPrefix(Buffer.from(bytesArray).toString('hex'))
 
-          log.verbose('Encoding transaction for QR:', { chainId, txType, isTypedTx, derivationPath, masterFingerprint: signer.masterFingerprint, signDataLength: signData.length })
+          log.verbose('Encoding transaction for QR:', {
+            chainId,
+            txType,
+            isTypedTx,
+            derivationPath,
+            masterFingerprint: signer.masterFingerprint,
+            signDataLength: signData.length
+          })
 
           urData = encodeEthSignRequest(
             requestId,
@@ -271,7 +284,10 @@ export default class QRSignerAdapter extends SignerAdapter {
           throw new Error(`Unsupported sign request type: ${request.type}`)
         }
 
-        log.verbose('Generated UR data:', { animated: urData.animated, framesCount: urData.frames?.length || 1 })
+        log.verbose('Generated UR data:', {
+          animated: urData.animated,
+          framesCount: urData.frames?.length || 1
+        })
 
         store.setQRSignRequest(signer.id, {
           ...request,

@@ -161,10 +161,7 @@ class AddHardwareQR extends React.Component {
                       }}
                     />
                   </div>
-                  <div
-                    className='addAccountItemOptionSubmit'
-                    onMouseDown={() => this.startScanning()}
-                  >
+                  <div className='addAccountItemOptionSubmit' onMouseDown={() => this.startScanning()}>
                     Scan QR Code
                   </div>
                 </div>

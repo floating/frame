@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { URDecoder, UREncoder } from '@ngraveio/bc-ur'
 import link from '../../../../../resources/link'
@@ -30,7 +30,9 @@ function QRScanner({ onScan, onError, onCancel }) {
         })
 
         if (!permissionResult.granted) {
-          throw new Error('Camera access denied. Please enable camera access in System Preferences > Privacy & Security > Camera.')
+          throw new Error(
+            'Camera access denied. Please enable camera access in System Preferences > Privacy & Security > Camera.'
+          )
         }
 
         // Initialize the ZXing reader
@@ -50,7 +52,7 @@ function QRScanner({ onScan, onError, onCancel }) {
         controls = await readerRef.current.decodeFromVideoDevice(
           devices[0].deviceId,
           videoRef.current,
-          (result, err) => {
+          (result, _err) => {
             if (!mounted) return
 
             if (result) {
@@ -146,11 +148,7 @@ function QRScanner({ onScan, onError, onCancel }) {
         </div>
       )}
 
-      {error && (
-        <div className='qrScannerError'>
-          {error}
-        </div>
-      )}
+      {error && <div className='qrScannerError'>{error}</div>}
 
       <div className='qrScannerInstructions'>
         Open your hardware wallet and display the account sync QR code

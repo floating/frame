@@ -143,7 +143,9 @@ export class Accounts extends EventEmitter {
       const existingAccount = this.accounts[address]
       const newType = getSignerType(options.type)
       if (newType && existingAccount.lastSignerType !== newType) {
-        log.info(`Updating account ${address} lastSignerType from ${existingAccount.lastSignerType} to ${newType}`)
+        log.info(
+          `Updating account ${address} lastSignerType from ${existingAccount.lastSignerType} to ${newType}`
+        )
         existingAccount.lastSignerType = newType
         existingAccount.update()
       }

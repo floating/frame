@@ -39,15 +39,18 @@ class QRSignRequest extends React.Component {
       if (this.state.animationInterval) {
         clearInterval(this.state.animationInterval)
       }
-      this.setState({
-        mode: 'display',
-        qrReady: false,
-        error: null,
-        urFrames: [],
-        currentFrame: 0,
-        animationInterval: null,
-        currentRequestId: signRequest.requestId
-      }, () => this.generateQR())
+      this.setState(
+        {
+          mode: 'display',
+          qrReady: false,
+          error: null,
+          urFrames: [],
+          currentFrame: 0,
+          animationInterval: null,
+          currentRequestId: signRequest.requestId
+        },
+        () => this.generateQR()
+      )
     }
   }
 
@@ -162,7 +165,7 @@ class QRSignRequest extends React.Component {
     })
   }
 
-  onScanError(error) {
+  onScanError(_error) {
     this.returnToDisplay()
   }
 
@@ -200,22 +203,21 @@ class QRSignRequest extends React.Component {
             {this.state.mode === 'display' ? (
               <>
                 <div className='qrSignRequestQR'>
-                  <canvas
-                    ref={this.canvasRef}
-                    style={{ display: this.state.qrReady ? 'block' : 'none' }}
-                  />
+                  <canvas ref={this.canvasRef} style={{ display: this.state.qrReady ? 'block' : 'none' }} />
                   {!this.state.qrReady && !this.state.error && (
                     <div className='qrSignRequestLoading'>Generating QR...</div>
                   )}
-                  {this.state.error && (
-                    <div className='qrSignRequestLoading'>Error: {this.state.error}</div>
-                  )}
+                  {this.state.error && <div className='qrSignRequestLoading'>Error: {this.state.error}</div>}
                 </div>
 
                 <div className='qrSignRequestInstructions'>
                   <div className='qrSignRequestStep'>1. Scan this QR code with your {signerName}</div>
-                  <div className='qrSignRequestStep'>2. Review and approve the transaction on your device</div>
-                  <div className='qrSignRequestStep'>3. Click "Scan Signature" and scan the signed QR</div>
+                  <div className='qrSignRequestStep'>
+                    2. Review and approve the transaction on your device
+                  </div>
+                  <div className='qrSignRequestStep'>
+                    3. Click &quot;Scan Signature&quot; and scan the signed QR
+                  </div>
                 </div>
 
                 <div className='qrSignRequestActions'>
@@ -234,11 +236,7 @@ class QRSignRequest extends React.Component {
                 </div>
               </>
             ) : (
-              <QRScanner
-                onScan={this.handleScan}
-                onError={this.handleError}
-                onCancel={this.handleCancel}
-              />
+              <QRScanner onScan={this.handleScan} onError={this.handleError} onCancel={this.handleCancel} />
             )}
           </div>
         </div>
