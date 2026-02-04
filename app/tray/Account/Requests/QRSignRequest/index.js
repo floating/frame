@@ -82,13 +82,13 @@ class QRSignRequest extends React.Component {
         const canvas = this.canvasRef.current
         if (canvas) {
           await QRCode.toCanvas(canvas, qrData, {
-            width: 280,
-            margin: 2,
+            width: 340,
+            margin: 3,
             color: {
               dark: '#000000',
               light: '#ffffff'
             },
-            errorCorrectionLevel: 'L'
+            errorCorrectionLevel: 'M'
           })
           this.setState({ qrReady: true })
         }
@@ -102,7 +102,7 @@ class QRSignRequest extends React.Component {
     const { urFrames } = this.state
     if (!urFrames || urFrames.length === 0) return
 
-    // Animate through frames at ~5 FPS
+    // Animate through frames at 5 FPS (200ms interval to match Keycard Shell)
     const interval = setInterval(async () => {
       const { currentFrame, urFrames } = this.state
       const nextFrame = (currentFrame + 1) % urFrames.length
@@ -110,18 +110,18 @@ class QRSignRequest extends React.Component {
       const canvas = this.canvasRef.current
       if (canvas) {
         await QRCode.toCanvas(canvas, urFrames[nextFrame], {
-          width: 280,
-          margin: 2,
+          width: 340,
+          margin: 3,
           color: {
             dark: '#000000',
             light: '#ffffff'
           },
-          errorCorrectionLevel: 'L'
+          errorCorrectionLevel: 'M'
         })
       }
 
       this.setState({ currentFrame: nextFrame, qrReady: true })
-    }, 200)
+    }, 200) // Keycard Shell uses 200ms internally
 
     this.setState({ animationInterval: interval, qrReady: true })
 
@@ -129,13 +129,13 @@ class QRSignRequest extends React.Component {
     const canvas = this.canvasRef.current
     if (canvas && urFrames[0]) {
       QRCode.toCanvas(canvas, urFrames[0], {
-        width: 280,
-        margin: 2,
+        width: 340,
+        margin: 3,
         color: {
           dark: '#000000',
           light: '#ffffff'
         },
-        errorCorrectionLevel: 'L'
+        errorCorrectionLevel: 'M'
       })
     }
   }

@@ -1,9 +1,10 @@
 import log from 'electron-log'
 import { v4 as uuidv4 } from 'uuid'
 import { TransactionFactory } from '@ethereumjs/tx'
-import { Common } from '@ethereumjs/common'
+import { RLP } from '@ethereumjs/rlp'
 import { addHexPrefix } from '@ethereumjs/util'
 import { SignerAdapter } from '../adapters'
+import chainConfig from '../../chains/config'
 import QRSigner from './QRSigner'
 import { QRDeviceData } from './types'
 import { encodeEthSignRequest } from './ur-utils'
@@ -220,23 +221,56 @@ export default class QRSignerAdapter extends SignerAdapter {
           const chainId = parseInt(rawTx.chainId, 16)
           const txType = parseInt(rawTx.type || '0x0', 16)
           const isTypedTx = txType >= 1 // EIP-2930 (type 1) and EIP-1559 (type 2) are typed transactions
+
+          // CRITICAL: Clean transaction object - remove extra fields that @ethereumjs/tx doesn't recognize
+          // Fields like gasFeesSource, recipientType, feesUpdated, warning, from cause silent serialization failures
+          const cleanTxData: Record<string, any> = {
+            chainId: rawTx.chainId,
+            type: rawTx.type,
+            nonce: rawTx.nonce,
+            to: rawTx.to,
+            value: rawTx.value,
+            data: rawTx.data,
+            gasLimit: rawTx.gasLimit || rawTx.gas
+          }
+
+          // Add gas fields based on transaction type
+          if (txType === 2) {
+            // EIP-1559
+            cleanTxData.maxFeePerGas = rawTx.maxFeePerGas
+            cleanTxData.maxPriorityFeePerGas = rawTx.maxPriorityFeePerGas
+          } else if (txType === 1) {
+            // EIP-2930
+            cleanTxData.gasPrice = rawTx.gasPrice
+          } else {
+            // Legacy
+            cleanTxData.gasPrice = rawTx.gasPrice
+          }
+
+          // AccessList for EIP-2930/1559
+          if (rawTx.accessList) {
+            cleanTxData.accessList = rawTx.accessList
+          }
+
+          // Use chainConfig for consistency with the rest of the codebase
           const hardfork = txType === 2 ? 'london' : 'berlin'
-          const common = Common.custom({ chainId }, { hardfork })
+          const common = chainConfig(chainId, hardfork)
 
-          const tx = TransactionFactory.fromTxData(rawTx, { common })
+          const tx = TransactionFactory.fromTxData(cleanTxData, { common })
           const unsignedTxBytes = tx.getMessageToSign(false) // false = don't hash
-          // getMessageToSign returns Uint8Array or Uint8Array[] - handle both cases
-          const bytesArray = Array.isArray(unsignedTxBytes) ? unsignedTxBytes[0] : unsignedTxBytes
-          const signData = addHexPrefix(Buffer.from(bytesArray).toString('hex'))
 
-          log.verbose('Encoding transaction for QR:', {
-            chainId,
-            txType,
-            isTypedTx,
-            derivationPath,
-            masterFingerprint: signer.masterFingerprint,
-            signDataLength: signData.length
-          })
+          // For legacy transactions (type 0), getMessageToSign returns an array of raw values
+          // that need to be RLP encoded. For typed transactions, it returns Uint8Array directly.
+          let serializedBytes: Uint8Array
+          if (Array.isArray(unsignedTxBytes)) {
+            // Legacy transaction - RLP encode the raw values array
+            serializedBytes = RLP.encode(unsignedTxBytes)
+          } else {
+            // Typed transaction - already serialized
+            serializedBytes = unsignedTxBytes
+          }
+
+          const signData = addHexPrefix(Buffer.from(serializedBytes).toString('hex'))
 
           urData = encodeEthSignRequest(
             requestId,
@@ -283,11 +317,6 @@ export default class QRSignerAdapter extends SignerAdapter {
         } else {
           throw new Error(`Unsupported sign request type: ${request.type}`)
         }
-
-        log.verbose('Generated UR data:', {
-          animated: urData.animated,
-          framesCount: urData.frames?.length || 1
-        })
 
         store.setQRSignRequest(signer.id, {
           ...request,

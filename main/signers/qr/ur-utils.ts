@@ -135,7 +135,7 @@ export function encodeEthSignRequest(
   )
 
   const ur = signRequest.toUR()
-  const encoder = new UREncoder(ur, 200) // 200 bytes per fragment
+  const encoder = new UREncoder(ur, 400) // 400 bytes per fragment
 
   if (encoder.fragmentsLength === 1) {
     return {

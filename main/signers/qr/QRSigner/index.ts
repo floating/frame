@@ -236,19 +236,80 @@ export default class QRSigner extends Signer {
       if (type === 'transaction') {
         // For transactions, we need to apply the signature and serialize
         const rawTx = data.rawTx as TransactionData
+        const expectedAddress = (rawTx.from || data.address) as string
         const sigHex = stripHexPrefix(signature)
 
         // Parse r, s, v from the signature (65 bytes: 32 + 32 + 1)
         const r = sigHex.slice(0, 64)
         const s = sigHex.slice(64, 128)
-        const v = sigHex.slice(128, 130)
+        const vRaw = parseInt(sigHex.slice(128, 130), 16)
+
+        // Normalize v to recovery ID (0 or 1)
+        // Keystone may return 0/1 (recovery ID) or 27/28 (legacy format)
+        const recoveryId = vRaw >= 27 ? vRaw - 27 : vRaw
+        if (recoveryId !== 0 && recoveryId !== 1) {
+          throw new Error(`Invalid signature recovery value: ${vRaw}`)
+        }
+
+        // Get transaction type (0 = legacy, 1 = EIP-2930, 2 = EIP-1559)
+        const txType = parseInt(rawTx.type || '0x0', 16)
+        const chainId = parseInt(rawTx.chainId, 16)
+
+        let v: string
+        if (txType >= 1) {
+          // Typed transaction (EIP-2930, EIP-1559) - v is just recovery ID (0 or 1)
+          v = recoveryId.toString(16).padStart(2, '0')
+        } else {
+          // Legacy transaction - convert recovery ID to EIP-155 v
+          // v = chainId * 2 + 35 + recovery
+          const vValue = chainId * 2 + 35 + recoveryId
+          v = vValue.toString(16)
+        }
+
+        log.verbose('QR signature parsed', { vRaw, recoveryId, txType, chainId })
+
+        // CRITICAL: Clean transaction object - must match exactly what was sent to Keystone
+        // Remove extra fields that @ethereumjs/tx doesn't recognize (gasFeesSource, from, etc.)
+        // This ensures the signed transaction hash matches what Keystone signed
+        const cleanTxData: Record<string, any> = {
+          chainId: rawTx.chainId,
+          type: rawTx.type,
+          nonce: rawTx.nonce,
+          to: rawTx.to,
+          value: rawTx.value,
+          data: rawTx.data,
+          gasLimit: rawTx.gasLimit || (rawTx as any).gas
+        }
+
+        // Add gas fields based on transaction type
+        if (txType === 2) {
+          // EIP-1559
+          cleanTxData.maxFeePerGas = rawTx.maxFeePerGas
+          cleanTxData.maxPriorityFeePerGas = rawTx.maxPriorityFeePerGas
+        } else {
+          // Legacy or EIP-2930
+          cleanTxData.gasPrice = rawTx.gasPrice
+        }
+
+        // AccessList for EIP-2930/1559
+        if (rawTx.accessList) {
+          cleanTxData.accessList = rawTx.accessList
+        }
 
         // Use the sign helper to create a properly signed transaction
-        const signedTx = await sign(rawTx, async () => ({
+        const signedTx = await sign(cleanTxData as TransactionData, async () => ({
           r,
           s,
           v
         }))
+
+        // Verify the recovered address matches the expected address
+        const recoveredAddress = signedTx.getSenderAddress().toString().toLowerCase()
+        if (recoveredAddress !== expectedAddress.toLowerCase()) {
+          throw new Error(
+            `Signature verification failed: recovered ${recoveredAddress}, expected ${expectedAddress}`
+          )
+        }
 
         const serializedTx = addHexPrefix(signedTx.serialize().toString('hex'))
         callback(null, serializedTx)
