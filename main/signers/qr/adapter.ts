@@ -7,7 +7,7 @@ import { SignerAdapter } from '../adapters'
 import chainConfig from '../../chains/config'
 import QRSigner from './QRSigner'
 import { QRDeviceData } from './types'
-import { encodeEthSignRequest } from './ur-utils'
+import { encodeEthSignRequest, normalizeQRDeviceData } from './ur-utils'
 import store from '../../store'
 
 interface QRSignRequest {
@@ -26,46 +26,98 @@ interface QRVerifyAddressRequest {
 
 export default class QRSignerAdapter extends SignerAdapter {
   private knownSigners: { [id: string]: QRSigner }
+  private loadingSigners: { [profileId: string]: Promise<QRSigner> }
   private observer: any
 
   constructor() {
     super('qr')
 
     this.knownSigners = {}
+    this.loadingSigners = {}
   }
 
   open() {
     // Watch for store changes to QR devices and load them
     this.observer = store.observer(() => {
-      const qrDevices: Record<string, QRDeviceData> = store('main.qr.devices') || {}
+      const rawDevices = (store('main.qr.devices') || {}) as Record<string, Partial<QRDeviceData>>
+      const { devices: qrDevices, changed } = this.normalizeStoredDevices(rawDevices)
+
+      if (changed) {
+        store.setQRDevices(qrDevices)
+      }
+
       log.verbose('QR adapter observer: devices in store:', Object.keys(qrDevices))
 
       // Load any new devices that were added
-      Object.entries(qrDevices).forEach(([fingerprint, deviceData]) => {
+      Object.values(qrDevices).forEach((deviceData) => {
         // Check if we already have a signer for this device
-        const existingSigner = Object.values(this.knownSigners).find(
-          (s) => s.masterFingerprint === fingerprint
-        )
+        const existingSigner = this.getSignerByProfileId(deviceData.profileId)
 
         if (!existingSigner && deviceData) {
-          this.loadDevice(deviceData)
+          this.loadDevice(deviceData).catch((err) => {
+            log.error(`Failed loading QR profile ${deviceData.profileId}:`, err)
+          })
         }
       })
 
       // Remove any signers whose devices were removed
+      const storedProfiles = new Set(Object.keys(qrDevices))
       Object.values(this.knownSigners).forEach((signer) => {
         log.verbose(
-          `QR adapter: checking signer ${signer.name} (fingerprint: ${
-            signer.masterFingerprint
-          }) - exists in store: ${!!qrDevices[signer.masterFingerprint]}`
+          `QR adapter: checking signer ${signer.name} (profile: ${
+            signer.profileId
+          }) - exists in store: ${storedProfiles.has(signer.profileId)}`
         )
-        if (!qrDevices[signer.masterFingerprint]) {
+        if (!storedProfiles.has(signer.profileId)) {
           this.removeSigner(signer)
         }
       })
     }, 'qrSigners')
 
     super.open()
+  }
+
+  private getSignerByProfileId(profileId: string): QRSigner | undefined {
+    return Object.values(this.knownSigners).find((signer) => signer.profileId === profileId)
+  }
+
+  private normalizeStoredDevices(rawDevices: Record<string, Partial<QRDeviceData>>): {
+    devices: Record<string, QRDeviceData>
+    changed: boolean
+  } {
+    let changed = false
+    const devices: Record<string, QRDeviceData> = {}
+
+    Object.entries(rawDevices).forEach(([storedKey, rawDevice]) => {
+      if (!rawDevice) {
+        changed = true
+        return
+      }
+
+      const normalizedDevice = normalizeQRDeviceData(rawDevice)
+
+      if (storedKey !== normalizedDevice.profileId) {
+        changed = true
+      }
+
+      if (
+        rawDevice.profileId !== normalizedDevice.profileId ||
+        rawDevice.masterFingerprint !== normalizedDevice.masterFingerprint ||
+        rawDevice.derivationPath !== normalizedDevice.derivationPath ||
+        rawDevice.accountSource !== normalizedDevice.accountSource ||
+        rawDevice.childrenPath !== normalizedDevice.childrenPath
+      ) {
+        changed = true
+      }
+
+      if (devices[normalizedDevice.profileId]) {
+        changed = true
+      }
+
+      devices[normalizedDevice.profileId] = normalizedDevice
+    })
+
+    return { devices, changed }
   }
 
   close() {
@@ -80,6 +132,7 @@ export default class QRSignerAdapter extends SignerAdapter {
     })
 
     this.knownSigners = {}
+    this.loadingSigners = {}
 
     super.close()
   }
@@ -108,33 +161,37 @@ export default class QRSignerAdapter extends SignerAdapter {
 
   // Import a new QR device from scanned sync QR data
   async importDevice(deviceData: QRDeviceData): Promise<QRSigner> {
-    log.info(`Importing QR device: ${deviceData.name} (${deviceData.masterFingerprint})`)
-
-    // Check if device already exists
-    const existing = Object.values(this.knownSigners).find(
-      (s) => s.masterFingerprint === deviceData.masterFingerprint
+    const normalizedDeviceData = normalizeQRDeviceData(deviceData)
+    log.info(
+      `Importing QR device: ${normalizedDeviceData.name} (${normalizedDeviceData.masterFingerprint}, profile ${normalizedDeviceData.profileId})`
     )
 
+    // Check if profile already exists
+    const existing = this.getSignerByProfileId(normalizedDeviceData.profileId)
+
     if (existing) {
-      log.info(`QR device already imported: ${deviceData.masterFingerprint}`)
+      log.info(`QR profile already imported: ${normalizedDeviceData.profileId}`)
       return existing
     }
 
     // Persist to store
-    const currentDevices = store('main.qr.devices') || {}
+    const currentDevices = (store('main.qr.devices') || {}) as Record<string, Partial<QRDeviceData>>
+    const { devices: normalizedDevices } = this.normalizeStoredDevices(currentDevices)
     store.setQRDevices({
-      ...currentDevices,
-      [deviceData.masterFingerprint]: deviceData
+      ...normalizedDevices,
+      [normalizedDeviceData.profileId]: normalizedDeviceData
     })
 
     // Directly load the device instead of waiting for observer
     try {
-      const signer = await this.loadDevice(deviceData)
+      const signer = await this.loadDevice(normalizedDeviceData)
       return signer
     } catch (err) {
       // Clean up on failure - remove from store
-      const updatedDevices = { ...store('main.qr.devices') }
-      delete updatedDevices[deviceData.masterFingerprint]
+      const updatedDevices = {
+        ...(store('main.qr.devices') || {})
+      } as Record<string, QRDeviceData>
+      delete updatedDevices[normalizedDeviceData.profileId]
       store.setQRDevices(updatedDevices)
       throw err
     }
@@ -169,26 +226,44 @@ export default class QRSignerAdapter extends SignerAdapter {
   }
 
   private async loadDevice(deviceData: QRDeviceData): Promise<QRSigner> {
-    log.info(`Loading QR device: ${deviceData.name}`)
+    const normalizedDeviceData = normalizeQRDeviceData(deviceData)
+    log.info(`Loading QR device: ${normalizedDeviceData.name} (${normalizedDeviceData.profileId})`)
 
     // Check if already loaded
-    const existingId = Object.keys(this.knownSigners).find(
-      (id) => this.knownSigners[id].masterFingerprint === deviceData.masterFingerprint
-    )
+    const existingId = Object.keys(this.knownSigners).find((id) => {
+      return this.knownSigners[id].profileId === normalizedDeviceData.profileId
+    })
     if (existingId) {
       return this.knownSigners[existingId]
     }
 
-    const signer = new QRSigner(deviceData)
-    this.setupSignerEvents(signer)
+    const pendingLoad = this.loadingSigners[normalizedDeviceData.profileId]
+    if (pendingLoad) {
+      return pendingLoad
+    }
 
-    await signer.open()
+    const loadPromise = (async () => {
+      const signer = new QRSigner(normalizedDeviceData)
+      this.setupSignerEvents(signer)
 
-    this.knownSigners[signer.id] = signer
-    this.emit('add', signer)
+      await signer.open()
 
-    log.info(`Loaded QR device: ${deviceData.name} with ${signer.addresses.length} addresses`)
-    return signer
+      this.knownSigners[signer.id] = signer
+      this.emit('add', signer)
+
+      log.info(
+        `Loaded QR device: ${normalizedDeviceData.name} (${normalizedDeviceData.profileId}) with ${signer.addresses.length} addresses`
+      )
+      return signer
+    })()
+
+    this.loadingSigners[normalizedDeviceData.profileId] = loadPromise
+
+    try {
+      return await loadPromise
+    } finally {
+      delete this.loadingSigners[normalizedDeviceData.profileId]
+    }
   }
 
   private setupSignerEvents(signer: QRSigner) {
@@ -345,8 +420,8 @@ export default class QRSignerAdapter extends SignerAdapter {
       delete this.knownSigners[signer.id]
 
       // Remove from store
-      const currentDevices = store('main.qr.devices') || {}
-      const { [signer.masterFingerprint]: removed, ...rest } = currentDevices
+      const currentDevices = (store('main.qr.devices') || {}) as Record<string, QRDeviceData>
+      const { [signer.profileId]: removed, ...rest } = currentDevices
       store.setQRDevices(rest)
 
       signer.close()

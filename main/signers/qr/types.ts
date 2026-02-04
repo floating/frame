@@ -8,12 +8,18 @@ export const Status = {
 }
 
 export interface QRDeviceData {
+  // Stable profile identifier for a specific derivation/source combination
+  profileId: string
   // Master fingerprint of the device (hex string)
   masterFingerprint: string
   // Extended public key
   xpub: string
   // Derivation path template (e.g., "m/44'/60'/0'/0")
   derivationPath: string
+  // Optional account source (e.g., account.standard, account.ledger_live)
+  accountSource?: string
+  // Optional child keypath metadata from UR hd-key children
+  childrenPath?: string
   // Device name set by user
   name: string
 }

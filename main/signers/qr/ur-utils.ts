@@ -7,8 +7,79 @@ import {
   DataType
 } from '@keystonehq/bc-ur-registry-eth'
 import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
+import { v5 as uuid } from 'uuid'
 import { TransactionData } from '../../../resources/domain/transaction'
 import { QRDeviceData } from './types'
+
+const DEFAULT_QR_DERIVATION_PATH = "m/44'/60'/0'"
+const qrProfileNamespace = '3f1c23c7-c6cf-59c2-86c2-d6a7da4ad993'
+
+function normalizeDerivationPath(path?: string): string {
+  const trimmed = (path || '').trim()
+  const withoutM = trimmed.startsWith('m/') ? trimmed.slice(2) : trimmed
+  const normalized = withoutM.replace(/^\/+/, '').replace(/\/+$/, '')
+
+  if (!normalized) {
+    return DEFAULT_QR_DERIVATION_PATH
+  }
+
+  return `m/${normalized}`
+}
+
+function normalizeOptionalPath(path?: string): string | undefined {
+  const trimmed = (path || '').trim()
+  return trimmed ? trimmed.replace(/^\/+/, '').replace(/\/+$/, '') : undefined
+}
+
+function normalizeAccountSource(source?: string): string | undefined {
+  const trimmed = (source || '').trim()
+  return trimmed || undefined
+}
+
+export function createQRProfileId(deviceData: {
+  masterFingerprint: string
+  xpub: string
+  derivationPath: string
+  accountSource?: string
+  childrenPath?: string
+}): string {
+  const profileSeed = [
+    (deviceData.masterFingerprint || '').toLowerCase(),
+    deviceData.xpub || '',
+    normalizeDerivationPath(deviceData.derivationPath),
+    normalizeAccountSource(deviceData.accountSource) || '',
+    normalizeOptionalPath(deviceData.childrenPath) || ''
+  ].join('|')
+
+  return uuid(profileSeed, qrProfileNamespace)
+}
+
+export function normalizeQRDeviceData(deviceData: Partial<QRDeviceData>): QRDeviceData {
+  const masterFingerprint = (deviceData.masterFingerprint || '').toLowerCase()
+  const xpub = deviceData.xpub || ''
+  const derivationPath = normalizeDerivationPath(deviceData.derivationPath)
+  const accountSource = normalizeAccountSource(deviceData.accountSource)
+  const childrenPath = normalizeOptionalPath(deviceData.childrenPath)
+  const profileId =
+    deviceData.profileId ||
+    createQRProfileId({
+      masterFingerprint,
+      xpub,
+      derivationPath,
+      accountSource,
+      childrenPath
+    })
+
+  return {
+    profileId,
+    masterFingerprint,
+    xpub,
+    derivationPath,
+    ...(accountSource ? { accountSource } : {}),
+    ...(childrenPath ? { childrenPath } : {}),
+    name: deviceData.name || 'QR Wallet'
+  }
+}
 
 // Parse a crypto-account or crypto-hdkey UR to extract device data
 export function parseAccountSyncUR(urData: string): QRDeviceData {
@@ -36,17 +107,14 @@ export function parseAccountSyncUR(urData: string): QRDeviceData {
 function parseCryptoHDKey(ur: any): QRDeviceData {
   const cryptoHDKey = CryptoHDKey.fromCBOR(ur.cbor)
 
-  const xpub = cryptoHDKey.getBip32Key()
-  const origin = cryptoHDKey.getOrigin()
-  const masterFingerprint = origin?.getSourceFingerprint()?.toString('hex') || ''
-  const path = origin?.getPath() || "m/44'/60'/0'"
-
-  return {
-    masterFingerprint,
-    xpub,
-    derivationPath: path,
+  return normalizeQRDeviceData({
+    masterFingerprint: cryptoHDKey.getOrigin()?.getSourceFingerprint()?.toString('hex') || '',
+    xpub: cryptoHDKey.getBip32Key(),
+    derivationPath: cryptoHDKey.getOrigin()?.getPath() || DEFAULT_QR_DERIVATION_PATH,
+    accountSource: cryptoHDKey.getNote(),
+    childrenPath: cryptoHDKey.getChildren()?.getPath(),
     name: 'QR Wallet'
-  }
+  })
 }
 
 function parseCryptoAccount(ur: any): QRDeviceData {
@@ -61,14 +129,14 @@ function parseCryptoAccount(ur: any): QRDeviceData {
     if (hdKey instanceof CryptoHDKey) {
       const xpub = hdKey.getBip32Key()
       const origin = hdKey.getOrigin()
-      const path = origin?.getPath() || "m/44'/60'/0'"
-
-      return {
+      return normalizeQRDeviceData({
         masterFingerprint,
         xpub,
-        derivationPath: path,
+        derivationPath: origin?.getPath() || DEFAULT_QR_DERIVATION_PATH,
+        accountSource: hdKey.getNote(),
+        childrenPath: hdKey.getChildren()?.getPath(),
         name: 'QR Wallet'
-      }
+      })
     }
   }
 

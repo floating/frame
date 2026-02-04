@@ -5,6 +5,7 @@ import { addHexPrefix, pubToAddress, toChecksumAddress, stripHexPrefix } from '@
 
 import Signer from '../../Signer'
 import { Status, QRDeviceData } from '../types'
+import { normalizeQRDeviceData } from '../ur-utils'
 import { TransactionData } from '../../../../resources/domain/transaction'
 import type { TypedMessage } from '../../../accounts/types'
 import { sign } from '../../../transaction'
@@ -15,9 +16,12 @@ const DEFAULT_ADDRESS_LIMIT = 10
 
 export default class QRSigner extends Signer {
   // Device metadata
+  profileId: string
   masterFingerprint: string
   xpub: string
   derivationPath: string
+  accountSource?: string
+  childrenPath?: string
 
   // Address derivation
   private hdNode: any
@@ -34,13 +38,18 @@ export default class QRSigner extends Signer {
   constructor(deviceData: QRDeviceData) {
     super()
 
-    this.masterFingerprint = deviceData.masterFingerprint
-    this.xpub = deviceData.xpub
-    this.derivationPath = deviceData.derivationPath
-    this.name = deviceData.name
+    const normalizedDeviceData = normalizeQRDeviceData(deviceData)
 
-    // Generate unique ID based on master fingerprint
-    this.id = uuid('QR' + this.masterFingerprint, ns)
+    this.profileId = normalizedDeviceData.profileId
+    this.masterFingerprint = normalizedDeviceData.masterFingerprint
+    this.xpub = normalizedDeviceData.xpub
+    this.derivationPath = normalizedDeviceData.derivationPath
+    this.accountSource = normalizedDeviceData.accountSource
+    this.childrenPath = normalizedDeviceData.childrenPath
+    this.name = normalizedDeviceData.name
+
+    // Generate unique ID based on profile (fingerprint + xpub/path/source)
+    this.id = uuid('QR' + this.profileId, ns)
     this.type = 'qr'
     this.model = 'QR Hardware Wallet'
     this.status = Status.INITIAL
@@ -356,9 +365,12 @@ export default class QRSigner extends Signer {
   // Get device metadata for storage
   getDeviceData(): QRDeviceData {
     return {
+      profileId: this.profileId,
       masterFingerprint: this.masterFingerprint,
       xpub: this.xpub,
       derivationPath: this.derivationPath,
+      ...(this.accountSource ? { accountSource: this.accountSource } : {}),
+      ...(this.childrenPath ? { childrenPath: this.childrenPath } : {}),
       name: this.name
     }
   }
