@@ -7,9 +7,9 @@ import {
   DataType
 } from '@keystonehq/bc-ur-registry-eth'
 import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
-import { v5 as uuid } from 'uuid'
+import { v5 as uuid, stringify as stringifyUuid } from 'uuid'
 import { TransactionData } from '../../../resources/domain/transaction'
-import { QRDeviceData } from './types'
+import { QRDeviceData, QRLegacyEncoding, QRLegacyHashMode } from './types'
 
 const DEFAULT_QR_DERIVATION_PATH = "m/44'/60'/0'"
 const qrProfileNamespace = '3f1c23c7-c6cf-59c2-86c2-d6a7da4ad993'
@@ -36,6 +36,22 @@ function normalizeAccountSource(source?: string): string | undefined {
   return trimmed || undefined
 }
 
+function normalizePreferredLegacyEncoding(value?: string): QRLegacyEncoding | undefined {
+  if (value === 'legacy-eip155-unsigned' || value === 'legacy-unsigned') {
+    return value
+  }
+
+  return undefined
+}
+
+function normalizePreferredLegacyHashMode(value?: string): QRLegacyHashMode | undefined {
+  if (value === 'keccak' || value === 'sha256' || value === 'identity32') {
+    return value
+  }
+
+  return undefined
+}
+
 export function createQRProfileId(deviceData: {
   masterFingerprint: string
   xpub: string
@@ -60,6 +76,8 @@ export function normalizeQRDeviceData(deviceData: Partial<QRDeviceData>): QRDevi
   const derivationPath = normalizeDerivationPath(deviceData.derivationPath)
   const accountSource = normalizeAccountSource(deviceData.accountSource)
   const childrenPath = normalizeOptionalPath(deviceData.childrenPath)
+  const preferredLegacyEncoding = normalizePreferredLegacyEncoding(deviceData.preferredLegacyEncoding)
+  const preferredLegacyHashMode = normalizePreferredLegacyHashMode(deviceData.preferredLegacyHashMode)
   const profileId =
     deviceData.profileId ||
     createQRProfileId({
@@ -77,6 +95,8 @@ export function normalizeQRDeviceData(deviceData: Partial<QRDeviceData>): QRDevi
     derivationPath,
     ...(accountSource ? { accountSource } : {}),
     ...(childrenPath ? { childrenPath } : {}),
+    ...(preferredLegacyEncoding ? { preferredLegacyEncoding } : {}),
+    ...(preferredLegacyHashMode ? { preferredLegacyHashMode } : {}),
     name: deviceData.name || 'QR Wallet'
   }
 }
@@ -226,7 +246,12 @@ export function encodeEthSignRequest(
 }
 
 // Parse a signature UR response
-export function parseSignatureUR(urData: string): { signature: string; requestId: string } {
+export function parseSignatureUR(urData: string): {
+  signature: string
+  requestId: string
+  requestIdHex: string
+  requestIdUuid: string
+} {
   const decoder = new URDecoder()
   decoder.receivePart(urData)
 
@@ -242,7 +267,13 @@ export function parseSignatureUR(urData: string): { signature: string; requestId
 
   const ethSignature = ETHSignature.fromCBOR(ur.cbor)
   const signature = ethSignature.getSignature()
-  const requestId = ethSignature.getRequestId()?.toString('hex') || ''
+  const requestIdBuffer = ethSignature.getRequestId()
+  if (requestIdBuffer && requestIdBuffer.length !== 16) {
+    throw new Error(`Invalid signature requestId length: ${requestIdBuffer.length}`)
+  }
+  const requestIdHex = requestIdBuffer ? requestIdBuffer.toString('hex') : ''
+  const requestIdUuid =
+    requestIdBuffer && requestIdBuffer.length === 16 ? stringifyUuid(requestIdBuffer).toLowerCase() : ''
 
   // Combine r, s, v into a single signature string
   const r = signature.slice(0, 32)
@@ -253,7 +284,9 @@ export function parseSignatureUR(urData: string): { signature: string; requestId
 
   return {
     signature: signatureHex,
-    requestId
+    requestId: requestIdHex,
+    requestIdHex,
+    requestIdUuid
   }
 }
 

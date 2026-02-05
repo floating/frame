@@ -154,9 +154,9 @@ const rpc = {
       cb(e.message || 'Failed to import QR device')
     }
   },
-  submitQRSignature(signerId, urData, cb) {
+  async submitQRSignature(signerId, urData, cb) {
     try {
-      const { signature } = parseSignatureUR(urData)
+      const { signature, requestIdUuid } = parseSignatureUR(urData)
 
       const qrAdapter = signers.getAdapter('qr')
 
@@ -164,7 +164,7 @@ const rpc = {
         return cb(new Error('QR adapter not found'))
       }
 
-      qrAdapter.submitSignature(signerId, signature)
+      await qrAdapter.submitSignature(signerId, signature, requestIdUuid)
       cb(null, { success: true })
     } catch (e) {
       log.error('Failed to submit QR signature:', e)

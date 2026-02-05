@@ -14,7 +14,7 @@ class AddHardwareQR extends React.Component {
       index: 0,
       status: '',
       error: false,
-      deviceName: 'Keystone',
+      deviceName: 'QR',
       scanning: false,
       scannedData: '',
       signerId: null

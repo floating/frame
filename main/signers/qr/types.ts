@@ -7,6 +7,9 @@ export const Status = {
   ERROR: 'Error'
 }
 
+export type QRLegacyEncoding = 'legacy-eip155-unsigned' | 'legacy-unsigned'
+export type QRLegacyHashMode = 'keccak' | 'sha256' | 'identity32'
+
 export interface QRDeviceData {
   // Stable profile identifier for a specific derivation/source combination
   profileId: string
@@ -20,6 +23,10 @@ export interface QRDeviceData {
   accountSource?: string
   // Optional child keypath metadata from UR hd-key children
   childrenPath?: string
+  // Legacy transaction sign-data encoding preference observed for this signer
+  preferredLegacyEncoding?: QRLegacyEncoding
+  // Legacy transaction hash mode preference observed for this signer
+  preferredLegacyHashMode?: QRLegacyHashMode
   // Device name set by user
   name: string
 }

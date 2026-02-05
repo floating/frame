@@ -3,7 +3,14 @@ import { BrowserMultiFormatReader } from '@zxing/browser'
 import { URDecoder, UREncoder } from '@ngraveio/bc-ur'
 import link from '../../../../../resources/link'
 
-function QRScanner({ onScan, onError, onCancel }) {
+function QRScanner({
+  onScan,
+  onError,
+  onCancel,
+  title = 'Scan device sync QR code',
+  instructions = 'Open your hardware wallet and display the account sync QR code',
+  externalError = null
+}) {
   const videoRef = useRef(null)
   const [error, setError] = useState(null)
   const [progress, setProgress] = useState(0)
@@ -11,6 +18,7 @@ function QRScanner({ onScan, onError, onCancel }) {
 
   const readerRef = useRef(null)
   const urDecoderRef = useRef(null)
+  const lastCompletedScanRef = useRef({ payload: '', timestamp: 0 })
 
   useEffect(() => {
     let mounted = true
@@ -69,11 +77,17 @@ function QRScanner({ onScan, onError, onCancel }) {
     }
 
     const handleQRResult = (text) => {
+      const now = Date.now()
+      const lastScan = lastCompletedScanRef.current
+      const isDuplicateScan = lastScan.payload === text && now - lastScan.timestamp < 1500
+      if (isDuplicateScan) return
+
       // Check if this is a UR-encoded QR code
       if (text.toLowerCase().startsWith('ur:')) {
         handleURPart(text)
       } else {
         // Non-UR data, pass through directly
+        lastCompletedScanRef.current = { payload: text, timestamp: now }
         onScan(text)
         stopScanning()
       }
@@ -96,6 +110,13 @@ function QRScanner({ onScan, onError, onCancel }) {
           // Re-encode the complete UR to a single-part string (handles multi-frame QRs)
           const encoder = new UREncoder(ur, Infinity)
           const completeURString = encoder.nextPart()
+
+          const now = Date.now()
+          const lastScan = lastCompletedScanRef.current
+          const isDuplicateScan = lastScan.payload === completeURString && now - lastScan.timestamp < 1500
+          if (isDuplicateScan) return
+
+          lastCompletedScanRef.current = { payload: completeURString, timestamp: now }
           onScan(completeURString)
           stopScanning()
         }
@@ -134,9 +155,7 @@ function QRScanner({ onScan, onError, onCancel }) {
 
   return (
     <div className='qrScannerContainer'>
-      <div className='qrScannerTitle'>
-        {isAnimated ? `Scanning animated QR... ${progress}%` : 'Scan device sync QR code'}
-      </div>
+      <div className='qrScannerTitle'>{isAnimated ? `Scanning animated QR... ${progress}%` : title}</div>
 
       <div className='qrScannerVideo'>
         <video ref={videoRef} style={{ width: '100%', maxWidth: '300px', borderRadius: '8px' }} />
@@ -148,11 +167,9 @@ function QRScanner({ onScan, onError, onCancel }) {
         </div>
       )}
 
-      {error && <div className='qrScannerError'>{error}</div>}
+      {(error || externalError) && <div className='qrScannerError'>{error || externalError}</div>}
 
-      <div className='qrScannerInstructions'>
-        Open your hardware wallet and display the account sync QR code
-      </div>
+      <div className='qrScannerInstructions'>{instructions}</div>
 
       <div className='addAccountItemOptionSubmit' onMouseDown={handleCancel}>
         Cancel

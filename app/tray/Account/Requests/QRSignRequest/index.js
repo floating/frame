@@ -8,10 +8,14 @@ import QRScanner from '../../../../dash/Accounts/Add/AddHardwareQR/QRScanner'
 class QRSignRequest extends React.Component {
   constructor(...args) {
     super(...args)
+    this.isSubmittingSignature = false
     this.state = {
       mode: 'display', // 'display' | 'scan'
       qrReady: false,
       error: null,
+      scanError: null,
+      scanAttempts: 0,
+      submittingSignature: false,
       urFrames: [],
       currentFrame: 0,
       animationInterval: null,
@@ -44,12 +48,18 @@ class QRSignRequest extends React.Component {
           mode: 'display',
           qrReady: false,
           error: null,
+          scanError: null,
+          scanAttempts: 0,
+          submittingSignature: false,
           urFrames: [],
           currentFrame: 0,
           animationInterval: null,
           currentRequestId: signRequest.requestId
         },
-        () => this.generateQR()
+        () => {
+          this.isSubmittingSignature = false
+          this.generateQR()
+        }
       )
     }
   }
@@ -58,6 +68,7 @@ class QRSignRequest extends React.Component {
     if (this.state.animationInterval) {
       clearInterval(this.state.animationInterval)
     }
+    this.isSubmittingSignature = false
   }
 
   async generateQR() {
@@ -102,7 +113,7 @@ class QRSignRequest extends React.Component {
     const { urFrames } = this.state
     if (!urFrames || urFrames.length === 0) return
 
-    // Animate through frames at 5 FPS (200ms interval to match Keycard Shell)
+    // Animate through frames at 15 FPS (~67ms interval)
     const interval = setInterval(async () => {
       const { currentFrame, urFrames } = this.state
       const nextFrame = (currentFrame + 1) % urFrames.length
@@ -121,7 +132,7 @@ class QRSignRequest extends React.Component {
       }
 
       this.setState({ currentFrame: nextFrame, qrReady: true })
-    }, 200) // Keycard Shell uses 200ms internally
+    }, 67)
 
     this.setState({ animationInterval: interval, qrReady: true })
 
@@ -144,32 +155,89 @@ class QRSignRequest extends React.Component {
     if (this.state.animationInterval) {
       clearInterval(this.state.animationInterval)
     }
-    this.setState({ mode: 'scan', animationInterval: null })
+    this.setState((prevState) => ({
+      mode: 'scan',
+      animationInterval: null,
+      scanError: null,
+      submittingSignature: false,
+      scanAttempts: prevState.scanAttempts + 1
+    }))
   }
 
   returnToDisplay() {
-    this.setState({ mode: 'display', qrReady: false }, () => {
+    this.setState({ mode: 'display', qrReady: false, scanError: null, submittingSignature: false }, () => {
+      this.isSubmittingSignature = false
       this.generateQR()
     })
   }
 
+  formatRpcError(err) {
+    if (!err) return 'Unknown signature scan error'
+
+    const rawMessage = typeof err === 'string' ? err : err.message || ''
+    if (!rawMessage) {
+      return 'Failed to submit scanned signature'
+    }
+
+    if (rawMessage.includes('Signature verification failed')) {
+      return 'Signature does not match this request. Re-scan the latest request QR and sign again.'
+    }
+
+    if (rawMessage.includes('attempts=')) {
+      return 'Signature does not match this request. Re-scan the latest request QR and sign again.'
+    }
+
+    if (rawMessage.includes('requestId mismatch')) {
+      return 'Scanned signature is for a different request. Scan the latest signature QR from your device.'
+    }
+
+    if (rawMessage.includes('missing requestId')) {
+      return 'Signature QR is missing request metadata. Please sign from the latest request QR.'
+    }
+
+    if (rawMessage.includes('Invalid signature')) {
+      return 'Signature QR data is invalid. Re-sign on your device and scan again.'
+    }
+
+    if (rawMessage.includes('No pending QR sign request')) {
+      return 'No active QR signing request. Restart signing from the beginning.'
+    }
+
+    if (rawMessage.length > 220) {
+      return `${rawMessage.slice(0, 217)}...`
+    }
+
+    return rawMessage
+  }
+
   onSignatureScanned(urData) {
     const signRequest = this.store('main.qr.signRequest')
-    if (!signRequest) return
+    if (!signRequest || this.isSubmittingSignature || this.state.submittingSignature) return
 
+    this.isSubmittingSignature = true
+    this.setState({ submittingSignature: true, scanError: null })
     link.rpc('submitQRSignature', signRequest.signerId, urData, (err) => {
       if (err) {
-        this.returnToDisplay()
+        this.isSubmittingSignature = false
+        this.setState((prevState) => ({
+          submittingSignature: false,
+          scanError: this.formatRpcError(err),
+          scanAttempts: prevState.scanAttempts + 1
+        }))
+        return
       }
-      // On success, the sign request will be cleared from store
+
+      this.isSubmittingSignature = false
+      this.setState({ submittingSignature: false, scanError: null })
     })
   }
 
   onScanError(_error) {
-    this.returnToDisplay()
+    this.setState({ scanError: _error || 'Scanner error' })
   }
 
   onScanCancel() {
+    this.isSubmittingSignature = false
     this.returnToDisplay()
   }
 
@@ -186,7 +254,6 @@ class QRSignRequest extends React.Component {
     if (!signRequest) return null
 
     const signerName = this.store('main.signers', signRequest.signerId, 'name') || 'QR Device'
-
     return (
       <div className='qrSignRequestOverlay'>
         <div className='qrSignRequestModal'>
@@ -236,7 +303,15 @@ class QRSignRequest extends React.Component {
                 </div>
               </>
             ) : (
-              <QRScanner onScan={this.handleScan} onError={this.handleError} onCancel={this.handleCancel} />
+              <QRScanner
+                key={this.state.scanAttempts}
+                onScan={this.handleScan}
+                onError={this.handleError}
+                onCancel={this.handleCancel}
+                title='Scan signed QR response'
+                instructions='Scan the signature QR shown by your hardware wallet.'
+                externalError={this.state.scanError}
+              />
             )}
           </div>
         </div>
