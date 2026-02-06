@@ -24,6 +24,9 @@ function QRScanner({
     let mounted = true
     let controls = null
 
+    // Reset duplicate detection on mount to prevent stale state from previous scans
+    lastCompletedScanRef.current = { payload: '', timestamp: 0 }
+
     const startScanning = async () => {
       try {
         // Request camera permission first (required on macOS)
@@ -142,6 +145,8 @@ function QRScanner({
 
     return () => {
       mounted = false
+      // Reset duplicate detection on unmount
+      lastCompletedScanRef.current = { payload: '', timestamp: 0 }
       stopScanning()
     }
   }, [onScan, onError])

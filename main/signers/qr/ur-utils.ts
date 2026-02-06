@@ -212,8 +212,9 @@ export function encodeEthSignRequest(
   // The xfp should be passed as hex string (8 characters = 4 bytes)
   const xfp = masterFingerprint || ''
 
+  const signDataBytes = Buffer.from(stripHexPrefix(signData), 'hex')
   const signRequest = EthSignRequest.constructETHRequest(
-    Buffer.from(stripHexPrefix(signData), 'hex'),
+    signDataBytes,
     ethDataType,
     derivationPath,
     xfp,

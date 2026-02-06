@@ -1,3 +1,4 @@
+import log from 'electron-log'
 import { TransactionFactory } from '@ethereumjs/tx'
 import { RLP } from '@ethereumjs/rlp'
 import { addHexPrefix, stripHexPrefix } from '@ethereumjs/util'
@@ -144,7 +145,7 @@ export function buildQRTxPayload(rawTx: TransactionData, options: BuildQRTxPaylo
       txType,
       isTypedTransaction,
       signData: toHex(primaryBytes),
-      signDataBytes: primaryBytes,
+      signDataBytes: Buffer.from(primaryBytes),
       txEncodingStrategy: 'primary',
       txHashHint: sha256Hint(primaryBytes),
       txKeccakHint: keccakHint(primaryBytes),
@@ -154,21 +155,40 @@ export function buildQRTxPayload(rawTx: TransactionData, options: BuildQRTxPaylo
 
   const legacyUnsignedBytes = Buffer.from(RLP.encode((tx.raw() as Buffer[]).slice(0, 6)))
   const legacyCandidates: QRTxLegacyCandidate[] = [
-    {
-      encodingId: 'legacy-eip155-unsigned',
-      signData: toHex(primaryBytes),
-      signDataBytes: primaryBytes,
-      hashHint: sha256Hint(primaryBytes),
-      keccakHint: keccakHint(primaryBytes)
-    },
+    // Pre-EIP155 format FIRST - Keystone uses separate chainId param for v value
     {
       encodingId: 'legacy-unsigned',
       signData: toHex(legacyUnsignedBytes),
       signDataBytes: legacyUnsignedBytes,
       hashHint: sha256Hint(legacyUnsignedBytes),
       keccakHint: keccakHint(legacyUnsignedBytes)
+    },
+    // EIP-155 format as fallback
+    {
+      encodingId: 'legacy-eip155-unsigned',
+      signData: toHex(primaryBytes),
+      signDataBytes: primaryBytes,
+      hashHint: sha256Hint(primaryBytes),
+      keccakHint: keccakHint(primaryBytes)
     }
   ]
+
+  // Deep-copy signDataBytes to detach from @ethereumjs/tx internal ArrayBuffers
+  for (const candidate of legacyCandidates) {
+    candidate.signDataBytes = Buffer.from(candidate.signDataBytes)
+  }
+
+  // Verify signData and signDataBytes are consistent
+  for (const candidate of legacyCandidates) {
+    const expectedHex = addHexPrefix(candidate.signDataBytes.toString('hex'))
+    if (candidate.signData !== expectedHex) {
+      log.error('QR payload inconsistency: signData does not match signDataBytes', {
+        encodingId: candidate.encodingId,
+        signData: candidate.signData.slice(0, 100) + '...',
+        expectedHex: expectedHex.slice(0, 100) + '...'
+      })
+    }
+  }
 
   const selectedLegacyCandidate = chooseLegacyCandidate(legacyCandidates, options.preferredLegacyEncoding)
   const selectedHashMode = chooseLegacyHashMode(

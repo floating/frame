@@ -40,6 +40,7 @@ interface SignatureValidationAttempt {
   hashMode: QRTxLegacyHashMode
   vMode: 'typed-0-1' | 'legacy-eip155-v' | 'legacy-27-28-v'
   v: string
+  recoveryIdUsed?: number
   txHashHint?: string
   txKeccakHint?: string
   recoveredAddress?: string
@@ -54,6 +55,7 @@ interface SubmitSignatureOptions {
 interface SubmitSignatureResult {
   selectedLegacyEncoding?: QRTxLegacyEncoding
   selectedHashMode?: QRTxLegacyHashMode
+  recoveryIdFlipped?: boolean
 }
 
 export default class QRSigner extends Signer {
@@ -106,6 +108,15 @@ export default class QRSigner extends Signer {
 
   async open() {
     try {
+      // Clear any stale pending request from previous session
+      if (this.pendingSignRequest) {
+        log.warn('Clearing stale pending sign request in signer on open', {
+          type: this.pendingSignRequest.type,
+          index: this.pendingSignRequest.index
+        })
+        this.pendingSignRequest = null
+      }
+
       // Initialize HD node from xpub
       this.hdNode = hdkey.fromExtendedKey(this.xpub)
 
@@ -151,9 +162,6 @@ export default class QRSigner extends Signer {
         const resolved = this.resolveDerivation(i)
         derivedAddresses.push(resolved.address)
         resolvedDerivations[i] = resolved
-        log.verbose(
-          `Derived QR address #${i}: ${resolved.address} (path=${resolved.fullPath}, strategy=${resolved.strategy})`
-        )
       } catch (err) {
         log.error(`Failed to derive address at index ${i}:`, err)
         break
@@ -227,10 +235,6 @@ export default class QRSigner extends Signer {
               : true
           }
         } catch (error) {
-          log.verbose(
-            `Failed QR derivation candidate (index=${index}, path=${candidate.fullPath}, strategy=${candidate.strategy}):`,
-            error
-          )
           return null
         }
       })
@@ -261,6 +265,7 @@ export default class QRSigner extends Signer {
     encodingCandidates: NonNullable<ReturnType<typeof buildQRTxPayload>['legacyCandidates']>,
     preferredEncoding?: QRTxLegacyEncoding
   ) {
+    // If no preference, keep the default order (legacy-unsigned first)
     if (!preferredEncoding) return encodingCandidates
 
     return [...encodingCandidates].sort((left, right) => {
@@ -373,8 +378,15 @@ export default class QRSigner extends Signer {
   }
 
   signMessage(index: number, message: string, cb: Callback<string>) {
+    // Clear stale pending request instead of blocking
     if (this.pendingSignRequest) {
-      return cb(new Error('Another signing request is pending'), undefined)
+      log.warn('Clearing stale pending sign request in signer', {
+        oldType: this.pendingSignRequest.type,
+        oldIndex: this.pendingSignRequest.index
+      })
+      // Don't call callback for old request - it's abandoned
+      this.pendingSignRequest = null
+      this.status = Status.OK
     }
 
     const address = this.addresses[index]
@@ -401,16 +413,30 @@ export default class QRSigner extends Signer {
   }
 
   signTransaction(index: number, rawTx: TransactionData, cb: Callback<string>) {
+    // Clear stale pending request instead of blocking
     if (this.pendingSignRequest) {
-      return cb(new Error('Another signing request is pending'), undefined)
+      log.warn('Clearing stale pending sign request in signer', {
+        oldType: this.pendingSignRequest.type,
+        oldIndex: this.pendingSignRequest.index
+      })
+      // Don't call callback for old request - it's abandoned
+      this.pendingSignRequest = null
+      this.status = Status.OK
     }
 
     this.startTransactionSignRequest(index, rawTx, cb)
   }
 
   signTypedData(index: number, typedMessage: TypedMessage, cb: Callback<string>) {
+    // Clear stale pending request instead of blocking
     if (this.pendingSignRequest) {
-      return cb(new Error('Another signing request is pending'), undefined)
+      log.warn('Clearing stale pending sign request in signer', {
+        oldType: this.pendingSignRequest.type,
+        oldIndex: this.pendingSignRequest.index
+      })
+      // Don't call callback for old request - it's abandoned
+      this.pendingSignRequest = null
+      this.status = Status.OK
     }
 
     const address = this.addresses[index]
@@ -448,13 +474,52 @@ export default class QRSigner extends Signer {
     const { type, data } = this.pendingSignRequest
     const callback = this.pendingSignRequest.callback
 
-    log.info('QR signer received signature')
-
     try {
       if (type === 'transaction') {
         const rawTx = data.rawTx as TransactionData
         const expectedAddress = (rawTx.from || data.address) as string
         const expectedAddressLower = expectedAddress.toLowerCase()
+
+        // Validate expected address matches derived address at this index
+        const derivedAddress = this.addresses[this.pendingSignRequest.index]
+        if (derivedAddress && derivedAddress.toLowerCase() !== expectedAddressLower) {
+          log.error('Expected address mismatch: rawTx.from differs from derived address', {
+            rawTxFrom: rawTx.from,
+            derivedAddress,
+            index: this.pendingSignRequest.index
+          })
+        }
+
+        // Validate the txPayloadSnapshot exists and has legacyCandidates for legacy tx
+        const txPayload = this.pendingSignRequest.txPayloadSnapshot
+        if (!txPayload) {
+          throw new QRSignError('Missing transaction payload snapshot', 'QR_MISSING_PAYLOAD_SNAPSHOT')
+        }
+
+        if (
+          txPayload.txType === 0 &&
+          (!txPayload.legacyCandidates || txPayload.legacyCandidates.length === 0)
+        ) {
+          log.error('Legacy transaction missing legacyCandidates in txPayloadSnapshot')
+          throw new QRSignError('Transaction payload corrupted', 'QR_PAYLOAD_CORRUPTED')
+        }
+
+        // Buffer integrity diagnostic: compare stored signDataBytes against hex-derived bytes
+        if (txPayload.legacyCandidates) {
+          for (const candidate of txPayload.legacyCandidates) {
+            const freshBytes = Buffer.from(stripHexPrefix(candidate.signData), 'hex')
+            if (!candidate.signDataBytes.equals(freshBytes as Uint8Array)) {
+              log.error('CRITICAL: signDataBytes buffer has been mutated since snapshot creation', {
+                encodingId: candidate.encodingId,
+                storedLength: candidate.signDataBytes.length,
+                freshLength: freshBytes.length,
+                storedPrefix: candidate.signDataBytes.slice(0, 16).toString('hex'),
+                freshPrefix: freshBytes.slice(0, 16).toString('hex')
+              })
+            }
+          }
+        }
+
         const sigHex = stripHexPrefix(signature)
 
         if (sigHex.length !== 130 || !/^[0-9a-fA-F]+$/.test(sigHex)) {
@@ -491,27 +556,8 @@ export default class QRSigner extends Signer {
             ? options.txHashMode
             : this.preferredLegacyHashMode
 
-        // Use the payload snapshot captured at QR creation time.
-        // This ensures we verify against the exact bytes the device signed,
-        // even if transaction data was mutated after the QR was displayed.
-        const txPayload = this.pendingSignRequest.txPayloadSnapshot
-        if (!txPayload) {
-          throw new QRSignError('Missing transaction payload snapshot', 'QR_MISSING_PAYLOAD_SNAPSHOT')
-        }
+        // txPayload was already validated above - extract needed fields
         const { cleanTxData, txType, chainId } = txPayload
-
-        log.verbose('QR signature parsed', {
-          vRaw,
-          recoveryId,
-          txType,
-          chainId,
-          txEncodingStrategy: txPayload.txEncodingStrategy,
-          txHashHint: txPayload.txHashHint,
-          txKeccakHint: txPayload.txKeccakHint,
-          txHashMode: txPayload.txHashMode,
-          requestedLegacyEncoding,
-          requestedLegacyHashMode
-        })
 
         const validationAttempts: SignatureValidationAttempt[] = []
 
@@ -544,13 +590,6 @@ export default class QRSigner extends Signer {
             )
           }
 
-          log.verbose('QR signature validation result', {
-            selectedEncoding: 'typed-primary',
-            selectedHashMode: 'keccak',
-            selectedVMode: 'typed-0-1',
-            attempts: validationAttempts
-          })
-
           const serializedTx = addHexPrefix(signedTx.serialize().toString('hex'))
           this.completePendingRequest()
           callback(null, serializedTx)
@@ -564,11 +603,21 @@ export default class QRSigner extends Signer {
         let selectedHashMode: QRTxLegacyHashMode | null = null
         let selectedVMode: SignatureValidationAttempt['vMode'] | null = null
         let selectedVHex: string | null = null
+        let recoveryIdWasFlipped = false
+        // Try both the signature's recovery id and the alternative (flipped) recovery id.
+        // Some QR hardware wallets (e.g. Keycard Shell) may return a v byte where the
+        // recovery id convention differs from what Frame expects.
+        const recoveryIdsToTry = [recoveryId, 1 - recoveryId]
+
         for (const encodingCandidate of orderedLegacyCandidates) {
+          // Re-derive bytes from hex string (ground truth) rather than using stored Buffer
+          // This ensures byte-for-byte equivalence with what was sent to the hardware wallet
+          const verificationBytes = Buffer.from(stripHexPrefix(encodingCandidate.signData), 'hex')
+
           for (const hashMode of orderedHashModes) {
             let txHash: Buffer
             try {
-              txHash = computeLegacyRecoveryHash(encodingCandidate.signDataBytes, hashMode)
+              txHash = computeLegacyRecoveryHash(verificationBytes, hashMode)
             } catch (hashError) {
               validationAttempts.push({
                 encodingId: encodingCandidate.encodingId,
@@ -585,47 +634,63 @@ export default class QRSigner extends Signer {
             const vModes: Array<'legacy-eip155-v' | 'legacy-27-28-v'> = ['legacy-eip155-v', 'legacy-27-28-v']
 
             for (const vMode of vModes) {
-              try {
-                const result = this.recoverLegacySignatureAddress(
-                  txHash,
-                  rBuffer,
-                  sBuffer,
-                  recoveryId,
-                  chainId,
-                  vMode
-                )
+              for (const tryRecoveryId of recoveryIdsToTry) {
+                try {
+                  const result = this.recoverLegacySignatureAddress(
+                    txHash,
+                    rBuffer,
+                    sBuffer,
+                    tryRecoveryId,
+                    chainId,
+                    vMode
+                  )
 
-                validationAttempts.push({
-                  encodingId: encodingCandidate.encodingId,
-                  hashMode,
-                  vMode,
-                  v: result.vHex,
-                  txHashHint: encodingCandidate.hashHint,
-                  txKeccakHint: encodingCandidate.keccakHint,
-                  recoveredAddress: result.recoveredAddress
-                })
+                  validationAttempts.push({
+                    encodingId: encodingCandidate.encodingId,
+                    hashMode,
+                    vMode,
+                    v: result.vHex,
+                    recoveryIdUsed: tryRecoveryId,
+                    txHashHint: encodingCandidate.hashHint,
+                    txKeccakHint: encodingCandidate.keccakHint,
+                    recoveredAddress: result.recoveredAddress
+                  })
 
-                if (result.recoveredAddress === expectedAddressLower) {
-                  selectedEncoding = encodingCandidate.encodingId
-                  selectedHashMode = hashMode
-                  selectedVMode = vMode
-                  selectedVHex = result.vHex
-                  break
+                  if (result.recoveredAddress === expectedAddressLower) {
+                    selectedEncoding = encodingCandidate.encodingId
+                    selectedHashMode = hashMode
+                    selectedVMode = vMode
+                    selectedVHex = result.vHex
+                    recoveryIdWasFlipped = tryRecoveryId !== recoveryId
+
+                    if (recoveryIdWasFlipped) {
+                      log.warn('QR signature matched with FLIPPED recovery id', {
+                        signatureRecoveryId: recoveryId,
+                        matchedRecoveryId: tryRecoveryId,
+                        encoding: encodingCandidate.encodingId,
+                        hashMode,
+                        vMode
+                      })
+                    }
+                    break
+                  }
+                } catch (error) {
+                  validationAttempts.push({
+                    encodingId: encodingCandidate.encodingId,
+                    hashMode,
+                    vMode,
+                    v:
+                      vMode === 'legacy-eip155-v'
+                        ? (chainId * 2 + 35 + tryRecoveryId).toString(16)
+                        : (27 + tryRecoveryId).toString(16),
+                    recoveryIdUsed: tryRecoveryId,
+                    txHashHint: encodingCandidate.hashHint,
+                    txKeccakHint: encodingCandidate.keccakHint,
+                    error: (error as Error).message
+                  })
                 }
-              } catch (error) {
-                validationAttempts.push({
-                  encodingId: encodingCandidate.encodingId,
-                  hashMode,
-                  vMode,
-                  v:
-                    vMode === 'legacy-eip155-v'
-                      ? (chainId * 2 + 35 + recoveryId).toString(16)
-                      : (27 + recoveryId).toString(16),
-                  txHashHint: encodingCandidate.hashHint,
-                  txKeccakHint: encodingCandidate.keccakHint,
-                  error: (error as Error).message
-                })
               }
+              if (selectedEncoding) break
             }
 
             if (selectedEncoding) {
@@ -639,29 +704,110 @@ export default class QRSigner extends Signer {
         }
 
         if (!selectedEncoding || !selectedHashMode || !selectedVHex || !selectedVMode) {
-          log.warn('QR transaction signature mismatch (legacy)', {
+          // Safety net: rebuild payload from immutable cleanTxData and retry all combinations
+          log.warn('QR legacy verification failed with snapshot, attempting rebuild from cleanTxData', {
             expectedAddress,
             requestedLegacyEncoding,
             requestedLegacyHashMode,
-            attempts: validationAttempts
+            attempts: validationAttempts.length
           })
-          throw new QRSignError(
-            `Signature verification failed: expected ${expectedAddress}`,
-            'QR_SIGNATURE_ADDRESS_MISMATCH'
-          )
+
+          const rebuiltPayload = buildQRTxPayload(cleanTxData)
+          const rebuiltCandidates = rebuiltPayload.legacyCandidates || []
+          const rebuiltAttempts: SignatureValidationAttempt[] = []
+
+          for (const encodingCandidate of rebuiltCandidates) {
+            const rebuildVerificationBytes = Buffer.from(stripHexPrefix(encodingCandidate.signData), 'hex')
+
+            for (const hashMode of LEGACY_HASH_MODE_ORDER) {
+              let txHash: Buffer
+              try {
+                txHash = computeLegacyRecoveryHash(rebuildVerificationBytes, hashMode)
+              } catch {
+                continue
+              }
+
+              const vModes: Array<'legacy-eip155-v' | 'legacy-27-28-v'> = [
+                'legacy-eip155-v',
+                'legacy-27-28-v'
+              ]
+              for (const vMode of vModes) {
+                for (const tryRecoveryId of recoveryIdsToTry) {
+                  try {
+                    const result = this.recoverLegacySignatureAddress(
+                      txHash,
+                      rBuffer,
+                      sBuffer,
+                      tryRecoveryId,
+                      chainId,
+                      vMode
+                    )
+
+                    rebuiltAttempts.push({
+                      encodingId: encodingCandidate.encodingId,
+                      hashMode,
+                      vMode,
+                      v: result.vHex,
+                      recoveryIdUsed: tryRecoveryId,
+                      recoveredAddress: result.recoveredAddress
+                    })
+
+                    if (result.recoveredAddress === expectedAddressLower) {
+                      selectedEncoding = encodingCandidate.encodingId
+                      selectedHashMode = hashMode
+                      selectedVMode = vMode
+                      selectedVHex = result.vHex
+                      recoveryIdWasFlipped = tryRecoveryId !== recoveryId
+                      break
+                    }
+                  } catch {
+                    // Skip failed recovery attempts
+                  }
+                }
+                if (selectedEncoding) break
+              }
+              if (selectedEncoding) break
+            }
+            if (selectedEncoding) break
+          }
+
+          if (selectedEncoding) {
+            log.warn('QR REBUILT payload matched - original snapshot was corrupted', {
+              selectedEncoding,
+              selectedHashMode,
+              selectedVMode,
+              rebuiltAttempts: rebuiltAttempts.length
+            })
+          } else {
+            log.warn('QR transaction signature mismatch (legacy)', {
+              expectedAddress,
+              derivedAddressAtIndex: this.addresses[this.pendingSignRequest?.index ?? -1],
+              requestedLegacyEncoding,
+              requestedLegacyHashMode,
+              signDataLength: txPayload.signDataBytes?.length,
+              cleanTxDataNonce: cleanTxData.nonce,
+              cleanTxDataChainId: cleanTxData.chainId,
+              attempts: validationAttempts,
+              rebuiltAttempts
+            })
+            throw new QRSignError(
+              `Signature verification failed: expected ${expectedAddress}`,
+              'QR_SIGNATURE_ADDRESS_MISMATCH'
+            )
+          }
         }
 
-        log.verbose('QR signature validation result', {
-          selectedEncoding,
-          selectedHashMode,
-          selectedVMode,
-          requestedLegacyEncoding,
-          requestedLegacyHashMode,
-          attempts: validationAttempts
-        })
+        // The v value for serialization must match the encoding format the device signed.
+        // - legacy-unsigned (6-field): network expects simple v (27/28) → hashes 6 fields
+        // - legacy-eip155-unsigned (9-field): network expects EIP-155 v → hashes 9 fields with chainId
+        const matchedRecoveryId = recoveryIdWasFlipped ? 1 - recoveryId : recoveryId
+        const serializationV =
+          selectedEncoding === 'legacy-eip155-unsigned'
+            ? (BigInt(chainId) * BigInt(2) + BigInt(35) + BigInt(matchedRecoveryId)).toString(16)
+            : (27 + matchedRecoveryId).toString(16)
 
         const serializedTx = serializeSignedLegacyTransaction(cleanTxData, {
-          v: selectedVHex,
+          v: serializationV,
           r,
           s
         })
@@ -669,7 +815,8 @@ export default class QRSigner extends Signer {
         callback(null, serializedTx)
         return {
           selectedLegacyEncoding: selectedEncoding,
-          selectedHashMode
+          selectedHashMode: selectedHashMode!,
+          recoveryIdFlipped: recoveryIdWasFlipped || undefined
         }
       }
 
@@ -723,6 +870,15 @@ export default class QRSigner extends Signer {
     return this.pendingSignRequest !== null
   }
 
+  // Clear pending request silently without invoking callback (used for cleanup)
+  clearPendingRequestSilently() {
+    if (this.pendingSignRequest) {
+      this.pendingSignRequest = null
+      this.status = Status.OK
+      this.emit('update')
+    }
+  }
+
   // Get current pending sign request info for UI
   getPendingSignRequest() {
     return this.pendingSignRequest
@@ -752,6 +908,16 @@ export default class QRSigner extends Signer {
     if (this.preferredLegacyHashMode === hashMode) return
     this.preferredLegacyHashMode = hashMode
     this.emit('update')
+  }
+
+  clearPreferredLegacySettings() {
+    const hadEncoding = !!this.preferredLegacyEncoding
+    const hadHashMode = !!this.preferredLegacyHashMode
+    this.preferredLegacyEncoding = undefined
+    this.preferredLegacyHashMode = undefined
+    if (hadEncoding || hadHashMode) {
+      this.emit('update')
+    }
   }
 
   // Get device metadata for storage

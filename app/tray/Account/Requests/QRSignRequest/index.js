@@ -30,6 +30,15 @@ class QRSignRequest extends React.Component {
   }
 
   componentDidMount() {
+    const signRequest = this.store('main.qr.signRequest')
+
+    // Validate sign request has required data
+    if (signRequest && (!signRequest.requestId || !signRequest.urData)) {
+      console.warn('QRSignRequest: Invalid sign request, clearing')
+      link.rpc('cancelQRSignRequest', signRequest.signerId, 'Invalid sign request', () => {})
+      return
+    }
+
     this.generateQR()
   }
 
@@ -69,6 +78,12 @@ class QRSignRequest extends React.Component {
       clearInterval(this.state.animationInterval)
     }
     this.isSubmittingSignature = false
+
+    // Cancel any pending sign request to clear ALL stale state
+    const signRequest = this.store('main.qr.signRequest')
+    if (signRequest && signRequest.signerId) {
+      link.rpc('cancelQRSignRequest', signRequest.signerId, 'Component unmounted', () => {})
+    }
   }
 
   async generateQR() {

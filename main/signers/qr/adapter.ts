@@ -89,6 +89,22 @@ export default class QRSignerAdapter extends SignerAdapter {
   }
 
   open() {
+    // Clear any stale QR sign request from previous session
+    const staleSignRequest = store('main.qr.signRequest')
+    if (staleSignRequest) {
+      log.warn('Clearing stale QR sign request on adapter open', {
+        signerId: staleSignRequest.signerId,
+        requestId: staleSignRequest.requestId
+      })
+      store.clearQRSignRequest()
+    }
+
+    const staleVerifyAddress = store('main.qr.verifyAddress')
+    if (staleVerifyAddress) {
+      log.warn('Clearing stale QR verify address on adapter open')
+      store.clearQRVerifyAddress()
+    }
+
     this.observer = store.observer(() => {
       const rawDevices = (store('main.qr.devices') || {}) as Record<string, Partial<QRDeviceData>>
       const { devices: qrDevices, changed } = this.normalizeStoredDevices(rawDevices)
@@ -96,8 +112,6 @@ export default class QRSignerAdapter extends SignerAdapter {
       if (changed) {
         store.setQRDevices(qrDevices)
       }
-
-      log.verbose('QR adapter observer: devices in store:', Object.keys(qrDevices))
 
       Object.values(qrDevices).forEach((deviceData) => {
         const existingSigner = this.getSignerByProfileId(deviceData.profileId)
@@ -111,11 +125,6 @@ export default class QRSignerAdapter extends SignerAdapter {
 
       const storedProfiles = new Set(Object.keys(qrDevices))
       Object.values(this.knownSigners).forEach((signer) => {
-        log.verbose(
-          `QR adapter: checking signer ${signer.name} (profile: ${
-            signer.profileId
-          }) - exists in store: ${storedProfiles.has(signer.profileId)}`
-        )
         if (!storedProfiles.has(signer.profileId)) {
           this.removeSigner(signer)
         }
@@ -264,6 +273,38 @@ export default class QRSignerAdapter extends SignerAdapter {
       throw new QRSignError('QR signer has no active sign request', 'QR_NO_PENDING_REQUEST', false)
     }
 
+    // Validate signer has txPayloadSnapshot for transaction requests
+    if (pendingRequest.type === 'transaction') {
+      const signerRequest = signer.getPendingSignRequest()
+      if (!signerRequest?.txPayloadSnapshot) {
+        log.error('Signer missing txPayloadSnapshot for transaction request', {
+          signerId,
+          requestId: pendingRequest.requestId
+        })
+        this.clearPendingRequestContext(signerId, true)
+        signer.cancelSignRequest('Missing transaction payload')
+        throw new QRSignError(
+          'Transaction payload not found - please retry signing',
+          'QR_MISSING_PAYLOAD',
+          false
+        )
+      }
+
+      // Validate hash hints match between adapter and signer state
+      const adapterHashHint = pendingRequest.txHashHint
+      const signerHashHint = signerRequest.txPayloadSnapshot.txHashHint
+      if (adapterHashHint && signerHashHint && adapterHashHint !== signerHashHint) {
+        log.error('State mismatch: txHashHint differs between adapter and signer', {
+          signerId,
+          adapterHashHint,
+          signerHashHint
+        })
+        this.clearPendingRequestContext(signerId, true)
+        signer.cancelSignRequest('Transaction payload mismatch')
+        throw new QRSignError('Transaction state mismatch - please retry signing', 'QR_STATE_MISMATCH', false)
+      }
+    }
+
     const normalizedRequestId = normalizeRequestId(requestId)
     if (!normalizedRequestId) {
       throw new QRSignError(
@@ -278,20 +319,6 @@ export default class QRSignerAdapter extends SignerAdapter {
         'QR_SIGNATURE_REQUEST_ID_MISMATCH'
       )
     }
-
-    log.verbose('Submitting QR signature', {
-      signerId,
-      requestId: pendingRequest.requestId,
-      type: pendingRequest.type,
-      index: pendingRequest.index,
-      expectedAddress: pendingRequest.expectedAddress,
-      resolvedDerivationPath: pendingRequest.resolvedDerivationPath,
-      txEncodingStrategy: pendingRequest.txEncodingStrategy,
-      txHashMode: pendingRequest.txHashMode,
-      txHashHint: pendingRequest.txHashHint,
-      txKeccakHint: pendingRequest.txKeccakHint,
-      txMeta: pendingRequest.txMeta
-    })
 
     try {
       const result = await signer.submitSignature(signature, {
@@ -325,6 +352,13 @@ export default class QRSignerAdapter extends SignerAdapter {
 
       this.clearPendingRequestContext(signerId, true)
     } catch (error) {
+      // Auto-reset encoding preferences on address mismatch so next retry uses defaults
+      if (error instanceof QRSignError && error.code === 'QR_SIGNATURE_ADDRESS_MISMATCH') {
+        signer.clearPreferredLegacySettings()
+        this.persistSignerDeviceData(signer)
+        log.info('Reset QR signer legacy preferences after signature mismatch', { signerId })
+      }
+
       if (isRecoverableQRSignError(error)) {
         throw error
       }
@@ -398,6 +432,15 @@ export default class QRSignerAdapter extends SignerAdapter {
       log.info('QR signer sign request:', request.type)
 
       try {
+        // Clear any stale state from previous requests before processing new request
+        if (this.pendingSignRequests[signer.id]) {
+          log.warn('Clearing stale pending request for signer before new request', {
+            signerId: signer.id,
+            oldRequestId: this.pendingSignRequests[signer.id].requestId
+          })
+          delete this.pendingSignRequests[signer.id]
+        }
+
         const resolvedDerivation = signer.resolveDerivation(request.index, request.address)
         if (!resolvedDerivation.matchesExpectedAddress) {
           throw new QRSignError(
@@ -512,16 +555,6 @@ export default class QRSignerAdapter extends SignerAdapter {
           txKeccakHint: txMeta?.txKeccakHint || '0x',
           txMeta
         })
-
-        log.verbose('Created QR sign request', {
-          signerId: signer.id,
-          requestId,
-          type: request.type,
-          index: request.index,
-          expectedAddress: request.address,
-          resolvedDerivationPath: resolvedDerivation.fullPath,
-          txMeta
-        })
       } catch (err) {
         log.error('Failed to encode sign request as UR:', err)
         this.clearPendingRequestContext(signer.id, true)
@@ -530,21 +563,38 @@ export default class QRSignerAdapter extends SignerAdapter {
     })
 
     signer.on('verify-address', (data: QRVerifyAddressRequest) => {
-      log.info('QR signer verify address request:', data)
       store.setQRVerifyAddress(signer.id, data)
     })
   }
 
   private clearPendingRequestContext(signerId: string, clearStore = false) {
+    const hadPendingRequest = !!this.pendingSignRequests[signerId]
+
     if (this.pendingSignRequests[signerId]) {
       delete this.pendingSignRequests[signerId]
     }
 
-    if (!clearStore) return
+    // Also clear signer pending request for consistency
+    const signer = this.knownSigners[signerId]
+    if (signer && signer.hasPendingSignRequest()) {
+      signer.clearPendingRequestSilently()
+    }
+
+    if (!clearStore) {
+      if (hadPendingRequest) {
+        log.warn('Cleared adapter state but NOT store state', { signerId })
+      }
+      return
+    }
 
     const currentSignRequest = store('main.qr.signRequest')
     if (currentSignRequest?.signerId === signerId) {
       store.clearQRSignRequest()
+    } else if (currentSignRequest) {
+      log.warn('Store has different signerId, not clearing', {
+        expected: signerId,
+        actual: currentSignRequest.signerId
+      })
     }
   }
 

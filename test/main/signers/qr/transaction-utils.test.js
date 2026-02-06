@@ -24,14 +24,14 @@ describe('qr transaction utils', () => {
     expect(payload.isTypedTransaction).toBe(false)
     expect(payload.chainId).toBe(1)
     expect(payload.cleanTxData.gasPrice).toBe(rawTx.gasPrice)
-    expect(payload.txEncodingStrategy).toBe('legacy-eip155-unsigned')
+    expect(payload.txEncodingStrategy).toBe('legacy-unsigned')
     expect(payload.txHashMode).toBe('keccak')
     expect(payload.txHashHint).toMatch(/^0x[0-9a-f]+$/)
     expect(payload.txKeccakHint).toMatch(/^0x[0-9a-f]+$/)
     expect(payload.signData.startsWith('0x')).toBe(true)
     expect(payload.legacyCandidates).toHaveLength(2)
-    expect(payload.legacyCandidates[0].encodingId).toBe('legacy-eip155-unsigned')
-    expect(payload.legacyCandidates[1].encodingId).toBe('legacy-unsigned')
+    expect(payload.legacyCandidates[0].encodingId).toBe('legacy-unsigned')
+    expect(payload.legacyCandidates[1].encodingId).toBe('legacy-eip155-unsigned')
     expect(payload.legacyCandidates[0].signData).not.toBe(payload.legacyCandidates[1].signData)
   })
 
@@ -54,7 +54,7 @@ describe('qr transaction utils', () => {
 
     expect(payload.txEncodingStrategy).toBe('legacy-unsigned')
     expect(payload.txHashMode).toBe('keccak')
-    expect(payload.signData).toBe(payload.legacyCandidates[1].signData)
+    expect(payload.signData).toBe(payload.legacyCandidates[0].signData)
   })
 
   it('uses preferred hash mode when requested and payload supports it', () => {

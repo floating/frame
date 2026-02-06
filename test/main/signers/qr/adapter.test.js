@@ -24,12 +24,18 @@ function buildAdapterWithPendingRequest() {
   const signer = {
     profileId: 'profile-1',
     hasPendingSignRequest: jest.fn(() => true),
+    getPendingSignRequest: jest.fn(() => ({
+      type: 'transaction',
+      txPayloadSnapshot: { txHashHint: '0xabc' }
+    })),
     submitSignature: jest.fn(() => Promise.resolve({})),
     cancelSignRequest: jest.fn(),
+    clearPendingRequestSilently: jest.fn(),
     getPreferredLegacyEncoding: jest.fn(() => 'legacy-eip155-unsigned'),
     getPreferredLegacyHashMode: jest.fn(() => 'keccak'),
     setPreferredLegacyEncoding: jest.fn(),
     setPreferredLegacyHashMode: jest.fn(),
+    clearPreferredLegacySettings: jest.fn(),
     getDeviceData: jest.fn(() => ({
       profileId: 'profile-1',
       masterFingerprint: '1234abcd',

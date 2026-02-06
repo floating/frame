@@ -1,7 +1,9 @@
 import { addHexPrefix, ecsign, privateToAddress } from '@ethereumjs/util'
+import { TransactionFactory } from '@ethereumjs/tx'
 
 import QRSigner from '../../../../main/signers/qr/QRSigner'
 import { buildQRTxPayload, computeLegacyRecoveryHash } from '../../../../main/signers/qr/transaction-utils'
+import chainConfig from '../../../../main/chains/config'
 
 function buildSigner() {
   return new QRSigner({
@@ -41,6 +43,13 @@ function signLegacyCandidate(candidate, privateKeyHex, hashMode = 'keccak') {
   return `0x${r.toString('hex')}${s.toString('hex')}${recoveryId.toString(16).padStart(2, '0')}`
 }
 
+function recoverSenderFromSerializedTx(serializedHex, chainId) {
+  const common = chainConfig(chainId, 'berlin')
+  const txBytes = Buffer.from(serializedHex.replace(/^0x/, ''), 'hex')
+  const tx = TransactionFactory.fromSerializedData(txBytes, { common })
+  return tx.getSenderAddress().toString().toLowerCase()
+}
+
 describe('QRSigner legacy signature compatibility', () => {
   it('accepts fallback when signature matches legacy unsigned encoding', async () => {
     const signer = buildSigner()
@@ -75,6 +84,10 @@ describe('QRSigner legacy signature compatibility', () => {
     expect(callback.mock.calls[0][0]).toBeNull()
     expect(callback.mock.calls[0][1]).toMatch(/^0x[0-9a-f]+$/)
     expect(signer.pendingSignRequest).toBeNull()
+
+    const serializedTx = callback.mock.calls[0][1]
+    const recoveredSender = recoverSenderFromSerializedTx(serializedTx, 42161)
+    expect(recoveredSender).toBe(expectedAddress.toLowerCase())
   })
 
   it('accepts sha256 hash-mode fallback for legacy signatures', async () => {
@@ -103,10 +116,49 @@ describe('QRSigner legacy signature compatibility', () => {
     })
 
     expect(result).toEqual({
-      selectedLegacyEncoding: 'legacy-eip155-unsigned',
+      selectedLegacyEncoding: 'legacy-unsigned',
       selectedHashMode: 'sha256'
     })
     expect(callback).toHaveBeenCalledTimes(1)
+    expect(callback.mock.calls[0][0]).toBeNull()
+    expect(callback.mock.calls[0][1]).toMatch(/^0x[0-9a-f]+$/)
+  })
+
+  it('serializes correctly when device signs eip155 encoding', async () => {
+    const signer = buildSigner()
+    const callback = jest.fn()
+    const rawTx = buildRawTx()
+    const payload = buildQRTxPayload(rawTx)
+    const eip155Candidate = payload.legacyCandidates.find(
+      (candidate) => candidate.encodingId === 'legacy-eip155-unsigned'
+    )
+    expect(eip155Candidate).toBeDefined()
+    const privateKey = '0x59c6995e998f97a5a004497e5daef286fdb74f3f6f20f07a5f8f2b2d6f5f6f9a'
+    const expectedAddress = addressFromPrivateKey(privateKey)
+
+    signer.pendingSignRequest = {
+      type: 'transaction',
+      index: 0,
+      data: {
+        rawTx,
+        address: expectedAddress
+      },
+      callback,
+      txPayloadSnapshot: payload
+    }
+
+    const signature = signLegacyCandidate(eip155Candidate, privateKey)
+    const result = await signer.submitSignature(signature, {
+      txEncodingStrategy: 'legacy-eip155-unsigned'
+    })
+
+    expect(result.selectedLegacyEncoding).toBe('legacy-eip155-unsigned')
+    expect(callback).toHaveBeenCalledTimes(1)
+    expect(callback.mock.calls[0][0]).toBeNull()
+
+    const serializedTx = callback.mock.calls[0][1]
+    const recoveredSender = recoverSenderFromSerializedTx(serializedTx, 42161)
+    expect(recoveredSender).toBe(expectedAddress.toLowerCase())
   })
 
   it('keeps pending request on recoverable mismatch after all strategies', async () => {
