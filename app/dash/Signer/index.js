@@ -172,7 +172,8 @@ class Signer extends React.Component {
   }
 
   getStatus() {
-    return (this.props.status || '').toLowerCase()
+    const signer = this.store('main.signers', this.props.id)
+    return (signer?.status || this.props.status || '').toLowerCase()
   }
 
   status() {
@@ -279,6 +280,8 @@ class Signer extends React.Component {
                   return <div className='signerIconWrap signerIconHot'>{svg.flame(23)}</div>
                 if (type === 'lattice')
                   return <div className='signerIconWrap signerIconSmart'>{svg.lattice(22)}</div>
+                if (type === 'qr')
+                  return <div className='signerIconWrap signerIconHardware'>{svg.qr(20)}</div>
                 return <div className='signerIconWrap'>{svg.logo(20)}</div>
               })()}
             </div>

@@ -6,6 +6,7 @@ import Account from './Account'
 import Notify from './Notify'
 import Menu from './Menu'
 import Badge from './Badge'
+import QRSignRequest from './Account/Requests/QRSignRequest'
 
 import Backdrop from './Backdrop'
 import AccountSelector from './AccountSelector'
@@ -79,6 +80,7 @@ class Panel extends React.Component {
         <Menu />
         <AccountSelector />
         <Account />
+        <QRSignRequest />
         <Backdrop />
         <Footer />
       </div>

@@ -155,6 +155,8 @@ class Account extends React.Component {
             return <div className='signerSelectIconWrap'>{svg.flame(25)}</div>
           if (type === 'lattice')
             return <div className='signerSelectIconWrap signerIconSmart'>{svg.lattice(26)}</div>
+          if (type === 'qr')
+            return <div className='signerSelectIconWrap signerIconHardware'>{svg.qr(24)}</div>
           return <div className='signerSelectIconWrap'>{svg.logo(22)}</div>
         })()}
       </div>

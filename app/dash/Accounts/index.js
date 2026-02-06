@@ -8,6 +8,7 @@ import Signer from '../Signer'
 
 import AddHardware from './Add/AddHardware'
 import AddHardwareLattice from './Add/AddHardwareLattice'
+import AddHardwareQR from './Add/AddHardwareQR'
 import AddPhrase from './Add/AddPhrase'
 import AddRing from './Add/AddRing'
 import AddKeystore from './Add/AddKeystore'
@@ -69,6 +70,13 @@ class AddAccounts extends React.Component {
       </div>
     )
   }
+  renderAddQR() {
+    return (
+      <div className='addAccounts cardShow'>
+        <AddHardwareQR type={'qr'} close={this.props.close} />
+      </div>
+    )
+  }
   renderAddGnosis() {
     return <div className='addAccounts cardShow'>{'Add Gnosis'}</div>
   }
@@ -96,6 +104,10 @@ class AddAccounts extends React.Component {
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('trezor')}>
           <div className='accountTypeSelectIcon'>{svg.trezor(20)}</div>
           <div>{'Trezor Device'}</div>
+        </div>
+        <div className='accountTypeSelect' onClick={() => this.createNewAccount('qr')}>
+          <div className='accountTypeSelectIcon'>{svg.qr(20)}</div>
+          <div>{'QR Device'}</div>
         </div>
         <div className='accountTypeSelect' onClick={() => this.createNewAccount('seed')}>
           <div className='accountTypeSelectIcon'>{svg.seedling(25)}</div>
@@ -125,6 +137,8 @@ class AddAccounts extends React.Component {
       return this.renderAddTrezor()
     } else if (newAccountType === 'lattice') {
       return this.renderAddLattice()
+    } else if (newAccountType === 'qr') {
+      return this.renderAddQR()
     } else if (newAccountType === 'seed') {
       return this.renderAddSeed({ accountData })
     } else if (newAccountType === 'keyring') {
@@ -151,7 +165,12 @@ class Dash extends React.Component {
     const hardwareSigners = Object.keys(this.store('main.signers'))
       .map((s) => {
         const signer = this.store('main.signers', s)
-        if (signer.type === 'ledger' || signer.type === 'trezor' || signer.type === 'lattice') {
+        if (
+          signer.type === 'ledger' ||
+          signer.type === 'trezor' ||
+          signer.type === 'lattice' ||
+          signer.type === 'qr'
+        ) {
           return signer
         } else {
           return false

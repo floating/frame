@@ -6,7 +6,8 @@ export enum Type {
   Seed = 'seed',
   Trezor = 'trezor',
   Ledger = 'ledger',
-  Lattice = 'lattice'
+  Lattice = 'lattice',
+  QR = 'qr'
 }
 
 export function getSignerType(typeValue: string) {
@@ -21,7 +22,7 @@ export function getSignerDisplayType(typeOrSigner: string | Signer = '') {
 export function isHardwareSigner(typeOrSigner: string | Signer = '') {
   const signerType = typeof typeOrSigner === 'string' ? typeOrSigner : (typeOrSigner as Signer).type
 
-  return ['ledger', 'trezor', 'lattice'].includes(signerType.toLowerCase())
+  return ['ledger', 'trezor', 'lattice', 'qr'].includes(signerType.toLowerCase())
 }
 
 export function isSignerReady(signer: Signer) {

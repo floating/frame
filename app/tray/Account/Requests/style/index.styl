@@ -2222,6 +2222,188 @@ span
     max-width fit-content
     position relative
 
+// QR Sign Request Overlay
+.qrSignRequestOverlay
+  position fixed
+  top 0
+  left 0
+  right 0
+  bottom 0
+  background rgba(0, 0, 0, 0.85)
+  z-index 99999999999
+  display flex
+  justify-content center
+  align-items center
+  animation fadeIn 0.2s ease-out
+
+.qrSignRequestModal
+  background var(--ghostA)
+  border-radius 24px
+  padding 24px
+  width 320px
+  box-shadow 0px 20px 40px rgba(0, 0, 0, 0.4)
+
+.qrSignRequestHeader
+  text-align center
+  margin-bottom 20px
+
+.qrSignRequestTitle
+  font-size 18px
+  font-weight 400
+  margin-bottom 4px
+
+.qrSignRequestType
+  font-size 12px
+  text-transform uppercase
+  letter-spacing 2px
+  color var(--outerspace08)
+
+.qrSignRequestContent
+  display flex
+  flex-direction column
+  align-items center
+
+.qrSignRequestQR
+  background white
+  padding 16px
+  border-radius 12px
+  margin-bottom 20px
+
+  img
+    display block
+    width 280px
+    height 280px
+
+.qrSignRequestLoading
+  width 280px
+  height 280px
+  display flex
+  justify-content center
+  align-items center
+  color var(--outerspace08)
+
+.qrSignRequestInstructions
+  text-align center
+  margin-bottom 24px
+
+.qrSignRequestStep
+  font-size 12px
+  color var(--outerspace08)
+  margin-bottom 8px
+  line-height 1.4
+
+.qrSignRequestActions
+  display flex
+  flex-direction column
+  gap 10px
+  width 100%
+
+.qrSignRequestButton
+  height 44px
+  border-radius 22px
+  display flex
+  justify-content center
+  align-items center
+  cursor pointer
+  font-size 14px
+  font-weight 400
+  text-transform uppercase
+  letter-spacing 1px
+  transition var(--standard)
+
+.qrSignRequestButtonPrimary
+  background var(--good)
+  color var(--spacewhite)
+
+.qrSignRequestButtonPrimary:hover
+  background var(--goodOver)
+
+.qrSignRequestButtonSecondary
+  background var(--ghostB)
+  color var(--outerspace)
+
+.qrSignRequestButtonSecondary:hover
+  background var(--ghostC)
+
+// QR Scanner styles (for signature scanning mode)
+.qrScannerContainer
+  display flex
+  flex-direction column
+  align-items center
+  justify-content flex-start
+  width 100%
+  padding 10px
+  box-sizing border-box
+
+.qrScannerTitle
+  font-size 14px
+  font-weight 400
+  margin-bottom 12px
+  text-align center
+
+.qrScannerVideo
+  width 100%
+  max-width 280px
+  display flex
+  justify-content center
+  align-items center
+  border-radius 12px
+  overflow hidden
+  background var(--ghostZ)
+
+  video
+    width 100%
+    border-radius 12px
+
+.qrScannerProgress
+  width 100%
+  max-width 280px
+  height 4px
+  background var(--ghostZ)
+  border-radius 2px
+  margin-top 10px
+  overflow hidden
+
+.qrScannerProgressBar
+  height 100%
+  background var(--good)
+  transition width 0.2s ease
+
+.qrScannerError
+  color var(--bad)
+  font-size 12px
+  text-align center
+  margin-top 10px
+  padding 0 20px
+
+.qrScannerInstructions
+  font-size 11px
+  text-align center
+  color var(--outerspace08)
+  margin-top 12px
+  padding 0 20px
+
+// Cancel button for QR scanner in tray context
+.qrScannerContainer .addAccountItemOptionSubmit
+  height 44px
+  border-radius 22px
+  padding 0px 40px
+  margin-top 20px
+  display flex
+  text-align center
+  justify-content center
+  align-items center
+  cursor pointer
+  background var(--ghostB)
+  font-size 14px
+  font-weight 400
+  text-transform uppercase
+  letter-spacing 1px
+  transition var(--standard)
+
+.qrScannerContainer .addAccountItemOptionSubmit:hover
+  background var(--ghostC)
+
 @import './next'
 @import '../TransactionRequest/style'
 @import '../ChainRequest/style'
