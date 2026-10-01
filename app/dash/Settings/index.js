@@ -255,7 +255,9 @@ class Settings extends Component {
                 options={[
                   { text: 'Standard', value: 'standard' },
                   { text: 'Legacy', value: 'legacy' },
-                  { text: 'Testnet', value: 'testnet' }
+                  { text: 'Testnet', value: 'testnet' },
+                  { text: 'Rootstock', value: 'rootstock' },
+                  { text: 'Rootstock Testnet', value: 'rootstockTestnet' }
                 ]}
               />
             </div>
@@ -271,7 +273,9 @@ class Settings extends Component {
                   { text: 'Live', value: 'live' },
                   { text: 'Legacy', value: 'legacy' },
                   { text: 'Standard', value: 'standard' },
-                  { text: 'Testnet', value: 'testnet' }
+                  { text: 'Testnet', value: 'testnet' },
+                  { text: 'Rootstock', value: 'rootstock' },
+                  { text: 'Rootstock Testnet', value: 'rootstockTestnet' }
                 ]}
               />
             </div>
@@ -304,7 +308,9 @@ class Settings extends Component {
                 options={[
                   { text: 'Standard', value: 'standard' },
                   { text: 'Legacy', value: 'legacy' },
-                  { text: 'Live', value: 'live' }
+                  { text: 'Live', value: 'live' },
+                  { text: 'Rootstock', value: 'rootstock' },
+                  { text: 'Rootstock Testnet', value: 'rootstockTestnet' }
                 ]}
               />
             </div>

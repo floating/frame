@@ -72,4 +72,29 @@ describe('#getDerivationPath', () => {
 
     expect(path).toBe("44'/60'/0'/0/0")
   })
+
+  it('provides a rootstock derivation path with no index', () => {
+    expect(getDerivationPath(Derivation.rootstock)).toBe("44'/137'/0'/0/")
+  })
+
+  it('provides a rootstock derivation path with a non-zero index', () => {
+    expect(getDerivationPath(Derivation.rootstock, 3)).toBe("44'/137'/0'/0/3")
+  })
+
+  it('provides a rootstock derivation path with a zero index', () => {
+    expect(getDerivationPath(Derivation.rootstock, 0)).toBe("44'/137'/0'/0/0")
+  })
+
+  it('provides a rootstock testnet derivation path with no index', () => {
+    expect(getDerivationPath(Derivation.rootstockTestnet)).toBe("44'/37310'/0'/0/")
+  })
+
+  it('provides a rootstock testnet derivation path with a non-zero index', () => {
+    expect(getDerivationPath(Derivation.rootstockTestnet, 9)).toBe("44'/37310'/0'/0/9")
+  })
+
+  it('provides a rootstock testnet derivation path with a zero index', () => {
+    expect(getDerivationPath(Derivation.rootstockTestnet, 0)).toBe("44'/37310'/0'/0/0")
+  })
+
 })
