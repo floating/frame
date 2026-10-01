@@ -10,6 +10,7 @@ import { MainSchema, Main } from './types/main'
 import type { Origin } from './types/origin'
 import type { Dapp } from './types/dapp'
 import type { Chain, ChainMetadata } from './types/chain'
+import { rootstockNetwork } from './rootstock'
 
 export type { ChainId, Chain, ChainMetadata } from './types/chain'
 export type { Connection } from './types/connection'
@@ -96,7 +97,7 @@ type M = Main & {
 }
 
 const mainState: M = {
-  _version: main('_version', 41),
+  _version: main('_version', 42),
   instanceId: main('instanceId', generateUuid()),
   colorway: main('colorway', 'dark'),
   colorwayPrimary: {
@@ -171,6 +172,8 @@ const mainState: M = {
   },
   networks: main('networks', {
     ethereum: {
+      30: rootstockNetwork(30).chain,
+      31: rootstockNetwork(31).chain,
       1: {
         id: 1,
         type: 'ethereum',
@@ -490,6 +493,8 @@ const mainState: M = {
   }),
   networksMeta: main('networksMeta', {
     ethereum: {
+      30: rootstockNetwork(30).metadata,
+      31: rootstockNetwork(31).metadata,
       1: {
         blockHeight: 0,
         gas: {
